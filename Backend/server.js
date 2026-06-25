@@ -1,0 +1,115 @@
+require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
+const bcrypt = require('bcryptjs');
+const { pool, testConnection, ensureDatabaseExists } = require('./config/db');
+const routes = require('./routes');
+const { notFound, errorHandler } = require('./middleware/errorHandler');
+
+const app = express();
+const port = process.env.PORT || 5000;
+const uploadsDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
+const allowedOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+function isLocalDevOrigin(origin) {
+  try {
+    const { hostname } = new URL(origin);
+    return hostname === 'localhost' || hostname === '127.0.0.1';
+  } catch {
+    return false;
+  }
+}
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+app.use(helmet({ crossOriginResourcePolicy: false }));
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin) || (process.env.NODE_ENV !== 'production' && isLocalDevOrigin(origin))) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
+  credentials: true
+}));
+app.use(compression());
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use('/uploads', express.static(uploadsDir));
+app.use('/api', routes);
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
+app.use(notFound);
+app.use(errorHandler);
+
+async function ensureSchema() {
+  const schemaPath = path.join(__dirname, 'config', 'schema.sql');
+  const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+  const statements = schemaSql
+    .split(';')
+    .map((statement) => statement.trim())
+    .filter(Boolean);
+
+  for (const statement of statements) {
+    await pool.query(statement);
+  }
+}
+
+async function ensureServiceColumns() {
+  const [rows] = await pool.query(
+    `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'services' AND COLUMN_NAME = 'key_features'`,
+    [process.env.MYSQL_DATABASE]
+  );
+
+  if (!rows.length) {
+    await pool.query('ALTER TABLE services ADD COLUMN key_features JSON NULL AFTER icon');
+  }
+}
+
+async function ensureDefaultAdmin() {
+  const email = process.env.DEFAULT_ADMIN_EMAIL?.toLowerCase().trim();
+  const password = process.env.DEFAULT_ADMIN_PASSWORD;
+  if (!email || !password) return;
+
+  const [rows] = await pool.query('SELECT id FROM users WHERE email = ? LIMIT 1', [email]);
+  if (rows.length > 0) return;
+
+  const hashedPassword = await bcrypt.hash(password, 12);
+  await pool.query('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)', [
+    'Admin',
+    email,
+    hashedPassword,
+    'admin'
+  ]);
+}
+
+async function bootstrap() {
+  await ensureDatabaseExists();
+  await testConnection();
+  await ensureSchema();
+  await ensureServiceColumns();
+  await ensureDefaultAdmin();
+
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+}
+
+bootstrap().catch((error) => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+});
+
+module.exports = app;
