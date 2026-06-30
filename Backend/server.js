@@ -7,12 +7,12 @@ const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
-const { pool, testConnection, ensureDatabaseExists } = require('./config/db');
+const { pool, testConnection, ensureDatabaseExists, dbConfig } = require('./config/db');
 const routes = require('./routes');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 const uploadsDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
 const allowedOrigins = (process.env.CORS_ORIGIN || '')
   .split(',')
@@ -70,7 +70,7 @@ async function ensureSchema() {
 async function ensureServiceColumns() {
   const [rows] = await pool.query(
     `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'services' AND COLUMN_NAME = 'key_features'`,
-    [process.env.MYSQL_DATABASE]
+    [dbConfig.database]
   );
 
   if (!rows.length) {
@@ -102,8 +102,8 @@ async function bootstrap() {
   await ensureServiceColumns();
   await ensureDefaultAdmin();
 
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
   });
 }
 
