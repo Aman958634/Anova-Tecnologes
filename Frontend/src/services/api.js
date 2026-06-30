@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const RAILWAY_BACKEND_URL = 'https://anova-tecnologes-production.up.railway.app';
+const RAILWAY_BACKEND_URL = 'https://anova-tecnologes-production.up.railway.app/api';
 
 function getApiBaseUrl() {
   const rawUrl = import.meta.env.VITE_API_URL || RAILWAY_BACKEND_URL;

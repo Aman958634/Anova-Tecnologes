@@ -34,14 +34,15 @@ export default function App() {
       <Route path="/projects" element={<PublicRoute element={<Projects />} />} />
       <Route path="/contact" element={<PublicRoute element={<Contact />} />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/admin/login" element={<Login />} />
       <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-<Route path="/admin/services" element={<ProtectedRoute><AdminServices /></ProtectedRoute>} />
-  <Route path="/admin/projects" element={<ProtectedRoute><AdminProjects /></ProtectedRoute>} />
-  <Route path="/admin/team" element={<ProtectedRoute><AdminTeam /></ProtectedRoute>} />
-  <Route path="/admin/stats" element={<ProtectedRoute><AdminStats /></ProtectedRoute>} />
-  <Route path="/admin/blogs" element={<ProtectedRoute><AdminBlogs /></ProtectedRoute>} />
-  <Route path="/admin/testimonials" element={<ProtectedRoute><AdminTestimonials /></ProtectedRoute>} />
-  <Route path="/admin/contacts" element={<ProtectedRoute><AdminContacts /></ProtectedRoute>} />
+      <Route path="/admin/services" element={<ProtectedRoute><AdminServices /></ProtectedRoute>} />
+      <Route path="/admin/projects" element={<ProtectedRoute><AdminProjects /></ProtectedRoute>} />
+      <Route path="/admin/team" element={<ProtectedRoute><AdminTeam /></ProtectedRoute>} />
+      <Route path="/admin/stats" element={<ProtectedRoute><AdminStats /></ProtectedRoute>} />
+      <Route path="/admin/blogs" element={<ProtectedRoute><AdminBlogs /></ProtectedRoute>} />
+      <Route path="/admin/testimonials" element={<ProtectedRoute><AdminTestimonials /></ProtectedRoute>} />
+      <Route path="/admin/contacts" element={<ProtectedRoute><AdminContacts /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
