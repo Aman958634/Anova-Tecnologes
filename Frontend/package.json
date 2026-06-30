@@ -2,6 +2,9 @@
   "name": "anova-tech-company-frontend",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "description": "Premium React frontend for the Anova tech company website",
   "scripts": {
     "dev": "vite",
