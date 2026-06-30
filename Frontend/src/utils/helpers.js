@@ -6,7 +6,9 @@ export function formatDate(dateValue) {
 export function buildImageUrl(url) {
   if (!url) return 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80';
   if (url.startsWith('http')) return url;
-  return `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}${url}`;
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const backendUrl = apiUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+  return `${backendUrl}${url}`;
 }
 
 export function starsFromRating(rating = 5) {
