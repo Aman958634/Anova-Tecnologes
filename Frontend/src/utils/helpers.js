@@ -18,6 +18,27 @@ export function buildImageUrl(url) {
   return `${backendUrl}${path}`;
 }
 
+export function getImageOverride(resource, id) {
+  try {
+    const data = JSON.parse(localStorage.getItem('anova:image-overrides') || '{}');
+    return data?.[resource]?.[String(id)] || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export function setImageOverride(resource, id, url) {
+  try {
+    const key = 'anova:image-overrides';
+    const data = JSON.parse(localStorage.getItem(key) || '{}');
+    data[resource] = data[resource] || {};
+    data[resource][String(id)] = url;
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    // ignore
+  }
+}
+
 export function starsFromRating(rating = 5) {
   return Array.from({ length: 5 }, (_, index) => index < rating);
 }
