@@ -113,20 +113,32 @@ async function ensureServiceColumns() {
 }
 
 async function ensureDefaultAdmin() {
-  const email = process.env.DEFAULT_ADMIN_EMAIL?.toLowerCase().trim();
-  const password = process.env.DEFAULT_ADMIN_PASSWORD;
-  if (!email || !password) return;
+  const email = (process.env.DEFAULT_ADMIN_EMAIL || 'admin@anova.com').toLowerCase().trim();
+  const password = process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@12345';
+  const name = process.env.DEFAULT_ADMIN_NAME || 'Admin';
 
-  const [rows] = await pool.query('SELECT id FROM users WHERE email = ? LIMIT 1', [email]);
-  if (rows.length > 0) return;
-
+  const [rows] = await pool.query('SELECT id, password, role FROM users WHERE email = ? LIMIT 1', [email]);
   const hashedPassword = await bcrypt.hash(password, 12);
-  await pool.query('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)', [
-    'Admin',
-    email,
-    hashedPassword,
-    'admin'
-  ]);
+
+  if (rows.length === 0) {
+    await pool.query('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)', [
+      name,
+      email,
+      hashedPassword,
+      'admin'
+    ]);
+    return;
+  }
+
+  const existing = rows[0];
+  if (existing.role !== 'admin') {
+    await pool.query('UPDATE users SET role = ? WHERE id = ?', ['admin', existing.id]);
+  }
+
+  const passwordMatches = await bcrypt.compare(password, existing.password);
+  if (!passwordMatches) {
+    await pool.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, existing.id]);
+  }
 }
 
 async function bootstrap() {
