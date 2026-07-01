@@ -25,7 +25,7 @@ const listProjects = asyncHandler(async (req, res) => {
     'SELECT * FROM projects WHERE title LIKE ? OR description LIKE ? ORDER BY featured DESC, id DESC LIMIT ? OFFSET ?',
     [search, search, limit, offset]
   );
-  const formatted = rows.map((row) => ({ ...row, tags: row.tags ? JSON.parse(row.tags) : [] }));
+  const formatted = rows.map((row) => ({ ...row, tags: parseTags(row.tags) }));
   const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM projects WHERE title LIKE ? OR description LIKE ?', [search, search]);
   res.json({ data: formatted, meta: { page, limit, total: countRows[0].total } });
 });
