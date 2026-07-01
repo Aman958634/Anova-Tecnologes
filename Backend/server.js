@@ -222,6 +222,78 @@ async function seedDefaultServices() {
   console.log('✅ Default services seeded into services table');
 }
 
+async function seedDefaultProjects() {
+  const [rows] = await pool.query('SELECT COUNT(*) AS total FROM projects');
+  if (rows[0].total > 0) return;
+
+  const projects = [
+    {
+      title: 'E-Commerce Platform',
+      description: 'Scalable e-commerce with payments, inventory, and analytics.',
+      image_url: null,
+      live_demo_url: null,
+      tags: JSON.stringify(['ecommerce', 'react', 'node']),
+      featured: 1
+    },
+    {
+      title: 'SaaS Dashboard',
+      description: 'Multi-tenant SaaS dashboard with role-based access and reporting.',
+      image_url: null,
+      live_demo_url: null,
+      tags: JSON.stringify(['saas', 'dashboard', 'analytics']),
+      featured: 0
+    }
+  ];
+
+  const values = projects.map((p) => [p.title, p.description, p.image_url, p.live_demo_url, p.tags, p.featured]);
+  await pool.query('INSERT INTO projects (title, description, image_url, live_demo_url, tags, featured) VALUES ?;', [values]);
+  console.log('✅ Default projects seeded into projects table');
+}
+
+async function seedDefaultTeam() {
+  const [rows] = await pool.query('SELECT COUNT(*) AS total FROM team_members');
+  if (rows[0].total > 0) return;
+
+  const members = [
+    { name: 'Aarav Shah', designation: 'Founder & CTO', image_url: null, featured: 1 },
+    { name: 'Maya Patel', designation: 'Lead UI Designer', image_url: null, featured: 0 },
+    { name: 'Noah Bennett', designation: 'Full Stack Engineer', image_url: null, featured: 0 }
+  ];
+
+  const values = members.map((m) => [m.name, m.designation, m.image_url, m.featured]);
+  await pool.query('INSERT INTO team_members (name, designation, image_url, featured) VALUES ?;', [values]);
+  console.log('✅ Default team members seeded into team_members table');
+}
+
+async function seedDefaultTestimonials() {
+  const [rows] = await pool.query('SELECT COUNT(*) AS total FROM testimonials');
+  if (rows[0].total > 0) return;
+
+  const testimonials = [
+    { name: 'Sophia Miller', designation: 'Product Director, NovaOps', review: 'The team delivered a launch-ready platform with speed, polish, and a clear technical vision.', rating: 5, photo_url: null },
+    { name: 'Daniel Carter', designation: 'Founder, GridFlow', review: 'The UI, motion, and responsiveness all feel deeply considered. It elevated our brand immediately.', rating: 5, photo_url: null },
+    { name: 'Ava Thompson', designation: 'Marketing Lead, BluePeak', review: 'A clean process, strong communication, and a product that looks premium on every screen size.', rating: 5, photo_url: null }
+  ];
+
+  const values = testimonials.map((t) => [t.name, t.designation, t.review, t.photo_url, t.rating]);
+  await pool.query('INSERT INTO testimonials (name, designation, review, photo_url, rating) VALUES ?;', [values]);
+  console.log('✅ Default testimonials seeded into testimonials table');
+}
+
+async function seedDefaultBlogs() {
+  const [rows] = await pool.query('SELECT COUNT(*) AS total FROM blogs');
+  if (rows[0].total > 0) return;
+
+  const blogs = [
+    { title: 'Building Scalable Web Apps', excerpt: 'Best practices for scalable web architecture.', content: null, category: 'Engineering', image_url: null, published_at: null },
+    { title: 'Design Systems 101', excerpt: 'How to create a consistent design system.', content: null, category: 'Design', image_url: null, published_at: null }
+  ];
+
+  const values = blogs.map((b) => [b.title, b.excerpt, b.content, b.category, b.image_url, b.published_at]);
+  await pool.query('INSERT INTO blogs (title, excerpt, content, category, image_url, published_at) VALUES ?;', [values]);
+  console.log('✅ Default blogs seeded into blogs table');
+}
+
 
 // =========================
 // BOOTSTRAP SERVER
@@ -236,6 +308,18 @@ async function bootstrap() {
 
     await seedDefaultServices();
     console.log('✅ Default services ready');
+
+    await seedDefaultProjects();
+    console.log('✅ Default projects ready');
+
+    await seedDefaultTeam();
+    console.log('✅ Default team ready');
+
+    await seedDefaultTestimonials();
+    console.log('✅ Default testimonials ready');
+
+    await seedDefaultBlogs();
+    console.log('✅ Default blogs ready');
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
