@@ -1,8 +1,10 @@
 # Dependencies
 node_modules/
+Frontend/node_modules/
 
 # Build output
 dist/
+Frontend/dist/
 build/
 
 # Local environment files
