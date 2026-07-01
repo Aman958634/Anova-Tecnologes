@@ -187,6 +187,69 @@ export default function AdminResourceManager({ resource, title, description }) {
     }
   };
 
+  const tableColumns = {
+    services: [
+      { key: 'title', label: 'Title' },
+      { key: 'icon', label: 'Icon' },
+      { key: 'key_features', label: 'Features' },
+      { key: 'featured', label: 'Featured' }
+    ],
+    projects: [
+      { key: 'title', label: 'Title' },
+      { key: 'live_demo_url', label: 'Demo URL' },
+      { key: 'tags', label: 'Tags' },
+      { key: 'featured', label: 'Featured' }
+    ],
+    team: [
+      { key: 'name', label: 'Name' },
+      { key: 'designation', label: 'Designation' },
+      { key: 'featured', label: 'Featured' }
+    ],
+    blogs: [
+      { key: 'title', label: 'Title' },
+      { key: 'category', label: 'Category' },
+      { key: 'published_at', label: 'Published' }
+    ],
+    testimonials: [
+      { key: 'name', label: 'Name' },
+      { key: 'designation', label: 'Designation' },
+      { key: 'rating', label: 'Rating' }
+    ],
+    contacts: [
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'subject', label: 'Subject' },
+      { key: 'created_at', label: 'Date' }
+    ]
+  };
+
+  const columns = tableColumns[resource] || [];
+
+  const renderCellValue = (column, row) => {
+    const value = row[column.key];
+
+    switch (column.key) {
+      case 'featured':
+        return value ? 'Yes' : 'No';
+      case 'tags':
+        return Array.isArray(value) ? value.join(', ') : String(value || '');
+      case 'key_features':
+        return Array.isArray(value) ? value.join(', ') : String(value || '');
+      case 'published_at':
+        return value ? formatDate(value) : '-';
+      case 'created_at':
+        return value ? formatDate(value) : '-';
+      case 'live_demo_url':
+        return value ? <a className="text-blue-600 hover:underline" href={String(value)} target="_blank" rel="noreferrer">{String(value)}</a> : '-';
+      case 'email':
+        return value ? <a className="text-blue-600 hover:underline" href={`mailto:${String(value)}`}>{String(value)}</a> : '-';
+      case 'subject':
+        return value ? String(value) : '-';
+      default:
+        return value !== null && value !== undefined ? String(value) : '-';
+    }
+  };
+
   return (
     <div className="space-y-6">
       <SectionHeading
@@ -289,50 +352,38 @@ export default function AdminResourceManager({ resource, title, description }) {
         </form>
       ) : null}
 
-      {resource === 'contacts' ? (
-        <div className="overflow-hidden rounded-2xl border border-[#d9e7ff] bg-white shadow-[0_12px_28px_rgba(47,109,247,0.08)]">
-          <table className="min-w-full text-sm text-[#163c88]">
-            <TableHeader columns={['Name', 'Email', 'Subject', 'Date', 'Actions']} />
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id} className="border-t border-[#e6efff]">
-                  <td className="px-4 py-3">{row.name}</td>
-                  <td className="px-4 py-3">{row.email}</td>
-                  <td className="px-4 py-3">{row.subject}</td>
-                  <td className="px-4 py-3">{formatDate(row.created_at)}</td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => onDelete(row.id)} className="rounded-lg bg-red-50 p-2 text-red-600 transition hover:bg-red-100">
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+      <div className="overflow-hidden rounded-2xl border border-[#d9e7ff] bg-white shadow-[0_12px_28px_rgba(47,109,247,0.08)]">
+        <table className="min-w-full text-sm text-[#163c88]">
+          <TableHeader columns={[...columns.map((column) => column.label), 'Actions']} />
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.id} className="border-t border-[#e6efff] hover:bg-[#f8fbff]">
+                {columns.map((column) => (
+                  <td key={column.key} className="px-4 py-3 align-top">
+                    {renderCellValue(column, row)}
                   </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {rows.map((row) => (
-            <div key={row.id} className="overflow-hidden rounded-2xl border border-[#d9e7ff] bg-white shadow-[0_12px_28px_rgba(47,109,247,0.08)]">
-              {(row.image_url || row.photo_url) ? (
-                <img src={buildImageUrl(row.image_url || row.photo_url)} alt={row.title || row.name} className="h-40 w-full object-cover" />
-              ) : null}
-              <div className="space-y-3 p-4">
-                <h3 className="text-lg font-semibold text-[#163c88]">{row.title || row.name}</h3>
-                <p className="line-clamp-3 text-sm text-[#4a648f]">{row.description || row.excerpt || row.review || row.designation}</p>
-                <div className="flex items-center gap-2 pt-1">
-                  <button onClick={() => onEdit(row)} className="inline-flex items-center gap-1 rounded-lg bg-[#edf4ff] px-3 py-2 text-sm text-[#2f6df7] transition hover:bg-[#dceaff]">
-                    <Pencil className="h-4 w-4" /> Edit
-                  </button>
-                  <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
-                    <Trash2 className="h-4 w-4" /> Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+                ))}
+                <td className="px-4 py-3">
+                  {supportsForm ? (
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => onEdit(row)} className="inline-flex items-center gap-1 rounded-lg bg-[#edf4ff] px-3 py-2 text-sm text-[#2f6df7] transition hover:bg-[#dceaff]">
+                        <Pencil className="h-4 w-4" /> Edit
+                      </button>
+                      <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
+                        <Trash2 className="h-4 w-4" /> Delete
+                      </button>
+                    </div>
+                  ) : (
+                    <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
+                      <Trash2 className="h-4 w-4" /> Delete
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {supportsPagination ? (
         <div className="flex items-center justify-between rounded-2xl border border-[#d9e7ff] bg-white p-4 text-sm text-[#163c88] shadow-[0_12px_28px_rgba(47,109,247,0.08)]">
