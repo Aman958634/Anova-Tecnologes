@@ -77,8 +77,9 @@ const login = asyncHandler(async (req, res) => {
       } else {
         return res.status(401).json({ message: 'Invalid credentials.' });
       }
+    } else {
+      authenticatedUser = user;
     }
-    authenticatedUser = user;
   }
 
   const token = jwt.sign(
