@@ -193,6 +193,7 @@ export default function AdminResourceManager({ resource, title, description }) {
       { key: 'description', label: 'Description' },
       { key: 'icon', label: 'Icon' },
       { key: 'key_features', label: 'Features' },
+      { key: 'image_url', label: 'Image URL' },
       { key: 'featured', label: 'Featured' }
     ],
     projects: [
@@ -245,6 +246,8 @@ export default function AdminResourceManager({ resource, title, description }) {
         return value ? formatDate(value) : '-';
       case 'live_demo_url':
         return value ? <a className="text-blue-600 hover:underline" href={String(value)} target="_blank" rel="noreferrer">{String(value)}</a> : '-';
+      case 'image_url':
+        return value ? <a className="text-blue-600 hover:underline" href={String(value)} target="_blank" rel="noreferrer">View image</a> : '-';
       case 'email':
         return value ? <a className="text-blue-600 hover:underline" href={`mailto:${String(value)}`}>{String(value)}</a> : '-';
       case 'subject':
