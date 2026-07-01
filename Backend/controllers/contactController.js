@@ -19,11 +19,18 @@ const createContact = asyncHandler(async (req, res) => {
   if (!name || !email || !subject || !message) {
     return res.status(400).json({ message: 'Name, email, subject, and message are required.' });
   }
+  let insertId = null;
+  try {
+    const [result] = await pool.query(
+      'INSERT INTO contacts (name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?)',
+      [name, email, phone || null, subject, message]
+    );
+    insertId = result.insertId;
+  } catch (dbErr) {
+    console.error('Failed to save contact to DB:', dbErr && dbErr.message ? dbErr.message : dbErr);
+    // continue — we'll still attempt to send email so messages can reach admin even if DB is down
+  }
 
-  const [result] = await pool.query(
-    'INSERT INTO contacts (name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?)',
-    [name, email, phone || null, subject, message]
-  );
   let mailSent = false;
   if (mailTransporter) {
     try {
@@ -47,12 +54,15 @@ const createContact = asyncHandler(async (req, res) => {
       mailSent = true;
     } catch (err) {
       console.error('Contact email failed:', err && err.message ? err.message : err);
-      // don't fail the request if email fails — message is still saved in DB
       mailSent = false;
     }
   }
 
-  res.status(201).json({ message: 'Message saved.', id: result.insertId, mailSent });
+  if (!insertId && !mailSent) {
+    return res.status(500).json({ message: 'Failed to save message and could not deliver email. Please try again later.' });
+  }
+
+  res.status(201).json({ message: 'Message received.', id: insertId, mailSent });
 });
 
 const listContacts = asyncHandler(async (req, res) => {
