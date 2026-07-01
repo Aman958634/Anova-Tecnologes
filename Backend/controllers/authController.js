@@ -133,4 +133,4 @@ const seedAdmin = asyncHandler(async (req, res) => {
   return res.json({ seeded: true, user: { id: updated.id, email: updated.email, name: updated.name, role: updated.role } });
 });
 
-module.exports = { login, me };
+module.exports = { login, me, seedAdmin };
