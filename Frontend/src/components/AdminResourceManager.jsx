@@ -151,6 +151,17 @@ export default function AdminResourceManager({ resource, title, description }) {
         payload.append('photo', value);
         return;
       }
+      // Ensure tags and key_features are sent as JSON arrays when provided as comma-separated strings
+      if (key === 'tags' && typeof value === 'string') {
+        const arr = value.split(',').map((s) => s.trim()).filter(Boolean);
+        payload.append('tags', JSON.stringify(arr));
+        return;
+      }
+      if (key === 'key_features' && typeof value === 'string') {
+        const arr = value.split(',').map((s) => s.trim()).filter(Boolean);
+        payload.append('key_features', JSON.stringify(arr));
+        return;
+      }
       payload.append(key, typeof value === 'boolean' ? String(value) : value);
     });
     return payload;
