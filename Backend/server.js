@@ -197,7 +197,7 @@ async function bootstrap() {
       });
   } catch (error) {
       console.error('Database startup failed:', error);
-      if (process.env.NODE_ENV !== 'production') {
+      if (process.env.NODE_ENV !== 'production' || process.env.ALLOW_FALLBACK === 'true') {
         console.warn('Continuing in development fallback mode (DB_DOWN=true). Admin login will use the default .env credentials.');
         global.DB_DOWN = true;
         app.listen(PORT, () => {
