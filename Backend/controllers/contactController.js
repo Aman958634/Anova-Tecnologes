@@ -24,28 +24,35 @@ const createContact = asyncHandler(async (req, res) => {
     'INSERT INTO contacts (name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?)',
     [name, email, phone || null, subject, message]
   );
-
+  let mailSent = false;
   if (mailTransporter) {
-    await mailTransporter.sendMail({
-      from: `Anova Technologies <${smtpUser}>`,
-      to: smtpUser,
-      replyTo: email,
-      subject: `New Contact Message: ${subject}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
-          <h2 style="color: #1d4ed8; margin-bottom: 16px;">New contact message</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-          <p><strong>Subject:</strong> ${subject}</p>
-          <p><strong>Message:</strong></p>
-          <p style="white-space: pre-wrap;">${message}</p>
-        </div>
-      `
-    });
+    try {
+      await mailTransporter.sendMail({
+        from: `Anova Technologies <${smtpUser}>`,
+        to: smtpUser,
+        replyTo: email,
+        subject: `New Contact Message: ${subject}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
+            <h2 style="color: #1d4ed8; margin-bottom: 16px;">New contact message</h2>
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+            <p><strong>Subject:</strong> ${subject}</p>
+            <p><strong>Message:</strong></p>
+            <p style="white-space: pre-wrap;">${message}</p>
+          </div>
+        `
+      });
+      mailSent = true;
+    } catch (err) {
+      console.error('Contact email failed:', err && err.message ? err.message : err);
+      // don't fail the request if email fails — message is still saved in DB
+      mailSent = false;
+    }
   }
 
-  res.status(201).json({ message: 'Message sent successfully.', id: result.insertId });
+  res.status(201).json({ message: 'Message saved.', id: result.insertId, mailSent });
 });
 
 const listContacts = asyncHandler(async (req, res) => {
