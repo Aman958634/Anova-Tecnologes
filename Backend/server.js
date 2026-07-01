@@ -127,6 +127,7 @@ async function ensureDefaultAdmin() {
       hashedPassword,
       'admin'
     ]);
+    console.log(`Default admin user created: ${email}`);
     return;
   }
 
@@ -138,6 +139,9 @@ async function ensureDefaultAdmin() {
   const passwordMatches = await bcrypt.compare(password, existing.password);
   if (!passwordMatches) {
     await pool.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, existing.id]);
+    console.log(`Default admin password reset for: ${email}`);
+  } else {
+    console.log(`Default admin user exists: ${email}`);
   }
 }
 
