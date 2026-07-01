@@ -190,12 +190,14 @@ export default function AdminResourceManager({ resource, title, description }) {
   const tableColumns = {
     services: [
       { key: 'title', label: 'Title' },
+      { key: 'description', label: 'Description' },
       { key: 'icon', label: 'Icon' },
       { key: 'key_features', label: 'Features' },
       { key: 'featured', label: 'Featured' }
     ],
     projects: [
       { key: 'title', label: 'Title' },
+      { key: 'description', label: 'Description' },
       { key: 'live_demo_url', label: 'Demo URL' },
       { key: 'tags', label: 'Tags' },
       { key: 'featured', label: 'Featured' }
@@ -208,12 +210,14 @@ export default function AdminResourceManager({ resource, title, description }) {
     blogs: [
       { key: 'title', label: 'Title' },
       { key: 'category', label: 'Category' },
-      { key: 'published_at', label: 'Published' }
+      { key: 'published_at', label: 'Published At' },
+      { key: 'excerpt', label: 'Excerpt' }
     ],
     testimonials: [
       { key: 'name', label: 'Name' },
       { key: 'designation', label: 'Designation' },
-      { key: 'rating', label: 'Rating' }
+      { key: 'rating', label: 'Rating' },
+      { key: 'review', label: 'Review' }
     ],
     contacts: [
       { key: 'name', label: 'Name' },
@@ -353,36 +357,42 @@ export default function AdminResourceManager({ resource, title, description }) {
       ) : null}
 
       <div className="overflow-hidden rounded-2xl border border-[#d9e7ff] bg-white shadow-[0_12px_28px_rgba(47,109,247,0.08)]">
-        <table className="min-w-full text-sm text-[#163c88]">
-          <TableHeader columns={[...columns.map((column) => column.label), 'Actions']} />
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id} className="border-t border-[#e6efff] hover:bg-[#f8fbff]">
-                {columns.map((column) => (
-                  <td key={column.key} className="px-4 py-3 align-top">
-                    {renderCellValue(column, row)}
-                  </td>
-                ))}
-                <td className="px-4 py-3">
-                  {supportsForm ? (
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => onEdit(row)} className="inline-flex items-center gap-1 rounded-lg bg-[#edf4ff] px-3 py-2 text-sm text-[#2f6df7] transition hover:bg-[#dceaff]">
-                        <Pencil className="h-4 w-4" /> Edit
-                      </button>
+        {rows.length === 0 ? (
+          <div className="p-8 text-center text-sm text-[#4a648f]">
+            No records found. Click + New to add data for this section.
+          </div>
+        ) : (
+          <table className="min-w-full text-sm text-[#163c88]">
+            <TableHeader columns={[...columns.map((column) => column.label), 'Actions']} />
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id} className="border-t border-[#e6efff] hover:bg-[#f8fbff]">
+                  {columns.map((column) => (
+                    <td key={column.key} className="px-4 py-3 align-top max-w-[260px] break-words">
+                      {renderCellValue(column, row)}
+                    </td>
+                  ))}
+                  <td className="px-4 py-3">
+                    {supportsForm ? (
+                      <div className="flex items-center gap-2">
+                        <button onClick={() => onEdit(row)} className="inline-flex items-center gap-1 rounded-lg bg-[#edf4ff] px-3 py-2 text-sm text-[#2f6df7] transition hover:bg-[#dceaff]">
+                          <Pencil className="h-4 w-4" /> Edit
+                        </button>
+                        <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
+                          <Trash2 className="h-4 w-4" /> Delete
+                        </button>
+                      </div>
+                    ) : (
                       <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
                         <Trash2 className="h-4 w-4" /> Delete
                       </button>
-                    </div>
-                  ) : (
-                    <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
-                      <Trash2 className="h-4 w-4" /> Delete
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {supportsPagination ? (
