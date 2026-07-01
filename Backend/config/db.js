@@ -43,6 +43,15 @@ async function ensureDatabaseExists() {
   const connection = await mysql.createConnection(connectionConfig);
   try {
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\``);
+  } catch (error) {
+    if (error.code === 'ER_ACCESS_DENIED_ERROR' || error.code === 'ER_DBACCESS_DENIED_ERROR') {
+      console.warn(
+        `Warning: Could not create database \"${dbConfig.database}\". Proceeding if it already exists or if the user lacks CREATE privileges.`,
+        error.message
+      );
+    } else {
+      throw error;
+    }
   } finally {
     await connection.end();
   }

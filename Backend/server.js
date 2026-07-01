@@ -145,12 +145,19 @@ async function ensureDefaultAdmin() {
   }
 }
 
+const seedOnly = process.argv.includes('--seed');
+
 async function bootstrap() {
   await ensureDatabaseExists();
   await testConnection();
   await ensureSchema();
   await ensureServiceColumns();
   await ensureDefaultAdmin();
+
+  if (seedOnly) {
+    console.log('Database seed complete. Exiting.');
+    process.exit(0);
+  }
 
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
