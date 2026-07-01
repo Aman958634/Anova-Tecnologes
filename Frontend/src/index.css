@@ -20,6 +20,11 @@ body {
   overflow-x: hidden;
 }
 
+/* Ensure anchor navigation scrolls sections into view below the sticky header */
+section[id] {
+  scroll-margin-top: 96px;
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
