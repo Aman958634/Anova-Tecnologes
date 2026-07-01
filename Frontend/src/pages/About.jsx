@@ -171,7 +171,8 @@ export default function About() {
                     <img
                       src={buildImageUrl(member.image || member.image_url)}
                       alt={member.name}
-                      className="h-[250px] w-full object-cover"
+                      onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
+                      className="h-[250px] w-full object-cover bg-[#eaf1ff]"
                     />
                   ) : (
                     <div className="flex h-[250px] items-center justify-center bg-[#eaf1ff]">

@@ -268,7 +268,12 @@ export default function AdminResourceManager({ resource, title, description }) {
         return value ? <a className="text-blue-600 hover:underline" href={String(value)} target="_blank" rel="noreferrer">{String(value)}</a> : '-';
       case 'image_url':
         return value ? (
-          <img src={buildImageUrl(value)} alt={row.title || 'image'} className="h-16 w-24 rounded-md object-cover" />
+          <img
+            src={buildImageUrl(value)}
+            alt={row.title || 'image'}
+            onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
+            className="h-16 w-24 rounded-md object-cover bg-[#f3f7ff]"
+          />
         ) : '-';
       case 'email':
         return value ? <a className="text-blue-600 hover:underline" href={`mailto:${String(value)}`}>{String(value)}</a> : '-';
@@ -334,7 +339,7 @@ export default function AdminResourceManager({ resource, title, description }) {
               }} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
               {previewUrl ? (
                 <div className="md:col-span-2 mt-2">
-                  <img src={previewUrl} alt="preview" className="h-32 w-auto rounded-md object-cover" />
+                  <img src={previewUrl} alt="preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-32 w-auto rounded-md object-cover bg-white" />
                 </div>
               ) : null}
               <label className="flex items-center gap-2 text-sm text-[#163c88]"><input type="checkbox" checked={Boolean(form.featured)} onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))} /> Featured</label>
@@ -360,7 +365,7 @@ export default function AdminResourceManager({ resource, title, description }) {
               }} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
               {previewUrl ? (
                 <div className="md:col-span-2 mt-2">
-                  <img src={previewUrl} alt="preview" className="h-32 w-auto rounded-md object-cover" />
+                  <img src={previewUrl} alt="preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-32 w-auto rounded-md object-cover bg-white" />
                 </div>
               ) : null}
               <label className="flex items-center gap-2 text-sm text-[#163c88]"><input type="checkbox" checked={Boolean(form.featured)} onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))} /> Featured</label>

@@ -312,7 +312,7 @@ export function ServicesSection() {
                 <div className={`flex ${isReversed ? 'lg:[direction:ltr]' : ''}`}>
                   <div className="card-animate relative h-[320px] w-full overflow-hidden rounded-[20px] border border-slate-200 bg-[#f5f7fb] shadow-[0_20px_45px_rgba(15,23,42,0.08)] sm:h-[360px]">
                     {service.image_url ? (
-                      <img src={buildImageUrl(service.image_url)} alt={service.title} className="h-full w-full object-cover" />
+                      <img src={buildImageUrl(service.image_url)} alt={service.title} onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-full w-full object-cover bg-[#f5f7fb]" />
                     ) : (
                       <div className="grid h-full place-items-center">
                         <div className="grid h-16 w-16 place-items-center rounded-2xl bg-[#e7efff] text-[#2f6df7] shadow-[0_10px_24px_rgba(47,109,247,0.12)]">
@@ -586,7 +586,8 @@ export function ProjectsSection() {
                   <img
                     src={buildImageUrl(project.image_url)}
                     alt={project.title}
-                    className="h-full w-full object-cover"
+                    onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
+                    className="h-full w-full object-cover bg-[#f0f3fa]"
                   />
                   {/* Category chip */}
                   <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${chipColor(index)}`}>
@@ -682,7 +683,7 @@ export function TestimonialsSection() {
               </div>
               <p className="mt-5 text-[0.92rem] italic leading-7 text-slate-600">“{item.review}”</p>
               <div className="mt-6 flex items-center gap-3">
-                <img src={buildImageUrl(item.photo_url)} alt={item.name} className="h-10 w-10 rounded-full object-cover" />
+                <img src={buildImageUrl(item.photo_url)} alt={item.name} onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-10 w-10 rounded-full object-cover bg-white" />
                 <div>
                   <h3 className="text-sm font-semibold text-[#163c88]">{item.name}</h3>
                   <p className="text-[0.76rem] text-slate-500">{item.designation}</p>
@@ -704,7 +705,7 @@ export function TeamSection() {
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {fallbackTeam.map((member) => (
             <SectionCard key={member.id} className="overflow-hidden p-0">
-              <img src={member.image} alt={member.name} className="h-72 w-full object-cover" />
+              <img src={member.image} alt={member.name} onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-72 w-full object-cover bg-[#f8fafc]" />
               <div className="space-y-2 p-6 text-center">
                 <h3 className="text-lg font-semibold text-[#163c88]">{member.name}</h3>
                 <p className="text-sm text-slate-500">{member.designation}</p>
