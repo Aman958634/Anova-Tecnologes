@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowRight, BarChart3, CheckCircle2, Clock3, Code2, Cloud, Cpu, Database, Globe, GraduationCap, Heart, HeartHandshake, LayoutPanelTop, Link2, Mail, MapPin, Megaphone, Monitor, Palette, Phone, PlayCircle, ShoppingCart, Smartphone, Star, ShieldCheck, UtensilsCrossed } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { buildImageUrl, starsFromRating } from '../utils/helpers';
+import { buildImageUrl, starsFromRating, getImageOverride } from '../utils/helpers';
 import { fallbackServices, fallbackTeam, fallbackTestimonials } from '../utils/siteData';
 import SectionHeading from './SectionHeading';
 import api from '../services/api';
