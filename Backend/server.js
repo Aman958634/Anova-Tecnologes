@@ -126,6 +126,102 @@ async function ensureDefaultAdmin() {
   }
 }
 
+async function seedDefaultServices() {
+  const [rows] = await pool.query('SELECT COUNT(*) AS total FROM services');
+  if (rows[0].total > 0) return;
+
+  const services = [
+    {
+      title: 'Web Development',
+      description: 'High-performance digital experiences built with modern frameworks and scalable architecture.',
+      icon: 'globe',
+      key_features: JSON.stringify([
+        'Attractive & Responsive Design',
+        'User-Friendly Experience',
+        'Best for Services & Businesses'
+      ]),
+      image_url: null,
+      featured: 1
+    },
+    {
+      title: 'Mobile App Development',
+      description: 'Native-feeling mobile products with polished UX, secure APIs, and fast iteration cycles.',
+      icon: 'smartphone',
+      key_features: JSON.stringify([
+        'Android & iOS App Development',
+        'User-Friendly & High-Performance Apps',
+        'Business-Centric Custom Solutions'
+      ]),
+      image_url: null,
+      featured: 1
+    },
+    {
+      title: 'UI/UX Design',
+      description: 'Conversion-focused interfaces, design systems, and interaction details that feel premium.',
+      icon: 'palette',
+      key_features: JSON.stringify([
+        'Attractive & Responsive Design',
+        'User-Friendly Experience',
+        'Best for Services & Businesses'
+      ]),
+      image_url: null,
+      featured: 0
+    },
+    {
+      title: 'Cloud Solutions',
+      description: 'Deployment-ready cloud foundations, monitoring, and resilient delivery workflows.',
+      icon: 'cloud',
+      key_features: JSON.stringify([
+        'Cloud Architecture',
+        'Managed Hosting',
+        'Performance & Reliability'
+      ]),
+      image_url: null,
+      featured: 0
+    },
+    {
+      title: 'AI Solutions',
+      description: 'Automation layers, copilots, and intelligent features tailored to your business goals.',
+      icon: 'cpu',
+      key_features: JSON.stringify([
+        'Intelligent Automation',
+        'Data-Driven Insights',
+        'Custom AI Workflows'
+      ]),
+      image_url: null,
+      featured: 0
+    },
+    {
+      title: 'Digital Marketing',
+      description: 'Growth campaigns backed by analytics, audience insights, and measurable conversion strategies.',
+      icon: 'megaphone',
+      key_features: JSON.stringify([
+        'Social Media Marketing',
+        'SEO & Website Optimization',
+        'Google Ads & PPC Campaigns'
+      ]),
+      image_url: null,
+      featured: 0
+    }
+  ];
+
+  const values = services.map((service) => [
+    service.title,
+    service.description,
+    service.icon,
+    service.key_features,
+    service.image_url,
+    service.featured
+  ]);
+
+  await pool.query(
+    'INSERT INTO services (title, description, icon, key_features, image_url, featured) VALUES ?;',
+    [values]
+  );
+
+  console.log('✅ Default services seeded into services table');
+}
+
 
 // =========================
 // BOOTSTRAP SERVER
@@ -137,6 +233,9 @@ async function bootstrap() {
 
     await ensureDefaultAdmin();
     console.log('✅ Default admin ready');
+
+    await seedDefaultServices();
+    console.log('✅ Default services ready');
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
