@@ -7,13 +7,14 @@ const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
-const { pool, testConnection, ensureDatabaseExists, dbConfig } = require('./config/db');
+const { pool, testConnection, dbConfig } = require('./config/db');
 const routes = require('./routes');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const uploadsDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
+
 function normalizeOrigin(origin = '') {
   return origin.trim().replace(/\/+$|\s+/g, '');
 }
@@ -21,6 +22,7 @@ function normalizeOrigin(origin = '') {
 const defaultAllowedOrigins = [
   'https://anova-tecnologes.vercel.app'
 ].map(normalizeOrigin);
+
 const allowedOrigins = [
   ...defaultAllowedOrigins,
   ...(process.env.CORS_ORIGIN || '')
@@ -33,6 +35,15 @@ const allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 const allowedHeaders = ['Content-Type', 'Authorization', 'X-Requested-With'];
 const exposedHeaders = ['Authorization'];
 
+function isLocalDevOrigin(origin) {
+  try {
+    const { hostname } = new URL(origin);
+    return hostname === 'localhost' || hostname === '127.0.0.1';
+  } catch {
+    return false;
+  }
+}
+
 function isAllowedOrigin(origin) {
   if (!origin) return true;
   const normalizedOrigin = normalizeOrigin(origin);
@@ -43,10 +54,8 @@ function isAllowedOrigin(origin) {
 const corsOptions = {
   origin: (origin, callback) => {
     if (isAllowedOrigin(origin)) {
-      callback(null, true);
-      return;
+      return callback(null, true);
     }
-
     callback(new Error(`Origin ${origin} not allowed by CORS`));
   },
   credentials: true,
@@ -55,22 +64,6 @@ const corsOptions = {
   exposedHeaders,
   optionsSuccessStatus: 204
 };
-
-const corsOriginsForLog = allowedOrigins.join(', ');
-process.env.CORS_ORIGIN = (process.env.CORS_ORIGIN || '')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean)
-  .join(',');
-
-function isLocalDevOrigin(origin) {
-  try {
-    const { hostname } = new URL(origin);
-    return hostname === 'localhost' || hostname === '127.0.0.1';
-  } catch {
-    return false;
-  }
-}
 
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
@@ -82,18 +75,24 @@ app.use(compression());
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+
 app.use('/uploads', express.static(uploadsDir));
 app.use('/api', routes);
-app.get('/health', (req, res) => res.json({ status: 'ok' }));
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 app.use(notFound);
 app.use(errorHandler);
 
 async function ensureSchema() {
   const schemaPath = path.join(__dirname, 'config', 'schema.sql');
   const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+
   const statements = schemaSql
     .split(';')
-    .map((statement) => statement.trim())
+    .map(statement => statement.trim())
     .filter(Boolean);
 
   for (const statement of statements) {
@@ -103,70 +102,105 @@ async function ensureSchema() {
 
 async function ensureServiceColumns() {
   const [rows] = await pool.query(
-    `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'services' AND COLUMN_NAME = 'key_features'`,
+    `SELECT COLUMN_NAME
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = ?
+     AND TABLE_NAME = 'services'
+     AND COLUMN_NAME = 'key_features'`,
     [dbConfig.database]
   );
 
   if (!rows.length) {
-    await pool.query('ALTER TABLE services ADD COLUMN key_features JSON NULL AFTER icon');
+    await pool.query(
+      'ALTER TABLE services ADD COLUMN key_features JSON NULL AFTER icon'
+    );
   }
 }
 
 async function ensureDefaultAdmin() {
-  const email = (process.env.DEFAULT_ADMIN_EMAIL || 'admin@anova.com').toLowerCase().trim();
-  const password = process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@12345';
-  const name = process.env.DEFAULT_ADMIN_NAME || 'Admin';
+  const email = (
+    process.env.DEFAULT_ADMIN_EMAIL || 'admin@anova.com'
+  ).toLowerCase().trim();
 
-  const [rows] = await pool.query('SELECT id, password, role FROM users WHERE email = ? LIMIT 1', [email]);
+  const password =
+    process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@12345';
+
+  const name =
+    process.env.DEFAULT_ADMIN_NAME || 'Admin';
+
+  const [rows] = await pool.query(
+    'SELECT id, password, role FROM users WHERE email = ? LIMIT 1',
+    [email]
+  );
+
   const hashedPassword = await bcrypt.hash(password, 12);
 
   if (rows.length === 0) {
-    await pool.query('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)', [
-      name,
-      email,
-      hashedPassword,
-      'admin'
-    ]);
-    console.log(`Default admin user created: ${email}`);
+    await pool.query(
+      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+      [name, email, hashedPassword, 'admin']
+    );
+
+    console.log(`✅ Default admin created: ${email}`);
     return;
   }
 
   const existing = rows[0];
+
   if (existing.role !== 'admin') {
-    await pool.query('UPDATE users SET role = ? WHERE id = ?', ['admin', existing.id]);
+    await pool.query(
+      'UPDATE users SET role = ? WHERE id = ?',
+      ['admin', existing.id]
+    );
   }
 
-  const passwordMatches = await bcrypt.compare(password, existing.password);
+  const passwordMatches = await bcrypt.compare(
+    password,
+    existing.password
+  );
+
   if (!passwordMatches) {
-    await pool.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, existing.id]);
-    console.log(`Default admin password reset for: ${email}`);
+    await pool.query(
+      'UPDATE users SET password = ? WHERE id = ?',
+      [hashedPassword, existing.id]
+    );
+
+    console.log(`✅ Default admin password reset: ${email}`);
   } else {
-    console.log(`Default admin user exists: ${email}`);
+    console.log(`✅ Default admin exists: ${email}`);
   }
 }
 
 const seedOnly = process.argv.includes('--seed');
 
 async function bootstrap() {
-  await ensureDatabaseExists();
-  await testConnection();
-  await ensureSchema();
-  await ensureServiceColumns();
-  await ensureDefaultAdmin();
+  try {
+    await testConnection();
+    console.log('✅ Database connected');
 
-  if (seedOnly) {
-    console.log('Database seed complete. Exiting.');
-    process.exit(0);
+    await ensureSchema();
+    console.log('✅ Schema verified');
+
+    await ensureServiceColumns();
+    console.log('✅ Service columns verified');
+
+    await ensureDefaultAdmin();
+    console.log('✅ Default admin verified');
+
+    if (seedOnly) {
+      console.log('Database seed complete.');
+      process.exit(0);
+    }
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
   }
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
 }
 
-bootstrap().catch((error) => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
-});
+bootstrap();
 
 module.exports = app;
