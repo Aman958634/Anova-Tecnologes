@@ -192,12 +192,22 @@ async function bootstrap() {
       process.exit(0);
     }
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
+      app.listen(PORT, () => {
+        console.log(`🚀 Server running on port ${PORT}`);
+      });
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
-    process.exit(1);
+      console.error('Database startup failed:', error);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('Continuing in development fallback mode (DB_DOWN=true). Admin login will use the default .env credentials.');
+        global.DB_DOWN = true;
+        app.listen(PORT, () => {
+          console.log(`Server running on port ${PORT} (DB_DOWN mode)`);
+        });
+        return;
+      }
+
+      console.error('❌ Failed to start server:', error);
+      process.exit(1);
   }
 }
 

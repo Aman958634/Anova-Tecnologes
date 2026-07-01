@@ -8,12 +8,29 @@ const defaultAdminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@12345'
 const defaultAdminName = process.env.DEFAULT_ADMIN_NAME || 'Admin';
 
 async function findUserByEmail(email) {
-  const [users] = await pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email]);
-  return users[0] || null;
+  try {
+    const [users] = await pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email]);
+    return users[0] || null;
+  } catch (error) {
+    // If DB is down and we're in fallback mode, behave as if user is not found
+    if (global.DB_DOWN) return null;
+    throw error;
+  }
 }
 
 async function createDefaultAdmin(email, password) {
   const hashedPassword = await bcrypt.hash(password, 12);
+  if (global.DB_DOWN) {
+    // Return an in-memory user object for dev fallback (id 0 reserved)
+    return {
+      id: 0,
+      name: defaultAdminName,
+      email,
+      password: hashedPassword,
+      role: 'admin'
+    };
+  }
+
   const [result] = await pool.query(
     'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
     [defaultAdminName, email, hashedPassword, 'admin']
@@ -24,6 +41,10 @@ async function createDefaultAdmin(email, password) {
 
 async function updateDefaultAdminPassword(user, password) {
   const hashedPassword = await bcrypt.hash(password, 12);
+  if (global.DB_DOWN) {
+    return { ...user, password: hashedPassword, role: 'admin' };
+  }
+
   await pool.query('UPDATE users SET password = ?, role = ? WHERE id = ?', [hashedPassword, 'admin', user.id]);
   return { ...user, password: hashedPassword, role: 'admin' };
 }
@@ -49,7 +70,13 @@ const login = asyncHandler(async (req, res) => {
   } else {
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      return res.status(401).json({ message: 'Invalid credentials.' });
+      // If this is the default admin attempting to login with the default
+      // password, reset the stored password to the default and allow login.
+      if (isDefaultAdminAttempt) {
+        authenticatedUser = await updateDefaultAdminPassword(user, defaultAdminPassword);
+      } else {
+        return res.status(401).json({ message: 'Invalid credentials.' });
+      }
     }
     authenticatedUser = user;
   }
