@@ -63,8 +63,13 @@ export default function Contact() {
         setStatus('success');
       }
     } catch (error) {
+      console.error('Contact submit error:', error);
       setStatus('error');
-      setErrorMessage(error?.response?.data?.message || 'We could not send your message right now. Please try again.');
+      if (error?.request && !error?.response) {
+        setErrorMessage('Server is unreachable. Please try again later.');
+      } else {
+        setErrorMessage(error?.response?.data?.message || 'We could not send your message right now. Please try again.');
+      }
     }
   };
 
