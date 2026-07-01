@@ -117,19 +117,53 @@ const register = async (req, res) => {
   }
 };
 
-const seedAdmin = async (req, res) => {
-  try {
-    return res.status(200).json({
-      success: true,
-      message: 'Admin seed endpoint working'
-    });
-  } catch (error) {
-    return res.status(500).json({
+const seedAdmin = asyncHandler(async (req, res) => {
+  const secret = req.headers['x-seed-secret'] || req.body?.seedSecret;
+
+  if (!process.env.SEED_SECRET) {
+    return res.status(400).json({
       success: false,
-      message: error.message
+      message: 'SEED_SECRET is not configured on the server.'
     });
   }
-};
+
+  if (!secret || secret !== process.env.SEED_SECRET) {
+    return res.status(403).json({
+      success: false,
+      message: 'Forbidden.'
+    });
+  }
+
+  const email = (process.env.DEFAULT_ADMIN_EMAIL || 'admin@anova.com').toLowerCase().trim();
+  const password = process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@12345';
+  const name = process.env.DEFAULT_ADMIN_NAME || 'Admin';
+
+  let user = await findUserByEmail(email);
+
+  if (!user) {
+    const created = await createDefaultAdmin(email, password);
+    return res.status(200).json({
+      seeded: true,
+      user: {
+        id: created.id,
+        email: created.email,
+        name: created.name,
+        role: created.role
+      }
+    });
+  }
+
+  const updated = await updateDefaultAdminPassword(user, password);
+  return res.status(200).json({
+    seeded: true,
+    user: {
+      id: updated.id,
+      email: updated.email,
+      name: updated.name,
+      role: updated.role
+    }
+  });
+});
 
 module.exports = {
   login,
