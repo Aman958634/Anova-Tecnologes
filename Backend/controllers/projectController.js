@@ -52,7 +52,7 @@ const updateProject = asyncHandler(async (req, res) => {
     [req.body.title, req.body.description, imageUrl, req.body.live_demo_url || null, tags, req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0, req.params.id]
   );
   const updated = await findById('projects', req.params.id);
-  updated.tags = updated.tags ? JSON.parse(updated.tags) : [];
+  updated.tags = parseTags(updated.tags);
   res.json(updated);
 });
 
