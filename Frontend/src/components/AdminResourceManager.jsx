@@ -37,6 +37,7 @@ function TableHeader({ columns }) {
 export default function AdminResourceManager({ resource, title, description }) {
   const [rows, setRows] = useState([]);
   const [busy, setBusy] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [query, setQuery] = useState('');
   const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0 });
   const [form, setForm] = useState(initialForms[resource] || {});
@@ -55,11 +56,14 @@ export default function AdminResourceManager({ resource, title, description }) {
 
   const openNewForm = () => {
     resetForm();
+    setPreviewUrl(null);
     setIsFormOpen(true);
   };
 
   const closeForm = () => {
     resetForm();
+    if (previewUrl && previewUrl.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
     setIsFormOpen(false);
   };
 
@@ -130,11 +134,13 @@ export default function AdminResourceManager({ resource, title, description }) {
     }
     if (resource === 'services') {
       setForm({ ...row, key_features: Array.isArray(row.key_features) ? row.key_features.join(', ') : row.key_features || '', image: null });
+      setPreviewUrl(row.image_url ? buildImageUrl(row.image_url) : null);
       setIsFormOpen(true);
       return;
     }
     if (resource === 'testimonials') {
       setForm({ ...row, photo_url: row.photo_url || '', photo: null });
+      setPreviewUrl(row.photo_url ? buildImageUrl(row.photo_url) : null);
       setIsFormOpen(true);
     }
   };
@@ -180,6 +186,9 @@ export default function AdminResourceManager({ resource, title, description }) {
       closeForm();
       fetchRows();
       notifyDataUpdated();
+      if (previewUrl && previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Save failed');
     } finally {
@@ -258,7 +267,9 @@ export default function AdminResourceManager({ resource, title, description }) {
       case 'live_demo_url':
         return value ? <a className="text-blue-600 hover:underline" href={String(value)} target="_blank" rel="noreferrer">{String(value)}</a> : '-';
       case 'image_url':
-        return value ? <a className="text-blue-600 hover:underline" href={String(value)} target="_blank" rel="noreferrer">View image</a> : '-';
+        return value ? (
+          <img src={buildImageUrl(value)} alt={row.title || 'image'} className="h-16 w-24 rounded-md object-cover" />
+        ) : '-';
       case 'email':
         return value ? <a className="text-blue-600 hover:underline" href={`mailto:${String(value)}`}>{String(value)}</a> : '-';
       case 'subject':
@@ -307,6 +318,25 @@ export default function AdminResourceManager({ resource, title, description }) {
               <textarea className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none md:col-span-2" rows="4" value={form.description || ''} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} placeholder="Description" required />
               <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none md:col-span-2" value={form.key_features || ''} onChange={(event) => setForm((current) => ({ ...current, key_features: event.target.value }))} placeholder="Key features (comma separated)" />
               <input type="url" className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.image_url || ''} onChange={(event) => setForm((current) => ({ ...current, image_url: event.target.value }))} placeholder="Image URL (https://...)" />
+              <button type="button" className="ml-2 text-sm text-[#1e4db8] underline" onClick={() => {
+                if (form.image_url) setPreviewUrl(buildImageUrl(form.image_url));
+              }}>Preview URL</button>
+              <input type="file" accept="image/*" onChange={(event) => {
+                const file = event.target.files?.[0] || null;
+                setForm((current) => ({ ...current, image: file, remove_image: false }));
+                if (file) {
+                  const url = URL.createObjectURL(file);
+                  setPreviewUrl((old) => {
+                    if (old && old.startsWith('blob:')) URL.revokeObjectURL(old);
+                    return url;
+                  });
+                }
+              }} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
+              {previewUrl ? (
+                <div className="md:col-span-2 mt-2">
+                  <img src={previewUrl} alt="preview" className="h-32 w-auto rounded-md object-cover" />
+                </div>
+              ) : null}
               <label className="flex items-center gap-2 text-sm text-[#163c88]"><input type="checkbox" checked={Boolean(form.featured)} onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))} /> Featured</label>
             </>
           ) : null}
@@ -317,7 +347,22 @@ export default function AdminResourceManager({ resource, title, description }) {
               <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.live_demo_url || ''} onChange={(event) => setForm((current) => ({ ...current, live_demo_url: event.target.value }))} placeholder="Live demo URL" />
               <textarea className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none md:col-span-2" rows="4" value={form.description || ''} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} placeholder="Description" required />
               <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none md:col-span-2" value={form.tags || ''} onChange={(event) => setForm((current) => ({ ...current, tags: event.target.value }))} placeholder="Tags (comma separated)" />
-              <input type="file" accept="image/*" onChange={(event) => setForm((current) => ({ ...current, image: event.target.files?.[0] || null, remove_image: false }))} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
+              <input type="file" accept="image/*" onChange={(event) => {
+                const file = event.target.files?.[0] || null;
+                setForm((current) => ({ ...current, image: file, remove_image: false }));
+                if (file) {
+                  const url = URL.createObjectURL(file);
+                  setPreviewUrl((old) => {
+                    if (old && old.startsWith('blob:')) URL.revokeObjectURL(old);
+                    return url;
+                  });
+                }
+              }} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
+              {previewUrl ? (
+                <div className="md:col-span-2 mt-2">
+                  <img src={previewUrl} alt="preview" className="h-32 w-auto rounded-md object-cover" />
+                </div>
+              ) : null}
               <label className="flex items-center gap-2 text-sm text-[#163c88]"><input type="checkbox" checked={Boolean(form.featured)} onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))} /> Featured</label>
               {form.id ? (
                 <label className="flex items-center gap-2 text-sm text-[#163c88] md:col-span-2"><input type="checkbox" checked={Boolean(form.remove_image)} onChange={(event) => setForm((current) => ({ ...current, remove_image: event.target.checked }))} /> Remove current image</label>
