@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ArrowRight,
   Mail,
@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import api from '../services/api';
+import toast from 'react-hot-toast';
 
 const initialForm = {
   name: '',
@@ -43,6 +44,7 @@ export default function Contact() {
   const [form, setForm] = useState(initialForm);
   const [status, setStatus] = useState('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const OUTBOX_KEY = 'anova:contact-outbox';
 
   const updateField = (field) => (event) => {
     setForm((current) => ({ ...current, [field]: event.target.value }));
@@ -66,12 +68,59 @@ export default function Contact() {
       console.error('Contact submit error:', error);
       setStatus('error');
       if (error?.request && !error?.response) {
-        setErrorMessage('Server is unreachable. Please try again later.');
+        // Network error / timeout — enqueue message for retry
+        enqueueOutbox(form);
+        setErrorMessage('Server is unreachable. Message saved and will be retried when connection returns.');
       } else {
         setErrorMessage(error?.response?.data?.message || 'We could not send your message right now. Please try again.');
       }
     }
   };
+
+  // Outbox helpers: store pending messages in localStorage and retry on focus
+  function enqueueOutbox(payload) {
+    try {
+      const current = JSON.parse(localStorage.getItem(OUTBOX_KEY) || '[]');
+      current.push({ id: Date.now(), payload, attempts: 0 });
+      localStorage.setItem(OUTBOX_KEY, JSON.stringify(current));
+    } catch (e) {
+      console.error('Failed to enqueue outbox', e);
+    }
+  }
+
+  async function resendOutbox() {
+    try {
+      const list = JSON.parse(localStorage.getItem(OUTBOX_KEY) || '[]');
+      if (!Array.isArray(list) || list.length === 0) return;
+
+      const remaining = [];
+      for (const item of list) {
+        try {
+          await api.post('/contact', item.payload);
+        } catch (err) {
+          // increment attempts and keep for later (limit attempts to 5)
+          item.attempts = (item.attempts || 0) + 1;
+          if (item.attempts < 5) remaining.push(item);
+        }
+      }
+      localStorage.setItem(OUTBOX_KEY, JSON.stringify(remaining));
+      if (remaining.length === 0) {
+        // notify user if any were delivered
+        toast?.success?.('Pending messages delivered. Thank you.');
+      }
+    } catch (e) {
+      console.error('Outbox resend failed', e);
+    }
+  }
+
+  // Retry pending messages when window gains focus
+  useEffect(() => {
+    const onFocus = () => resendOutbox();
+    window.addEventListener('focus', onFocus);
+    // try once on mount
+    resendOutbox();
+    return () => window.removeEventListener('focus', onFocus);
+  }, []);
 
   return (
     <div className="bg-white text-slate-900">
