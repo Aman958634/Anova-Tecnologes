@@ -14,10 +14,54 @@ const { notFound, errorHandler } = require('./middleware/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 5000;
 const uploadsDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
-const allowedOrigins = (process.env.CORS_ORIGIN || '')
+function normalizeOrigin(origin = '') {
+  return origin.trim().replace(/\/+$|\s+/g, '');
+}
+
+const defaultAllowedOrigins = [
+  'https://anova-tecnologes.vercel.app'
+].map(normalizeOrigin);
+const allowedOrigins = [
+  ...defaultAllowedOrigins,
+  ...(process.env.CORS_ORIGIN || '')
+    .split(',')
+    .map(normalizeOrigin)
+    .filter(Boolean)
+].filter((origin, index, origins) => origins.indexOf(origin) === index);
+
+const allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
+const allowedHeaders = ['Content-Type', 'Authorization', 'X-Requested-With'];
+const exposedHeaders = ['Authorization'];
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  const normalizedOrigin = normalizeOrigin(origin);
+  if (allowedOrigins.includes(normalizedOrigin)) return true;
+  return process.env.NODE_ENV !== 'production' && isLocalDevOrigin(origin);
+}
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
+  credentials: true,
+  methods: allowedMethods,
+  allowedHeaders,
+  exposedHeaders,
+  optionsSuccessStatus: 204
+};
+
+const corsOriginsForLog = allowedOrigins.join(', ');
+process.env.CORS_ORIGIN = (process.env.CORS_ORIGIN || '')
   .split(',')
   .map((origin) => origin.trim())
-  .filter(Boolean);
+  .filter(Boolean)
+  .join(',');
 
 function isLocalDevOrigin(origin) {
   try {
@@ -32,18 +76,8 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+app.use(cors(corsOptions));
 app.use(helmet({ crossOriginResourcePolicy: false }));
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin) || (process.env.NODE_ENV !== 'production' && isLocalDevOrigin(origin))) {
-      callback(null, true);
-      return;
-    }
-
-    callback(new Error(`Origin ${origin} not allowed by CORS`));
-  },
-  credentials: true
-}));
 app.use(compression());
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
