@@ -42,22 +42,16 @@ const login = asyncHandler(async (req, res) => {
   let authenticatedUser = null;
 
   if (!user) {
-    if (isDefaultAdminAttempt) {
-      authenticatedUser = await createDefaultAdmin(normalizedEmail, defaultAdminPassword);
-    } else {
+    if (!isDefaultAdminAttempt) {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
+    authenticatedUser = await createDefaultAdmin(normalizedEmail, defaultAdminPassword);
   } else {
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      if (isDefaultAdminAttempt) {
-        authenticatedUser = await updateDefaultAdminPassword(user, defaultAdminPassword);
-      } else {
-        return res.status(401).json({ message: 'Invalid credentials.' });
-      }
-    } else {
-      authenticatedUser = user;
+      return res.status(401).json({ message: 'Invalid credentials.' });
     }
+    authenticatedUser = user;
   }
 
   const token = jwt.sign(
