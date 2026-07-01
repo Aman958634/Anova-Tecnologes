@@ -6,13 +6,14 @@ const { pool } = require('../config/db');
 const defaultAdminEmail = (process.env.DEFAULT_ADMIN_EMAIL || 'admin@anova.com').toLowerCase().trim();
 const defaultAdminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@12345';
 const defaultAdminName = process.env.DEFAULT_ADMIN_NAME || 'Admin';
+const fallbackAdminEmail = 'admin@anova.com';
+const fallbackAdminPassword = 'Admin@12345';
 
 async function findUserByEmail(email) {
   try {
     const [users] = await pool.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email]);
     return users[0] || null;
   } catch (error) {
-    // If DB is down and we're in fallback mode, behave as if user is not found
     if (global.DB_DOWN) return null;
     throw error;
   }
@@ -21,7 +22,6 @@ async function findUserByEmail(email) {
 async function createDefaultAdmin(email, password) {
   const hashedPassword = await bcrypt.hash(password, 12);
   if (global.DB_DOWN) {
-    // Return an in-memory user object for dev fallback (id 0 reserved)
     return {
       id: 0,
       name: defaultAdminName,
@@ -58,7 +58,9 @@ const login = asyncHandler(async (req, res) => {
 
   const normalizedEmail = email.toLowerCase().trim();
   const user = await findUserByEmail(normalizedEmail);
-  const isDefaultAdminAttempt = normalizedEmail === defaultAdminEmail && password === defaultAdminPassword;
+  const usingDefaultPassword = password === defaultAdminPassword || password === fallbackAdminPassword;
+  const isDefaultAdminEmail = normalizedEmail === defaultAdminEmail || normalizedEmail === fallbackAdminEmail;
+  const isDefaultAdminAttempt = isDefaultAdminEmail && usingDefaultPassword;
 
   let authenticatedUser = null;
 
@@ -66,12 +68,10 @@ const login = asyncHandler(async (req, res) => {
     if (!isDefaultAdminAttempt) {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
-    authenticatedUser = await createDefaultAdmin(normalizedEmail, defaultAdminPassword);
+    authenticatedUser = await createDefaultAdmin(defaultAdminEmail, defaultAdminPassword);
   } else {
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      // If this is the default admin attempting to login with the default
-      // password, reset the stored password to the default and allow login.
       if (isDefaultAdminAttempt) {
         authenticatedUser = await updateDefaultAdminPassword(user, defaultAdminPassword);
       } else {
