@@ -54,9 +54,14 @@ export default function Contact() {
     setErrorMessage('');
 
     try {
-      await api.post('/contact', form);
+      const response = await api.post('/contact', form);
       setForm(initialForm);
-      setStatus('success');
+      if (response.data && response.data.mailSent === false) {
+        setStatus('success');
+        setErrorMessage('Message saved — email delivery failed. Admin can view messages in the dashboard.');
+      } else {
+        setStatus('success');
+      }
     } catch (error) {
       setStatus('error');
       setErrorMessage(error?.response?.data?.message || 'We could not send your message right now. Please try again.');
