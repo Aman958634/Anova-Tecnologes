@@ -6,13 +6,16 @@ const nodemailer = require('nodemailer');
 const smtpUser = process.env.SMTP_USER;
 const smtpPass = process.env.SMTP_PASS;
 
-const mailTransporter = smtpUser && smtpPass ? nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: smtpUser,
-    pass: smtpPass
-  }
-}) : null;
+let mailTransporter = null;
+if (smtpUser && smtpPass) {
+  mailTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: smtpUser,
+      pass: smtpPass
+    }
+  });
+}
 
 const createContact = asyncHandler(async (req, res) => {
   const { name, email, phone, subject, message } = req.body;
@@ -32,6 +35,8 @@ const createContact = asyncHandler(async (req, res) => {
   }
 
   let mailSent = false;
+  let mailStatusMessage = null;
+
   if (mailTransporter) {
     try {
       await mailTransporter.sendMail({
@@ -55,14 +60,25 @@ const createContact = asyncHandler(async (req, res) => {
     } catch (err) {
       console.error('Contact email failed:', err && err.message ? err.message : err);
       mailSent = false;
+      mailStatusMessage = err?.message || 'Email delivery failed.';
     }
+  } else {
+    mailStatusMessage = 'SMTP is not configured. Email will not be delivered.';
   }
 
   if (!insertId && !mailSent) {
-    return res.status(500).json({ message: 'Failed to save message and could not deliver email. Please try again later.' });
+    const fallbackMessage = mailStatusMessage || 'Failed to save message and could not deliver email. Please try again later.';
+    return res.status(500).json({ message: fallbackMessage });
   }
 
-  res.status(201).json({ message: 'Message received.', id: insertId, mailSent });
+  let responseMessage = 'Message received.';
+  if (insertId && !mailSent) {
+    responseMessage = `Message saved to the database, but email delivery failed. ${mailStatusMessage || ''}`.trim();
+  } else if (!insertId && mailSent) {
+    responseMessage = 'Message sent by email. Database save failed.';
+  }
+
+  res.status(201).json({ message: responseMessage, id: insertId, mailSent });
 });
 
 const listContacts = asyncHandler(async (req, res) => {

@@ -58,12 +58,8 @@ export default function Contact() {
     try {
       const response = await api.post('/contact', form);
       setForm(initialForm);
-      if (response.data && response.data.mailSent === false) {
-        setStatus('success');
-        setErrorMessage('Message saved — email delivery failed. Admin can view messages in the dashboard.');
-      } else {
-        setStatus('success');
-      }
+      setStatus('success');
+      setErrorMessage(response.data?.message || 'Your message has been sent successfully. We will contact you shortly.');
     } catch (error) {
       console.error('Contact submit error:', error);
       setStatus('error');
@@ -188,8 +184,8 @@ export default function Contact() {
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <FieldInput icon={Phone} label="Phone Number*" placeholder="+91 12345 67890" value={form.phone} onChange={updateField('phone')} required />
-                  <FieldInput icon={FileText} label="Subject" placeholder="How can we help?" value={form.subject} onChange={updateField('subject')} />
+                  <FieldInput icon={Phone} label="Phone Number" placeholder="+91 12345 67890" value={form.phone} onChange={updateField('phone')} />
+                  <FieldInput icon={FileText} label="Subject*" placeholder="How can we help?" value={form.subject} onChange={updateField('subject')} required />
                 </div>
 
                 <label className="grid gap-2 text-sm font-medium text-[#163c88]">
