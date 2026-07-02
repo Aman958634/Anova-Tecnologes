@@ -170,8 +170,7 @@ export function HomeServicesSection() {
       <div className="section-shell">
         <motion.div
           initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.22 }}
+          animate="show"
           variants={gridVariants}
           className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
         >
