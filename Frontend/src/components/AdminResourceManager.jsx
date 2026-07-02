@@ -188,7 +188,6 @@ export default function AdminResourceManager({ resource, title, description }) {
       try {
         const saved = response.data || {};
         if (saved && saved.id && saved.image_url) {
-          // lazy-load helper to avoid circular import
           const { setImageOverride, buildImageUrl } = await import('../utils/helpers');
           setImageOverride(resource, saved.id, buildImageUrl(saved.image_url));
         }
