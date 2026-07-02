@@ -27,7 +27,14 @@ function normalizeText(html) {
     .trim();
 }
 
-async function sendEmail(subject, html, replyTo = null) {
+async function sendEmail(to, subject, html, replyTo = null) {
+  console.log('📧 sendEmail() called');
+  console.log({
+    to,
+    subject,
+    senderEmail,
+  });
+
   if (!brevo) {
     throw new Error('Brevo client is not configured. Set BREVO_API_KEY to enable email delivery.');
   }
@@ -37,7 +44,7 @@ async function sendEmail(subject, html, replyTo = null) {
       name: 'Anova Technologies',
       email: senderEmail,
     },
-    to: [{ email: contactEmail }],
+    to: [{ email: String(to).trim() }],
     subject,
     htmlContent: html,
     textContent: normalizeText(html),
@@ -49,10 +56,20 @@ async function sendEmail(subject, html, replyTo = null) {
       : replyTo;
   }
 
-  console.log('🔥 Starting Brevo email send...');
-  const response = await brevo.transactionalEmails.sendTransacEmail(payload);
-  console.log('✅ Brevo response:', response);
-  return response;
+  console.log('📤 Brevo payload:');
+  console.log(JSON.stringify(payload, null, 2));
+
+  try {
+    const response = await brevo.transactionalEmails.sendTransacEmail(payload);
+    console.log('✅ Brevo API success:');
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error('❌ BREVO API FAILED:');
+    console.error(error);
+    console.error(error.response?.body);
+    throw error;
+  }
 }
 
 module.exports = { sendEmail, contactEmail };

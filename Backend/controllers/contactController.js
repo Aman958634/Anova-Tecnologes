@@ -15,6 +15,9 @@ const createContact = asyncHandler(async (req, res) => {
       [name, email, phone || null, subject, message]
     );
 
+    console.log('🔥 CONTACT API HIT');
+    console.log(req.body);
+
     const contact = {
       id: result.insertId || null,
       name,
@@ -23,6 +26,9 @@ const createContact = asyncHandler(async (req, res) => {
       subject,
       message,
     };
+
+    console.log('✅ Contact saved to DB');
+    console.log(contact);
 
     const html = `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
@@ -37,12 +43,22 @@ const createContact = asyncHandler(async (req, res) => {
     `;
 
     try {
-      await sendEmail(`New contact received: ${subject}`, html, {
-        email,
-        name: name || email,
-      });
+      console.log('📧 Starting Brevo email send...');
+      console.log('Admin email:', process.env.CONTACT_EMAIL);
+
+      const response = await sendEmail(
+        process.env.CONTACT_EMAIL.trim(),
+        `New contact received: ${subject}`,
+        html,
+        email
+      );
+
+      console.log('✅ Brevo response:');
+      console.log(JSON.stringify(response, null, 2));
     } catch (err) {
-      console.error('❌ BREVO ERROR:', err);
+      console.error('❌ BREVO ERROR:');
+      console.error(err);
+      console.error(err.response?.body);
     }
 
     return res.status(201).json({
