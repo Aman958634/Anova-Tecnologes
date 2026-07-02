@@ -1,6 +1,5 @@
-const brevo = require('@getbrevo/brevo');
+const nodemailer = require('nodemailer');
 
-const brevoApiKey = process.env.BREVO_API_KEY;
 const contactEmail = (process.env.CONTACT_EMAIL || 'anovatechnologies5@gmail.com').trim();
 const senderEmail = (
   process.env.BREVO_SENDER_EMAIL ||
@@ -8,90 +7,67 @@ const senderEmail = (
   process.env.SMTP_USER ||
   'no-reply@anova.com'
 ).trim();
+const smtpHost = (process.env.SMTP_HOST || 'smtp-relay.brevo.com').trim();
+const smtpPort = Number(process.env.SMTP_PORT || 587);
+const smtpUser = (process.env.SMTP_USER || '').trim();
+const smtpPass = (process.env.SMTP_PASS || '').trim();
 
-console.log({
-  BREVO_API_KEY_EXISTS: !!brevoApiKey,
-  CONTACT_EMAIL: contactEmail,
-  SENDER_EMAIL: senderEmail,
+console.log('SMTP config loaded:', {
+  contactEmail,
+  senderEmail,
+  smtpHost,
+  smtpPort,
+  smtpUserConfigured: !!smtpUser,
+  smtpPassConfigured: !!smtpPass,
 });
 
-let apiInstance = null;
-
-if (brevoApiKey) {
-  try {
-    apiInstance = new brevo.TransactionalEmailsApi();
-
-    apiInstance.setApiKey(
-      brevo.TransactionalEmailsApiApiKeys.apiKey,
-      brevoApiKey
-    );
-
-    console.log('✅ Brevo API initialized');
-  } catch (err) {
-    console.error('❌ Brevo initialization failed:', err);
-  }
-} else {
-  console.warn('⚠️ BREVO_API_KEY not configured');
-}
-
-function normalizeText(html) {
-  return html
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
+const transporter = nodemailer.createTransport({
+  host: smtpHost,
+  port: smtpPort,
+  secure: false,
+  auth: {
+    user: smtpUser,
+    pass: smtpPass,
+  },
+});
 
 async function sendEmail(to, subject, html, replyTo = null) {
   console.log('📧 sendEmail() called');
-
-  if (!apiInstance) {
-    throw new Error('Brevo API not initialized');
-  }
+  console.log({
+    to,
+    subject,
+    senderEmail,
+    replyTo,
+  });
 
   const recipients = Array.isArray(to)
-    ? to.map(email => ({ email: String(email).trim() }))
-    : [{ email: String(to).trim() }];
+    ? to.map(email => String(email).trim())
+    : [String(to).trim()];
 
-  const payload = {
-    sender: {
-      name: 'Anova Technologies',
-      email: senderEmail,
-    },
-
+  const mailOptions = {
+    from: `Anova Technologies <${senderEmail}>`,
     to: recipients,
-
-    subject: subject,
-
-    htmlContent: html,
-
-    textContent: normalizeText(html),
+    subject,
+    html,
+    text: html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
   };
 
   if (replyTo) {
-    payload.replyTo =
-      typeof replyTo === 'string'
-        ? { email: replyTo.trim() }
-        : replyTo;
+    mailOptions.replyTo = String(replyTo).trim();
   }
 
-  console.log('📤 Brevo payload:');
-  console.log(JSON.stringify(payload, null, 2));
+  console.log('📤 email payload:');
+  console.log(JSON.stringify(mailOptions, null, 2));
 
   try {
-    const response = await apiInstance.sendTransacEmail(payload);
-
-    console.log('✅ Brevo API success:');
+    const response = await transporter.sendMail(mailOptions);
+    console.log('✅ SMTP success response:');
     console.log(response);
-
     return response;
   } catch (error) {
-    console.error('❌ Brevo API failed');
+    console.error('❌ SMTP error response:');
     console.error(error);
-
-    if (error.response) {
-      console.error(error.response.text || error.response.body);
-    }
-
+    console.error(error.response || error);
     throw error;
   }
 }
