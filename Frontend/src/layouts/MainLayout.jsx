@@ -17,6 +17,13 @@ export default function MainLayout({ children }) {
 
     targets.forEach((node) => node.classList.add('fx-reveal'));
 
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+    if (isMobile) {
+      targets.forEach((node) => node.classList.add('fx-reveal--visible'));
+      return undefined;
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -26,12 +33,23 @@ export default function MainLayout({ children }) {
           }
         });
       },
-      { threshold: 0.15, rootMargin: '0px 0px -5% 0px' }
+      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
     );
 
     targets.forEach((node) => observer.observe(node));
 
-    return () => observer.disconnect();
+    const revealFallback = window.setTimeout(() => {
+      targets.forEach((node) => {
+        if (!node.classList.contains('fx-reveal--visible')) {
+          node.classList.add('fx-reveal--visible');
+        }
+      });
+    }, 500);
+
+    return () => {
+      observer.disconnect();
+      window.clearTimeout(revealFallback);
+    };
   }, [location.pathname]);
 
   return (
