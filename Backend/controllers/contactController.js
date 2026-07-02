@@ -1,7 +1,7 @@
 const asyncHandler = require('../utils/asyncHandler');
 const { pool } = require('../config/db');
 const { deleteById, countRows } = require('../models/baseModel');
-const { sendContactEmail } = require('../config/smtp');
+const { sendEmail } = require('../config/smtp');
 
 const createContact = asyncHandler(async (req, res) => {
   const { name, email, phone, subject, message } = req.body;
@@ -21,16 +21,28 @@ const createContact = asyncHandler(async (req, res) => {
       email,
       phone: phone || null,
       subject,
-      message
+      message,
     };
 
-    sendContactEmail(contact).catch((err) => {
+    const html = `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
+        <h2 style="color: #1d4ed8; margin-bottom: 16px;">New contact message</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Message:</strong></p>
+        <p style="white-space: pre-wrap;">${message}</p>
+      </div>
+    `;
+
+    sendEmail(contact.email, `New contact received: ${subject}`, html).catch((err) => {
       console.error('Contact email send failed:', err);
     });
 
     return res.status(201).json({
       success: true,
-      message: 'Contact submitted successfully'
+      message: 'Contact submitted successfully',
     });
   } catch (err) {
     console.error('Failed to save contact to DB:', err && err.message ? err.message : err);

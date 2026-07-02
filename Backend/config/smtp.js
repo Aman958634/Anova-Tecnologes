@@ -1,71 +1,58 @@
-const Brevo = require('@getbrevo/brevo');
+const { BrevoClient } = require('@getbrevo/brevo');
 
 const brevoApiKey = process.env.BREVO_API_KEY;
 const contactEmail = process.env.CONTACT_EMAIL || 'anovatechnologies5@gmail.com';
-const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_USER || 'no-reply@anova.com';
+const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SENDER_EMAIL || process.env.SMTP_USER || 'no-reply@anova.com';
+const timeoutInSeconds = Number(process.env.BREVO_TIMEOUT_SECONDS || 30);
 
 console.log({
   BREVO_API_KEY_EXISTS: !!brevoApiKey,
   CONTACT_EMAIL: contactEmail,
-  SENDER_EMAIL: senderEmail
+  SENDER_EMAIL: senderEmail,
+  BREVO_TIMEOUT_SECONDS: timeoutInSeconds
 });
 
-let brevoClient = null;
+const brevo = brevoApiKey
+  ? new BrevoClient({ apiKey: brevoApiKey, timeoutInSeconds })
+  : null;
 
-if (brevoApiKey) {
-  brevoClient = new Brevo.TransactionalEmailsApi();
-  brevoClient.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
-} else {
-  console.warn('BREVO_API_KEY is not configured; Brevo email sending disabled');
+if (!brevo) {
+  console.warn('BREVO_API_KEY is not configured; Brevo email sending is disabled');
 }
 
-async function sendContactEmail({ name, email, phone, subject, message }) {
-  if (!brevoClient) {
-    const error = new Error('Brevo client is not configured');
-    console.error('sendContactEmail failed:', error);
-    throw error;
+function normalizeText(html) {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+async function sendEmail(to, subject, html) {
+  if (!brevo) {
+    throw new Error('Brevo client is not configured. Set BREVO_API_KEY to enable email delivery.');
   }
 
-  const emailPayload = {
+  const recipients = Array.isArray(to) ? to : [to];
+  const toRecipients = recipients.map((recipient) => {
+    if (typeof recipient === 'string') {
+      return { email: recipient };
+    }
+    return recipient;
+  });
+
+  const payload = {
     sender: {
       name: 'Anova Technologies',
-      email: senderEmail
+      email: senderEmail,
     },
-    to: [
-      {
-        email: contactEmail,
-        name: 'Anova Technologies'
-      }
-    ],
-    replyTo: {
-      email,
-      name: name || email
-    },
-    subject: `New Contact Message: ${subject}`,
-    htmlContent: `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
-        <h2 style="color: #1d4ed8; margin-bottom: 16px;">New contact message</h2>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-        <p><strong>Subject:</strong> ${subject}</p>
-        <p><strong>Message:</strong></p>
-        <p style="white-space: pre-wrap;">${message}</p>
-      </div>
-    `,
-    textContent: `New contact message\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nSubject: ${subject}\nMessage: ${message}`
+    to: toRecipients,
+    subject,
+    htmlContent: html,
+    textContent: normalizeText(html),
   };
 
-  try {
-    console.log('Sending Brevo contact email...');
-    const response = await brevoClient.sendTransacEmail(emailPayload);
-    console.log('Brevo contact email sent successfully:', response);
-    return response;
-  } catch (error) {
-    console.error('Brevo sendContactEmail failed:');
-    console.error(error);
-    throw error;
-  }
+  const response = await brevo.transactionalEmails.sendTransacEmail(payload);
+  return response;
 }
 
-module.exports = { sendContactEmail };
+module.exports = { sendEmail, contactEmail };
