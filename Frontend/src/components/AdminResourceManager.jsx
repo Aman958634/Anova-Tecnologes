@@ -13,7 +13,6 @@ const initialForms = {
   testimonials: { id: null, name: '', designation: '', review: '', rating: 5, photo_url: '', photo: null }
 };
 
-            toast.success('Image preview will persist after refresh');
 const endpoints = {
   services: '/services',
   projects: '/projects',
@@ -185,15 +184,7 @@ export default function AdminResourceManager({ resource, title, description }) {
       const url = `${endpoint}${form.id ? `/${form.id}` : ''}`;
       const response = await api[method](url, buildPayload(), { headers: { 'Content-Type': 'multipart/form-data' } });
       // store image override so public pages show the newly uploaded image immediately after refresh
-      try {
-        const saved = response.data || {};
-        if (saved && saved.id && saved.image_url) {
-          const { setImageOverride, buildImageUrl } = await import('../utils/helpers');
-          setImageOverride(resource, saved.id, buildImageUrl(saved.image_url));
-        }
-      } catch (e) {
-        // ignore override failures
-      }
+      // no persistent preview override — do not store preview across refresh
       toast.success(`${title} saved successfully`);
       closeForm();
       fetchRows();
