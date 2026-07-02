@@ -281,20 +281,20 @@ export function ServicesSection() {
             return (
               <div
                 key={service.id || service.title}
-                className={`card-animate grid items-center gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16 ${isReversed ? 'lg:[direction:rtl]' : ''}`}
+                className={`card-animate flex flex-col gap-10 overflow-hidden rounded-[26px] border border-slate-200 bg-white p-5 shadow-[0_20px_45px_rgba(15,23,42,0.08)] transition hover:shadow-[0_24px_55px_rgba(15,23,42,0.12)] lg:flex-row lg:items-center lg:gap-16 ${isReversed ? 'lg:flex-row-reverse' : ''}`}
               >
-                <div className={`space-y-6 ${isReversed ? 'lg:[direction:ltr]' : ''}`}>
+                <div className="space-y-6 lg:flex-1">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#eef4ff] text-[#2f6df7] ring-1 ring-[#dbe6ff]">
                     <span className="text-xl">▣</span>
                   </div>
                   <div>
                     <h2 className="text-3xl font-semibold tracking-tight text-[#163c88]">{service.title}</h2>
-                    <p className="mt-4 max-w-xl text-sm leading-7 text-slate-600">{service.description}</p>
+                    <p className="mt-4 text-sm leading-7 text-slate-600">{service.description}</p>
                   </div>
 
                   <div className="space-y-3">
                     <p className="text-sm font-semibold text-[#163c88]">Key Features</p>
-                    <div className="grid gap-x-10 gap-y-3 sm:grid-cols-2">
+                    <div className="grid gap-3 sm:grid-cols-2">
                       {bullets.map((bullet) => (
                         <div key={bullet} className="flex items-start gap-2 text-sm text-slate-700">
                           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#2f6df7]" />
@@ -309,8 +309,8 @@ export function ServicesSection() {
                   </a>
                 </div>
 
-                <div className={`flex ${isReversed ? 'lg:[direction:ltr]' : ''}`}>
-                  <div className="card-animate relative h-[320px] w-full overflow-hidden rounded-[20px] border border-slate-200 bg-[#f5f7fb] shadow-[0_20px_45px_rgba(15,23,42,0.08)] sm:h-[360px]">
+                <div className="flex flex-1 items-center justify-center">
+                  <div className="card-animate relative h-[320px] w-full overflow-hidden rounded-[20px] border border-slate-200 bg-[#f5f7fb] sm:h-[360px]">
                     {service.image_url ? (
                       <img src={buildImageUrl(service.image_url)} alt={service.title} onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-full w-full object-cover bg-[#f5f7fb]" />
                     ) : (
@@ -328,7 +328,12 @@ export function ServicesSection() {
         </div>
       </div>
 
-      <div className="bg-[#eaf1ff] px-4 py-16 text-center sm:py-20">
+      {services.length === 0 ? (
+        <div className="section-shell py-16 text-center">
+          <p className="text-base text-slate-600">No services are available right now. Please check back later.</p>
+        </div>
+      ) : (
+        <div className="bg-[#eaf1ff] px-4 py-16 text-center sm:py-20">
         <div className="mx-auto flex max-w-3xl flex-col items-center">
           <h3 className="text-2xl font-semibold tracking-tight text-[#163c88] sm:text-[1.8rem]">Not sure which service you need?</h3>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
@@ -339,6 +344,7 @@ export function ServicesSection() {
           </a>
         </div>
       </div>
+      )}
     </section>
   );
 }
