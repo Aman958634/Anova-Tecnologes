@@ -163,12 +163,13 @@ section[id] {
 
 @media (max-width: 768px) {
   .fx-reveal {
-    transform: translate3d(0, 18px, 0);
+    opacity: 1 !important;
+    transform: none !important;
     transition-duration: 0.45s;
   }
 
   .card-animate:hover {
-    transform: translateY(-4px);
+    transform: none;
   }
 
   .section-shell > * {

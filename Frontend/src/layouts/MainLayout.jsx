@@ -15,12 +15,11 @@ export default function MainLayout({ children }) {
       document.querySelectorAll('main section, main .card-animate, footer')
     );
 
-    targets.forEach((node) => node.classList.add('fx-reveal'));
+    targets.forEach((node) => node.classList.add('fx-reveal', 'fx-reveal--visible'));
 
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
     if (isMobile) {
-      targets.forEach((node) => node.classList.add('fx-reveal--visible'));
       return undefined;
     }
 
