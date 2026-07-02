@@ -56,9 +56,9 @@ export default function Navbar() {
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center gap-3">
-          <a href="#contact" className={`rounded-2xl px-4 py-2.5 text-base font-medium transition sm:px-5 sm:py-3 sm:text-[1.02rem] ${isLightHeader ? 'bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.24)] hover:bg-[#2563eb]' : 'border border-white/15 bg-white text-[#1d4ed8] hover:bg-white/90'} lg:rounded-full`}>
+          <Link to="/contact" className={`rounded-2xl px-4 py-2.5 text-base font-medium transition sm:px-5 sm:py-3 sm:text-[1.02rem] ${isLightHeader ? 'bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.24)] hover:bg-[#2563eb]' : 'border border-white/15 bg-white text-[#1d4ed8] hover:bg-white/90'} lg:rounded-full`}>
             Get in Touch
-          </a>
+          </Link>
 
           <button onClick={() => setOpen((value) => !value)} className={`flex h-11 w-11 items-center justify-center rounded-full lg:hidden ${isLightHeader ? 'text-slate-900' : 'text-white'}`}>
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -76,11 +76,11 @@ export default function Navbar() {
           >
             <div className="section-shell flex flex-col gap-3 py-5">
               {navLinks.map((link) => (
-                <NavLink key={link.path} to={link.path} onClick={() => setOpen(false)} className={`rounded-2xl px-4 py-3 text-sm transition ${isLightHeader ? 'text-slate-700 hover:bg-slate-100 hover:text-[#2f6df7]' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}>
+                <Link key={link.path} to={link.path} onClick={() => setOpen(false)} className={`rounded-2xl px-4 py-3 text-sm transition ${isLightHeader ? 'text-slate-700 hover:bg-slate-100 hover:text-[#2f6df7]' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}>
                   {link.label}
-                </NavLink>
+                </Link>
               ))}
-              <a href="#contact" onClick={() => setOpen(false)} className="btn-primary w-full justify-center">Get in Touch</a>
+              <Link to="/contact" onClick={() => setOpen(false)} className="btn-primary w-full justify-center">Get in Touch</Link>
             </div>
           </motion.div>
         ) : null}
