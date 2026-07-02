@@ -8,15 +8,28 @@ const smtpPass = process.env.SMTP_PASS;
 
 let mailTransporter = null;
 if (smtpUser && smtpPass) {
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const port = Number(process.env.SMTP_PORT) || 587;
+  const secure = port === 465; // true for 465, false for 587
   mailTransporter = nodemailer.createTransport({
-    service: 'gmail',
+    host,
+    port,
+    secure,
     auth: {
       user: smtpUser,
       pass: smtpPass
     },
     connectionTimeout: 10000,
     greetingTimeout: 10000,
-    socketTimeout: 10000
+    socketTimeout: 10000,
+    tls: { rejectUnauthorized: false }
+  });
+
+  // Verify transporter connectivity in background
+  mailTransporter.verify().then(() => {
+    console.log('SMTP transporter verified');
+  }).catch((err) => {
+    console.warn('SMTP transporter verification failed:', err && err.message ? err.message : err);
   });
 }
 
@@ -60,12 +73,19 @@ const createContact = asyncHandler(async (req, res) => {
         `
       };
 
-      try {
-        await mailTransporter.sendMail(mailOptions);
-        console.log('Contact email sent');
-      } catch (emailError) {
-        console.error('Contact email failed:', emailError && emailError.message ? emailError.message : emailError);
-      }
+      // Fire-and-forget send to avoid blocking the API response. Retry once on failure.
+      mailTransporter.sendMail(mailOptions).then((info) => {
+        console.log('Contact email sent:', info && info.response ? info.response : info);
+      }).catch((err) => {
+        console.error('Contact email failed (1st):', err && err.message ? err.message : err);
+        setTimeout(() => {
+          mailTransporter.sendMail(mailOptions).then((info2) => {
+            console.log('Contact email sent (retry):', info2 && info2.response ? info2.response : info2);
+          }).catch((err2) => {
+            console.error('Contact email failed (retry):', err2 && err2.message ? err2.message : err2);
+          });
+        }, 2000);
+      });
     } else {
       console.warn('SMTP not configured — skipping email send');
     }

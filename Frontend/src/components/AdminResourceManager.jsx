@@ -174,6 +174,33 @@ export default function AdminResourceManager({ resource, title, description }) {
     return payload;
   };
 
+  const buildFormDataFrom = (obj) => {
+    const payload = new FormData();
+    Object.entries(obj).forEach(([key, value]) => {
+      if (key === 'id' || value === null || value === undefined) return;
+      if (key === 'image' && value) {
+        payload.append('image', value);
+        return;
+      }
+      if (key === 'photo' && value) {
+        payload.append('photo', value);
+        return;
+      }
+      if (key === 'tags' && typeof value === 'string') {
+        const arr = value.split(',').map((s) => s.trim()).filter(Boolean);
+        payload.append('tags', JSON.stringify(arr));
+        return;
+      }
+      if (key === 'key_features' && typeof value === 'string') {
+        const arr = value.split(',').map((s) => s.trim()).filter(Boolean);
+        payload.append('key_features', JSON.stringify(arr));
+        return;
+      }
+      payload.append(key, typeof value === 'boolean' ? String(value) : value);
+    });
+    return payload;
+  };
+
   const onSubmit = async (event) => {
     event.preventDefault();
     if (!supportsForm) return;
@@ -207,6 +234,35 @@ export default function AdminResourceManager({ resource, title, description }) {
       notifyDataUpdated();
     } catch {
       toast.error('Delete failed');
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    // If new form (no id), just clear preview and mark remove_image
+    if (!form.id) {
+      if (previewUrl && previewUrl.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+      setForm((current) => ({ ...current, image: null, remove_image: true }));
+      return;
+    }
+
+    // For existing resource, send update with remove_image = true
+    try {
+      setBusy(true);
+      const payloadObj = { ...form, remove_image: true, image: null };
+      const payload = buildFormDataFrom(payloadObj);
+      const response = await api.put(`${endpoint}/${form.id}`, payload, { headers: { 'Content-Type': 'multipart/form-data' } });
+      toast.success('Image removed');
+      // update local form state to reflect removed image
+      setForm((current) => ({ ...current, image_url: response.data.image_url || null, remove_image: false, image: null }));
+      if (previewUrl && previewUrl.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(null);
+      fetchRows();
+      notifyDataUpdated();
+    } catch (e) {
+      toast.error('Failed to remove image');
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -343,7 +399,8 @@ export default function AdminResourceManager({ resource, title, description }) {
                 }
               }} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
               {previewUrl ? (
-                <div className="md:col-span-2 mt-2">
+                <div className="md:col-span-2 mt-2 relative">
+                  <button type="button" onClick={handleRemoveImage} className="absolute right-2 top-2 z-10 inline-flex items-center gap-2 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100">Delete image</button>
                   <img src={previewUrl} alt="preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-32 w-full rounded-md object-cover bg-white" />
                 </div>
               ) : null}
@@ -369,7 +426,8 @@ export default function AdminResourceManager({ resource, title, description }) {
                 }
               }} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
               {previewUrl ? (
-                <div className="md:col-span-2 mt-2">
+                <div className="md:col-span-2 mt-2 relative">
+                  <button type="button" onClick={handleRemoveImage} className="absolute right-2 top-2 z-10 inline-flex items-center gap-2 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100">Delete image</button>
                   <img src={previewUrl} alt="preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-32 w-full rounded-md object-cover bg-white" />
                 </div>
               ) : null}
