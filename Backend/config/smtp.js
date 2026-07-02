@@ -1,96 +1,71 @@
-const nodemailer = require('nodemailer');
+const Brevo = require('@getbrevo/brevo');
 
-const smtpUser = process.env.SMTP_USER;
-const smtpPass = process.env.SMTP_PASS;
-const host = process.env.SMTP_HOST || 'smtp-relay.brevo.com';
-const port = Number(process.env.SMTP_PORT) || 587;
-const secure = false;
-const contactEmail = process.env.CONTACT_EMAIL || process.env.SMTP_USER;
+const brevoApiKey = process.env.BREVO_API_KEY;
+const contactEmail = process.env.CONTACT_EMAIL || 'anovatechnologies5@gmail.com';
+const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SMTP_USER || 'no-reply@anova.com';
 
 console.log({
-  SMTP_HOST: host,
-  SMTP_PORT: port,
-  SMTP_USER: smtpUser,
-  SMTP_PASS_EXISTS: !!smtpPass
+  BREVO_API_KEY_EXISTS: !!brevoApiKey,
+  CONTACT_EMAIL: contactEmail,
+  SENDER_EMAIL: senderEmail
 });
 
-let transporter = null;
+let brevoClient = null;
 
-if (smtpUser && smtpPass) {
-  transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    requireTLS: true,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass
-    },
-    tls: {
-      rejectUnauthorized: false
-    },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000
-  });
-
-  (async () => {
-    try {
-      if (!contactEmail) {
-        console.warn('CONTACT_EMAIL is not configured; skipping SMTP test email send');
-        return;
-      }
-
-      console.log('Sending SMTP test email...');
-
-      const testMailOptions = {
-        from: `Anova Technologies <${smtpUser}>`,
-        to: contactEmail,
-        subject: 'Brevo SMTP Diagnostic Test',
-        text: 'This is a test message to verify Brevo SMTP connectivity from Railway deployment.',
-        html: '<p>This is a test message to verify <strong>Brevo SMTP</strong> connectivity from Railway deployment.</p>'
-      };
-
-      await transporter.sendMail(testMailOptions);
-      console.log('Test email sent');
-    } catch (error) {
-      console.error('SMTP diagnostic test failed:');
-      console.error(error);
-    }
-  })();
+if (brevoApiKey) {
+  brevoClient = new Brevo.TransactionalEmailsApi();
+  brevoClient.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
 } else {
-  console.warn('SMTP credentials not set; email sending disabled');
+  console.warn('BREVO_API_KEY is not configured; Brevo email sending disabled');
 }
 
-/**
- * sendMail - sends an email via the configured transporter.
- * This function performs a non-blocking send and will optionally retry once on failure.
- * It logs outcomes but does not throw to callers (so it won't block API responses).
- */
-async function sendMail(mailOptions, options = {}) {
-  const { retry = 1, retryDelay = 2000 } = options;
-  if (!transporter) {
-    console.warn('sendMail called but transporter is not configured - skipping');
-    return null;
+async function sendContactEmail({ name, email, phone, subject, message }) {
+  if (!brevoClient) {
+    const error = new Error('Brevo client is not configured');
+    console.error('sendContactEmail failed:', error);
+    throw error;
   }
+
+  const emailPayload = {
+    sender: {
+      name: 'Anova Technologies',
+      email: senderEmail
+    },
+    to: [
+      {
+        email: contactEmail,
+        name: 'Anova Technologies'
+      }
+    ],
+    replyTo: {
+      email,
+      name: name || email
+    },
+    subject: `New Contact Message: ${subject}`,
+    htmlContent: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
+        <h2 style="color: #1d4ed8; margin-bottom: 16px;">New contact message</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Message:</strong></p>
+        <p style="white-space: pre-wrap;">${message}</p>
+      </div>
+    `,
+    textContent: `New contact message\n\nName: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nSubject: ${subject}\nMessage: ${message}`
+  };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info && info.response ? info.response : info);
-    return info;
-  } catch (err) {
-    console.error('sendMail failed (attempt):', err && err.stack ? err.stack : err);
-    if (retry > 0) {
-      setTimeout(() => {
-        transporter.sendMail(mailOptions).then((info2) => {
-          console.log('Email sent (retry):', info2 && info2.response ? info2.response : info2);
-        }).catch((err2) => {
-          console.error('sendMail failed (retry):', err2 && err2.stack ? err2.stack : err2);
-        });
-      }, retryDelay);
-    }
-    return null;
+    console.log('Sending Brevo contact email...');
+    const response = await brevoClient.sendTransacEmail(emailPayload);
+    console.log('Brevo contact email sent successfully:', response);
+    return response;
+  } catch (error) {
+    console.error('Brevo sendContactEmail failed:');
+    console.error(error);
+    throw error;
   }
 }
 
-module.exports = { transporter, sendMail };
+module.exports = { sendContactEmail };

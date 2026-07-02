@@ -1,7 +1,7 @@
 const asyncHandler = require('../utils/asyncHandler');
 const { pool } = require('../config/db');
 const { deleteById, countRows } = require('../models/baseModel');
-const { transporter, sendMail } = require('../config/smtp');
+const { sendContactEmail } = require('../config/smtp');
 
 const createContact = asyncHandler(async (req, res) => {
   const { name, email, phone, subject, message } = req.body;
@@ -24,31 +24,9 @@ const createContact = asyncHandler(async (req, res) => {
       message
     };
 
-    const mailOptions = {
-      from: `Anova Technologies <${process.env.SMTP_USER}>`,
-      to: process.env.CONTACT_EMAIL || process.env.SMTP_USER,
-      replyTo: email,
-      subject: `New Contact Message: ${subject}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
-          <h2 style="color: #1d4ed8; margin-bottom: 16px;">New contact message</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-          <p><strong>Subject:</strong> ${subject}</p>
-          <p><strong>Message:</strong></p>
-          <p style="white-space: pre-wrap;">${message}</p>
-        </div>
-      `
-    };
-
-    if (transporter) {
-      sendMail(mailOptions).catch((err) => {
-        console.error('Contact email send failed:', err);
-      });
-    } else {
-      console.warn('SMTP not configured — skipping email send');
-    }
+    sendContactEmail(contact).catch((err) => {
+      console.error('Contact email send failed:', err);
+    });
 
     return res.status(201).json({
       success: true,
