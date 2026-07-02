@@ -1,5 +1,3 @@
-const nodemailer = require('nodemailer');
-
 const contactEmail = (process.env.CONTACT_EMAIL || 'anovatechnologies5@gmail.com').trim();
 const senderEmail = (
   process.env.BREVO_SENDER_EMAIL ||
@@ -7,59 +5,40 @@ const senderEmail = (
   process.env.SMTP_USER ||
   'no-reply@anova.com'
 ).trim();
-const smtpHost = (process.env.SMTP_HOST || 'smtp-relay.brevo.com').trim();
-const primarySmtpPort = Number(process.env.SMTP_PORT || 587);
-const smtpUser = (process.env.SMTP_USER || '').trim();
-const smtpPass = (process.env.SMTP_PASS || '').trim();
+const brevoApiKey = (process.env.BREVO_API_KEY || '').trim();
+const brevoEndpoint = 'https://api.brevo.com/v3/smtp/email';
 
-const fallbackPorts = [2525, 465].filter((port) => port !== primarySmtpPort);
-
-console.log('SMTP config loaded:', {
+console.log('Email config loaded:', {
   contactEmail,
   senderEmail,
-  smtpHost,
-  smtpPort: primarySmtpPort,
-  smtpUserConfigured: !!smtpUser,
-  smtpPassConfigured: !!smtpPass,
-  fallbackPorts,
+  brevoApiKeyConfigured: !!brevoApiKey,
+  brevoEndpoint,
 });
 
-function createTransport(port) {
-  const secure = port === 465;
+function buildPayload(to, subject, html, replyTo) {
+  const recipients = Array.isArray(to)
+    ? to.map((email) => ({ email: String(email).trim() }))
+    : [{ email: String(to).trim() }];
 
-  return nodemailer.createTransport({
-    host: smtpHost,
-    port,
-    secure,
-    requireTLS: !secure,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
+  const payload = {
+    sender: {
+      name: 'Anova Technologies',
+      email: senderEmail,
     },
-    connectionTimeout: 15000,
-    greetingTimeout: 15000,
-    socketTimeout: 30000,
-    logger: true,
-    debug: true,
-    tls: {
-      rejectUnauthorized: false,
-    },
-  });
+    to: recipients,
+    subject,
+    htmlContent: html,
+    textContent: html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+  };
+
+  if (replyTo) {
+    payload.replyTo = {
+      email: String(replyTo).trim(),
+    };
+  }
+
+  return payload;
 }
-
-const transports = [{ port: primarySmtpPort, transporter: createTransport(primarySmtpPort) }]
-  .concat(fallbackPorts.map((port) => ({ port, transporter: createTransport(port) })));
-
-transports.forEach(({ port, transporter }) => {
-  transporter.verify((err, success) => {
-    if (err) {
-      console.error(`❌ SMTP transporter verification failed on port ${port}:`);
-      console.error(err);
-      return;
-    }
-    console.log(`✅ SMTP transporter verified on port ${port}:`, success);
-  });
-});
 
 async function sendEmail(to, subject, html, replyTo = null) {
   console.log('📧 sendEmail() called');
@@ -70,44 +49,45 @@ async function sendEmail(to, subject, html, replyTo = null) {
     replyTo,
   });
 
-  const recipients = Array.isArray(to)
-    ? to.map((email) => String(email).trim())
-    : [String(to).trim()];
-
-  const mailOptions = {
-    from: `Anova Technologies <${senderEmail}>`,
-    to: recipients,
-    subject,
-    html,
-    text: html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
-  };
-
-  if (replyTo) {
-    mailOptions.replyTo = String(replyTo).trim();
+  if (!brevoApiKey) {
+    const error = new Error('BREVO_API_KEY is not configured.');
+    console.error('❌ Email send failed:', error);
+    throw error;
   }
 
-  console.log('📤 email payload:');
-  console.log(JSON.stringify(mailOptions, null, 2));
+  const payload = buildPayload(to, subject, html, replyTo);
+  console.log('📤 Brevo API payload:');
+  console.log(JSON.stringify(payload, null, 2));
 
-  let lastError;
-  for (const { port, transporter } of transports) {
-    try {
-      console.log(`📡 Attempting SMTP send on port ${port}...`);
-      const response = await transporter.sendMail(mailOptions);
-      console.log(`✅ SMTP success response on port ${port}:`);
-      console.log(response);
-      return response;
-    } catch (error) {
-      console.error(`❌ SMTP error on port ${port}:`);
-      console.error(error);
-      console.error(error.response || error);
-      lastError = error;
-      if (fallbackPorts.length === 0) break;
-      console.log(`🔁 Trying next SMTP port after failure on port ${port}`);
-    }
+  const response = await fetch(brevoEndpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': brevoApiKey,
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const body = await response.text();
+  let parsed;
+  try {
+    parsed = JSON.parse(body);
+  } catch (parseError) {
+    parsed = body;
   }
 
-  throw lastError;
+  if (!response.ok) {
+    const error = new Error(`Brevo API failed with status ${response.status}`);
+    error.status = response.status;
+    error.body = parsed;
+    console.error('❌ Brevo API error:', error);
+    throw error;
+  }
+
+  console.log('✅ Brevo API response:');
+  console.log(parsed);
+  return parsed;
 }
 
 module.exports = {
