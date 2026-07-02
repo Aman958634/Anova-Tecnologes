@@ -1,51 +1,9 @@
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, Facebook, Linkedin, Mail, MapPin, Phone, Instagram, Youtube } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { navLinks } from '../utils/siteData';
 
 export default function Footer() {
-  const { pathname } = useLocation();
-  const isContactPage = pathname === '/contact';
-
-  if (isContactPage) {
-    return (
-      <footer className="border-t border-slate-200 bg-white text-slate-700">
-        <div className="section-shell grid gap-8 py-8 lg:grid-cols-[1fr_auto_1fr] lg:items-center">
-          <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.35 }} className="text-sm text-slate-500">
-            <div className="mb-3 inline-flex rounded-2xl bg-[linear-gradient(135deg,#0a2a66,#123f94)] px-3.5 py-2 shadow-[0_10px_24px_rgba(10,42,102,0.22)]">
-              <img
-                src="/logoanova-white.png"
-                alt="Anova Technologies"
-                className="h-auto w-[118px] max-w-none object-contain"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-            © {new Date().getFullYear()} <span className="font-semibold text-slate-900">ANOVA</span> Technologies. All rights reserved.
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.35, delay: 0.05 }} className="text-center text-sm font-medium text-slate-500">
-            Built with passion and code <span className="text-[#2f6df7]">♥</span>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.35, delay: 0.1 }} className="flex items-center justify-start gap-3 lg:justify-end">
-            {[Linkedin, GithubIcon, TwitterIcon, Mail].map((Icon, index) => (
-              <motion.a
-                key={index}
-                href="/"
-                whileHover={{ y: -3 }}
-                className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-[0_6px_18px_rgba(15,23,42,0.05)] transition hover:border-[#2f6df7] hover:text-[#2f6df7]"
-              >
-                <Icon className="h-4 w-4" />
-              </motion.a>
-            ))}
-          </motion.div>
-        </div>
-      </footer>
-    );
-  }
-
   return (
     <footer className="border-t border-[#0f2f6d] bg-[#071d4a] text-white">
       <div className="section-shell grid gap-10 py-16 md:grid-cols-2 lg:grid-cols-4">
