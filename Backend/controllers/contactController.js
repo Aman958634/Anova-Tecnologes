@@ -52,30 +52,37 @@ const createContact = asyncHandler(async (req, res) => {
       </div>
     `;
 
-    // Send email using Brevo
-    try {
+    // Send response immediately, then dispatch email asynchronously.
+    const responsePayload = {
+      success: true,
+      message: 'Contact submitted successfully',
+    };
+
+    res.status(201).json(responsePayload);
+    console.log('✅ Response sent to client');
+
+    setImmediate(() => {
       console.log('📧 Starting Brevo email send...');
       console.log('Admin email:', contactEmail);
 
-      const response = await sendEmail(
-        contactEmail,                          // your Gmail
+      sendEmail(
+        contactEmail,
         `New contact received: ${subject}`,
         html,
-        email                                 // reply-to user
-      );
-
-      console.log('✅ Brevo response:');
-      console.log(JSON.stringify(response, null, 2));
-    } catch (emailError) {
-      console.error('❌ BREVO ERROR:');
-      console.error(emailError);
-      console.error(emailError?.response?.body);
-    }
-
-    return res.status(201).json({
-      success: true,
-      message: 'Contact submitted successfully',
+        email
+      )
+        .then((response) => {
+          console.log('✅ Brevo response:');
+          console.log(JSON.stringify(response, null, 2));
+        })
+        .catch((emailError) => {
+          console.error('❌ BREVO ERROR:');
+          console.error(emailError);
+          console.error(emailError?.response?.body || emailError?.response || emailError);
+        });
     });
+
+    return;
 
   } catch (err) {
     console.error('❌ Failed to save contact:', err);

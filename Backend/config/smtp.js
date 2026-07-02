@@ -29,6 +29,23 @@ const transporter = nodemailer.createTransport({
     user: smtpUser,
     pass: smtpPass,
   },
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 20000,
+  logger: true,
+  debug: true,
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
+
+transporter.verify((err, success) => {
+  if (err) {
+    console.error('❌ SMTP transporter verification failed:');
+    console.error(err);
+    return;
+  }
+  console.log('✅ SMTP transporter verified:', success);
 });
 
 async function sendEmail(to, subject, html, replyTo = null) {
