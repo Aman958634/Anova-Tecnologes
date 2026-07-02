@@ -62,7 +62,7 @@ const createContact = asyncHandler(async (req, res) => {
     console.log('✅ Response sent to client');
 
     setImmediate(() => {
-      console.log('📧 Starting Brevo email send...');
+      console.log('📧 Starting SMTP email send...');
       console.log('Admin email:', contactEmail);
 
       sendEmail(
@@ -72,11 +72,11 @@ const createContact = asyncHandler(async (req, res) => {
         email
       )
         .then((response) => {
-          console.log('✅ Brevo response:');
+          console.log('✅ Email sent successfully:');
           console.log(JSON.stringify(response, null, 2));
         })
         .catch((emailError) => {
-          console.error('❌ BREVO ERROR:');
+          console.error('❌ Email send error:');
           console.error(emailError);
           console.error(emailError?.response?.body || emailError?.response || emailError);
         });

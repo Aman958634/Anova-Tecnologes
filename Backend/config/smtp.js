@@ -12,10 +12,7 @@ const primarySmtpPort = Number(process.env.SMTP_PORT || 587);
 const smtpUser = (process.env.SMTP_USER || '').trim();
 const smtpPass = (process.env.SMTP_PASS || '').trim();
 
-const fallbackPorts = [];
-if (!process.env.SMTP_PORT && primarySmtpPort !== 2525) {
-  fallbackPorts.push(2525);
-}
+const fallbackPorts = [2525, 465].filter((port) => port !== primarySmtpPort);
 
 console.log('SMTP config loaded:', {
   contactEmail,
@@ -28,11 +25,13 @@ console.log('SMTP config loaded:', {
 });
 
 function createTransport(port) {
+  const secure = port === 465;
+
   return nodemailer.createTransport({
     host: smtpHost,
     port,
-    secure: false,
-    requireTLS: true,
+    secure,
+    requireTLS: !secure,
     auth: {
       user: smtpUser,
       pass: smtpPass,
