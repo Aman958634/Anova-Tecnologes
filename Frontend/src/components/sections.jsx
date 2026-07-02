@@ -218,14 +218,22 @@ export function HomeServicesSection() {
 
 export function ServicesSection() {
   const [services, setServices] = useState(fallbackServices);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const fetchServices = useCallback(async () => {
+    setLoading(true);
+    setError('');
+
     try {
       const response = await api.get('/services', { params: { page: 1, limit: 20 } });
       const items = response.data.data || [];
       setServices(items.length ? items : fallbackServices);
-    } catch {
+    } catch (err) {
+      setError('Unable to load services right now. Please try again later.');
       setServices(fallbackServices);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -260,6 +268,12 @@ export function ServicesSection() {
     };
   }, [fetchServices]);
 
+  const statusMessage = loading
+    ? 'Loading services...'
+    : error
+    ? error
+    : `${services.length} services available`;
+
   return (
     <section id="services" className="bg-white text-slate-900">
       <div className="bg-[#102c66] px-4 py-16 text-center text-white sm:py-20">
@@ -272,7 +286,8 @@ export function ServicesSection() {
       </div>
 
       <div className="section-shell py-16 sm:py-20 lg:py-24">
-        <div className="space-y-16 lg:space-y-20">
+        <div className="mb-8 text-sm text-slate-600">{statusMessage}</div>
+        <div className="space-y-8">
           {services.map((service, index) => {
             const isReversed = index % 2 === 1;
             const bullets = resolveFeatures(service);
@@ -280,14 +295,14 @@ export function ServicesSection() {
             return (
               <div
                 key={service.id || service.title}
-                className={`card-animate flex flex-col gap-10 overflow-hidden rounded-[26px] border border-slate-200 bg-white p-5 shadow-[0_20px_45px_rgba(15,23,42,0.08)] transition hover:shadow-[0_24px_55px_rgba(15,23,42,0.12)] lg:flex-row lg:items-center lg:gap-16 ${isReversed ? 'lg:flex-row-reverse' : ''}`}
+                className={`card-animate overflow-hidden rounded-[26px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)] transition hover:shadow-[0_24px_55px_rgba(15,23,42,0.12)] lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-10 ${isReversed ? 'lg:grid-flow-col-dense lg:grid-cols-[0.95fr_1.05fr]' : ''}`}
               >
-                <div className="space-y-6 lg:flex-1">
+                <div className="space-y-6">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#eef4ff] text-[#2f6df7] ring-1 ring-[#dbe6ff]">
                     <span className="text-xl">▣</span>
                   </div>
                   <div>
-                    <h2 className="text-3xl font-semibold tracking-tight text-[#163c88]">{service.title}</h2>
+                    <h2 className="text-3xl font-semibold tracking-tight text-[#163c88] sm:text-2xl">{service.title}</h2>
                     <p className="mt-4 text-sm leading-7 text-slate-600">{service.description}</p>
                   </div>
 
@@ -308,10 +323,15 @@ export function ServicesSection() {
                   </a>
                 </div>
 
-                <div className="flex flex-1 items-center justify-center">
-                  <div className="card-animate relative h-[320px] w-full overflow-hidden rounded-[20px] border border-slate-200 bg-[#f5f7fb] sm:h-[360px]">
+                <div className="mt-6 lg:mt-0">
+                  <div className="relative h-[240px] w-full overflow-hidden rounded-[20px] border border-slate-200 bg-[#f5f7fb] sm:h-[320px]">
                     {service.image_url ? (
-                      <img src={buildImageUrl(service.image_url)} alt={service.title} onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-full w-full object-cover bg-[#f5f7fb]" />
+                      <img
+                        src={buildImageUrl(service.image_url)}
+                        alt={service.title}
+                        onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
+                        className="h-full w-full object-cover bg-[#f5f7fb]"
+                      />
                     ) : (
                       <div className="grid h-full place-items-center">
                         <div className="grid h-16 w-16 place-items-center rounded-2xl bg-[#e7efff] text-[#2f6df7] shadow-[0_10px_24px_rgba(47,109,247,0.12)]">
@@ -333,16 +353,16 @@ export function ServicesSection() {
         </div>
       ) : (
         <div className="bg-[#eaf1ff] px-4 py-16 text-center sm:py-20">
-        <div className="mx-auto flex max-w-3xl flex-col items-center">
-          <h3 className="text-2xl font-semibold tracking-tight text-[#163c88] sm:text-[1.8rem]">Not sure which service you need?</h3>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-            Our experts can help analyze your business requirements and suggest the most effective digital solutions for your specific goals.
-          </p>
-          <a href="/contact" className="mt-8 inline-flex items-center justify-center rounded-md bg-[#2f6df7] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#245fe0]">
-            Talk to an Expert
-          </a>
+          <div className="mx-auto flex max-w-3xl flex-col items-center">
+            <h3 className="text-2xl font-semibold tracking-tight text-[#163c88] sm:text-[1.8rem]">Not sure which service you need?</h3>
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+              Our experts can help analyze your business requirements and suggest the most effective digital solutions for your specific goals.
+            </p>
+            <a href="/contact" className="mt-8 inline-flex items-center justify-center rounded-md bg-[#2f6df7] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#245fe0]">
+              Talk to an Expert
+            </a>
+          </div>
         </div>
-      </div>
       )}
     </section>
   );
