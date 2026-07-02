@@ -9,7 +9,7 @@ console.log({
   BREVO_API_KEY_EXISTS: !!brevoApiKey,
   CONTACT_EMAIL: contactEmail,
   SENDER_EMAIL: senderEmail,
-  BREVO_TIMEOUT_SECONDS: timeoutInSeconds
+  BREVO_TIMEOUT_SECONDS: timeoutInSeconds,
 });
 
 const brevo = brevoApiKey
@@ -27,7 +27,7 @@ function normalizeText(html) {
     .trim();
 }
 
-async function sendEmail(to, subject, html) {
+async function sendEmail(to, subject, html, replyTo = null) {
   if (!brevo) {
     throw new Error('Brevo client is not configured. Set BREVO_API_KEY to enable email delivery.');
   }
@@ -50,6 +50,12 @@ async function sendEmail(to, subject, html) {
     htmlContent: html,
     textContent: normalizeText(html),
   };
+
+  if (replyTo) {
+    payload.replyTo = typeof replyTo === 'string'
+      ? { email: replyTo }
+      : replyTo;
+  }
 
   const response = await brevo.transactionalEmails.sendTransacEmail(payload);
   return response;
