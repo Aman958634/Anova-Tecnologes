@@ -14,8 +14,8 @@ const nodemailer = require('nodemailer');
 const smtpUser = process.env.SMTP_USER;
 const smtpPass = process.env.SMTP_PASS;
 const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-const port = Number(process.env.SMTP_PORT) || 587;
-const secure = port === 465;
+const port = Number(process.env.SMTP_PORT) || 465;
+const secure = true;
 
 let transporter = null;
 
@@ -24,15 +24,14 @@ if (smtpUser && smtpPass) {
     host,
     port,
     secure,
+    family: 4, // force IPv4
     auth: {
       user: smtpUser,
       pass: smtpPass
     },
-    family: 4, // force IPv4
     connectionTimeout: 10000,
     greetingTimeout: 10000,
-    socketTimeout: 10000,
-    tls: { rejectUnauthorized: false }
+    socketTimeout: 10000
   });
 
   // Verify transporter connectivity in background and log the result

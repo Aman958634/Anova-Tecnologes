@@ -27,7 +27,7 @@ const createContact = asyncHandler(async (req, res) => {
     if (transporter) {
       const mailOptions = {
         from: `Anova Technologies <${process.env.SMTP_USER}>`,
-        to: process.env.SMTP_USER,
+        to: process.env.CONTACT_EMAIL || process.env.SMTP_USER,
         replyTo: email,
         subject: `New Contact Message: ${subject}`,
         html: `
@@ -43,7 +43,7 @@ const createContact = asyncHandler(async (req, res) => {
         `
       };
 
-      // Fire-and-forget send; sendMail handles one retry and logs failures.
+      // Fire-and-forget send; sendMail logs failures and does not block the response.
       sendMail(mailOptions);
     } else {
       console.warn('SMTP not configured — skipping email send');
@@ -51,7 +51,6 @@ const createContact = asyncHandler(async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      data: contact,
       message: 'Contact submitted successfully'
     });
   } catch (err) {
