@@ -1,8 +1,8 @@
 const { BrevoClient } = require('@getbrevo/brevo');
 
 const brevoApiKey = process.env.BREVO_API_KEY;
-const contactEmail = process.env.CONTACT_EMAIL || 'anovatechnologies5@gmail.com';
-const senderEmail = process.env.BREVO_SENDER_EMAIL || process.env.SENDER_EMAIL || process.env.SMTP_USER || 'no-reply@anova.com';
+const contactEmail = (process.env.CONTACT_EMAIL || 'anovatechnologies5@gmail.com').trim();
+const senderEmail = (process.env.BREVO_SENDER_EMAIL || process.env.SENDER_EMAIL || process.env.SMTP_USER || 'no-reply@anova.com').trim();
 const timeoutInSeconds = Number(process.env.BREVO_TIMEOUT_SECONDS || 30);
 
 console.log({
@@ -27,25 +27,17 @@ function normalizeText(html) {
     .trim();
 }
 
-async function sendEmail(to, subject, html, replyTo = null) {
+async function sendEmail(subject, html, replyTo = null) {
   if (!brevo) {
     throw new Error('Brevo client is not configured. Set BREVO_API_KEY to enable email delivery.');
   }
-
-  const recipients = Array.isArray(to) ? to : [to];
-  const toRecipients = recipients.map((recipient) => {
-    if (typeof recipient === 'string') {
-      return { email: recipient };
-    }
-    return recipient;
-  });
 
   const payload = {
     sender: {
       name: 'Anova Technologies',
       email: senderEmail,
     },
-    to: toRecipients,
+    to: [{ email: contactEmail }],
     subject,
     htmlContent: html,
     textContent: normalizeText(html),
@@ -57,7 +49,9 @@ async function sendEmail(to, subject, html, replyTo = null) {
       : replyTo;
   }
 
+  console.log('🔥 Starting Brevo email send...');
   const response = await brevo.transactionalEmails.sendTransacEmail(payload);
+  console.log('✅ Brevo response:', response);
   return response;
 }
 

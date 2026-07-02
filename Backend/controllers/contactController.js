@@ -36,9 +36,14 @@ const createContact = asyncHandler(async (req, res) => {
       </div>
     `;
 
-    sendEmail(contact.email, `New contact received: ${subject}`, html).catch((err) => {
-      console.error('Contact email send failed:', err);
-    });
+    try {
+      await sendEmail(`New contact received: ${subject}`, html, {
+        email,
+        name: name || email,
+      });
+    } catch (err) {
+      console.error('❌ BREVO ERROR:', err);
+    }
 
     return res.status(201).json({
       success: true,
