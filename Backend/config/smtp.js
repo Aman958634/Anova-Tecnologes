@@ -29,21 +29,19 @@ if (smtpUser && smtpPass) {
     tls: {
       rejectUnauthorized: false
     },
-    connectionTimeout: 30000,
-    greetingTimeout: 30000,
-    socketTimeout: 30000
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000
   });
 
   (async () => {
     try {
-      console.log('Testing SMTP connection...');
-      await transporter.verify();
-      console.log('Brevo SMTP connected successfully');
-
       if (!contactEmail) {
         console.warn('CONTACT_EMAIL is not configured; skipping SMTP test email send');
         return;
       }
+
+      console.log('Sending SMTP test email...');
 
       const testMailOptions = {
         from: `Anova Technologies <${smtpUser}>`,
@@ -57,7 +55,7 @@ if (smtpUser && smtpPass) {
       console.log('Test email sent');
     } catch (error) {
       console.error('SMTP diagnostic test failed:');
-      console.error(error && error.stack ? error.stack : error);
+      console.error(error);
     }
   })();
 } else {
