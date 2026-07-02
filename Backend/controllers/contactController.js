@@ -13,33 +13,36 @@ if (smtpUser && smtpPass) {
     auth: {
       user: smtpUser,
       pass: smtpPass
-    }
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000
   });
 }
 
 const createContact = asyncHandler(async (req, res) => {
   const { name, email, phone, subject, message } = req.body;
   if (!name || !email || !subject || !message) {
-    return res.status(400).json({ message: 'Name, email, subject, and message are required.' });
+    return res.status(400).json({ success: false, message: 'Name, email, subject, and message are required.' });
   }
-  let insertId = null;
+
   try {
     const [result] = await pool.query(
       'INSERT INTO contacts (name, email, phone, subject, message) VALUES (?, ?, ?, ?, ?)',
       [name, email, phone || null, subject, message]
     );
-    insertId = result.insertId;
-  } catch (dbErr) {
-    console.error('Failed to save contact to DB:', dbErr && dbErr.message ? dbErr.message : dbErr);
-    // continue — we'll still attempt to send email so messages can reach admin even if DB is down
-  }
 
-  let mailSent = false;
-  let mailStatusMessage = null;
+    const contact = {
+      id: result.insertId || null,
+      name,
+      email,
+      phone: phone || null,
+      subject,
+      message
+    };
 
-  if (mailTransporter) {
-    try {
-      await mailTransporter.sendMail({
+    if (mailTransporter) {
+      const mailOptions = {
         from: `Anova Technologies <${smtpUser}>`,
         to: smtpUser,
         replyTo: email,
@@ -55,30 +58,27 @@ const createContact = asyncHandler(async (req, res) => {
             <p style="white-space: pre-wrap;">${message}</p>
           </div>
         `
-      });
-      mailSent = true;
-    } catch (err) {
-      console.error('Contact email failed:', err && err.message ? err.message : err);
-      mailSent = false;
-      mailStatusMessage = err?.message || 'Email delivery failed.';
+      };
+
+      try {
+        await mailTransporter.sendMail(mailOptions);
+        console.log('Contact email sent');
+      } catch (emailError) {
+        console.error('Contact email failed:', emailError && emailError.message ? emailError.message : emailError);
+      }
+    } else {
+      console.warn('SMTP not configured — skipping email send');
     }
-  } else {
-    mailStatusMessage = 'SMTP is not configured. Email will not be delivered.';
-  }
 
-  if (!insertId && !mailSent) {
-    const fallbackMessage = mailStatusMessage || 'Failed to save message and could not deliver email. Please try again later.';
-    return res.status(500).json({ message: fallbackMessage });
+    return res.status(201).json({
+      success: true,
+      data: contact,
+      message: 'Contact submitted successfully'
+    });
+  } catch (err) {
+    console.error('Failed to save contact to DB:', err && err.message ? err.message : err);
+    return res.status(500).json({ success: false, message: err.message || 'Failed to submit contact' });
   }
-
-  let responseMessage = 'Message received.';
-  if (insertId && !mailSent) {
-    responseMessage = `Message saved to the database, but email delivery failed. ${mailStatusMessage || ''}`.trim();
-  } else if (!insertId && mailSent) {
-    responseMessage = 'Message sent by email. Database save failed.';
-  }
-
-  res.status(201).json({ message: responseMessage, id: insertId, mailSent });
 });
 
 const listContacts = asyncHandler(async (req, res) => {
