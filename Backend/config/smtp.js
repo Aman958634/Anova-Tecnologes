@@ -1,21 +1,17 @@
-const dns = require('dns');
-// Prefer IPv4 to avoid IPv6 connectivity issues on some hosts/platforms
-if (typeof dns.setDefaultResultOrder === 'function') {
-  try {
-    dns.setDefaultResultOrder('ipv4first');
-    console.log('DNS result order set to ipv4first');
-  } catch (e) {
-    console.warn('Failed to set DNS result order:', e && e.message ? e.message : e);
-  }
-}
-
 const nodemailer = require('nodemailer');
 
 const smtpUser = process.env.SMTP_USER;
 const smtpPass = process.env.SMTP_PASS;
-const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-const port = Number(process.env.SMTP_PORT) || 465;
-const secure = true;
+const host = process.env.SMTP_HOST || 'smtp-relay.brevo.com';
+const port = Number(process.env.SMTP_PORT) || 587;
+const secure = false;
+
+console.log({
+  SMTP_HOST: host,
+  SMTP_PORT: port,
+  SMTP_USER: smtpUser,
+  SMTP_PASS_EXISTS: !!smtpPass
+});
 
 let transporter = null;
 
@@ -24,21 +20,25 @@ if (smtpUser && smtpPass) {
     host,
     port,
     secure,
-    family: 4, // force IPv4
+    requireTLS: true,
     auth: {
       user: smtpUser,
       pass: smtpPass
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000
+    tls: {
+      rejectUnauthorized: false
+    },
+    connectionTimeout: 30000,
+    greetingTimeout: 30000,
+    socketTimeout: 30000
   });
 
-  // Verify transporter connectivity in background and log the result
-  transporter.verify().then(() => {
-    console.log('SMTP transporter verified');
-  }).catch((err) => {
-    console.warn('SMTP transporter verification failed:', err && err.message ? err.message : err);
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error('SMTP verify failed:', error);
+    } else {
+      console.log('✅ Brevo SMTP connected');
+    }
   });
 } else {
   console.warn('SMTP credentials not set; email sending disabled');
@@ -61,13 +61,13 @@ async function sendMail(mailOptions, options = {}) {
     console.log('Email sent:', info && info.response ? info.response : info);
     return info;
   } catch (err) {
-    console.error('sendMail failed (attempt):', err && err.message ? err.message : err);
+    console.error('sendMail failed (attempt):', err);
     if (retry > 0) {
       setTimeout(() => {
         transporter.sendMail(mailOptions).then((info2) => {
           console.log('Email sent (retry):', info2 && info2.response ? info2.response : info2);
         }).catch((err2) => {
-          console.error('sendMail failed (retry):', err2 && err2.message ? err2.message : err2);
+          console.error('sendMail failed (retry):', err2);
         });
       }, retryDelay);
     }

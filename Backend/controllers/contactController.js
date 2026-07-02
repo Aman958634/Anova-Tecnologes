@@ -24,27 +24,28 @@ const createContact = asyncHandler(async (req, res) => {
       message
     };
 
-    if (transporter) {
-      const mailOptions = {
-        from: `Anova Technologies <${process.env.SMTP_USER}>`,
-        to: process.env.CONTACT_EMAIL || process.env.SMTP_USER,
-        replyTo: email,
-        subject: `New Contact Message: ${subject}`,
-        html: `
-          <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
-            <h2 style="color: #1d4ed8; margin-bottom: 16px;">New contact message</h2>
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-            <p><strong>Subject:</strong> ${subject}</p>
-            <p><strong>Message:</strong></p>
-            <p style="white-space: pre-wrap;">${message}</p>
-          </div>
-        `
-      };
+    const mailOptions = {
+      from: `Anova Technologies <${process.env.SMTP_USER}>`,
+      to: process.env.CONTACT_EMAIL || process.env.SMTP_USER,
+      replyTo: email,
+      subject: `New Contact Message: ${subject}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #0f172a;">
+          <h2 style="color: #1d4ed8; margin-bottom: 16px;">New contact message</h2>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
+          <p><strong>Subject:</strong> ${subject}</p>
+          <p><strong>Message:</strong></p>
+          <p style="white-space: pre-wrap;">${message}</p>
+        </div>
+      `
+    };
 
-      // Fire-and-forget send; sendMail logs failures and does not block the response.
-      sendMail(mailOptions);
+    if (transporter) {
+      sendMail(mailOptions).catch((err) => {
+        console.error('Contact email send failed:', err);
+      });
     } else {
       console.warn('SMTP not configured — skipping email send');
     }
