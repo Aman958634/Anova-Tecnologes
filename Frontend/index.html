@@ -8,12 +8,21 @@
     <!-- Primary favicon (used as fallback) -->
     <link rel="icon" href="/logoanova.png" type="image/png" />
     <link rel="shortcut icon" href="/logoanova.png" type="image/png" />
-    <!-- Standard sizes for better browser support -->
+    <!-- Multiple sizes (browsers pick the best one) -->
+    <link rel="icon" type="image/png" sizes="64x64" href="/logoanova.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/logoanova.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/logoanova.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/logoanova.png">
+    <!-- High-res icons for pinned tabs / Android -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/logoanova.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/logoanova.png">
     <!-- Apple touch icon -->
-    <link rel="apple-touch-icon" href="/logoanova.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/logoanova.png">
+    <!-- Safari pinned tab (mask icon) - uses monochrome SVG ideally -->
+    <link rel="mask-icon" href="/logoanova.svg" color="#0b1220">
     <meta name="msapplication-TileColor" content="#0b1220" />
+    <!-- Web manifest for mobile / PWA icons -->
+    <link rel="manifest" href="/manifest.json">
     <title>ANOVA TECHNOLOGIES</title>
   </head>
   <body class="bg-slate-950 text-slate-100 antialiased">
