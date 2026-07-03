@@ -813,7 +813,14 @@ export function TeamSection() {
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {fallbackTeam.map((member) => (
             <SectionCard key={member.id} className="overflow-hidden p-0">
-              <img src={member.image} alt={member.name} loading="lazy" decoding="async" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-72 w-full object-cover bg-[#f8fafc]" />
+              <img
+                src={buildImageUrl(member.image_url || member.image)}
+                alt={member.name}
+                loading="lazy"
+                decoding="async"
+                onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
+                className="h-72 w-full object-cover bg-[#f8fafc]"
+              />
               <div className="space-y-2 p-6 text-center">
                 <h3 className="text-lg font-semibold text-[#163c88]">{member.name}</h3>
                 <p className="text-sm text-slate-500">{member.designation}</p>

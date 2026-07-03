@@ -44,6 +44,8 @@ export default function About() {
     };
   }, []);
 
+  const heroImage = teamMembers[0]?.image_url || teamMembers[0]?.image || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80';
+
   return (
     <div className="bg-white text-slate-900">
       <section className="bg-[#102c66] px-4 py-16 text-center text-white sm:py-20">
@@ -85,10 +87,11 @@ export default function About() {
           <div className="justify-self-center">
             <div className="overflow-hidden rounded-[18px] shadow-[0_20px_55px_rgba(15,23,42,0.18)]">
               <img
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80"
+                src={buildImageUrl(heroImage)}
                 alt="Team collaboration"
                 loading="lazy"
                 decoding="async"
+                onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80'; }}
                 className="h-[420px] w-full object-cover"
               />
             </div>
