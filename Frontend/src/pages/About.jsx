@@ -86,8 +86,13 @@ export default function About() {
             </div>
           </div>
 
-          <div className="justify-self-center">
-            <div className="overflow-hidden rounded-[18px] shadow-[0_20px_55px_rgba(15,23,42,0.18)]">
+          <div className="justify-self-end">
+            <motion.div
+              initial={{ opacity: 0, x: 18 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+              className="overflow-hidden rounded-[18px] shadow-[0_20px_55px_rgba(15,23,42,0.18)] w-[420px]"
+            >
               <img
                 src={buildImageUrl(heroImage, heroImageFallback)}
                 alt="Team collaboration"
@@ -96,7 +101,7 @@ export default function About() {
                 onError={(e) => { e.currentTarget.src = heroImageFallback; }}
                 className="h-[420px] w-full object-cover"
               />
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </section>
