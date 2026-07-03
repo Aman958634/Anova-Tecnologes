@@ -44,8 +44,8 @@ export default function About() {
     };
   }, []);
 
-  // Use the original static portrait for the About hero to ensure consistent display
-  const heroImage = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1200&q=80';
+  // Use the site team-working hero image for the About right-side illustration
+  const heroImage = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80';
   const heroImageFallback = imageFallbackByKey('team');
 
   return (
