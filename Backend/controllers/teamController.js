@@ -1,19 +1,33 @@
 const asyncHandler = require('../utils/asyncHandler');
 const { pool } = require('../config/db');
 const { findById, deleteById } = require('../models/baseModel');
+const { getCache, setCache, invalidateCache } = require('../utils/simpleCache');
+
+const setShortCacheHeaders = (res) => {
+  res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=30');
+};
 
 const listTeamMembers = asyncHandler(async (req, res) => {
   const search = req.query.search ? `%${req.query.search}%` : '%';
   const page = Math.max(Number(req.query.page) || 1, 1);
   const limit = Math.min(Math.max(Number(req.query.limit) || 12, 1), 100);
   const offset = (page - 1) * limit;
+  const cacheKey = `team:${search}:${page}:${limit}`;
+  const cached = getCache(cacheKey);
+  if (cached) {
+    setShortCacheHeaders(res);
+    return res.json(cached);
+  }
 
   const [rows] = await pool.query(
     'SELECT * FROM team_members WHERE name LIKE ? OR designation LIKE ? ORDER BY featured DESC, id DESC LIMIT ? OFFSET ?',
     [search, search, limit, offset]
   );
   const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM team_members WHERE name LIKE ? OR designation LIKE ?', [search, search]);
-  res.json({ data: rows, meta: { page, limit, total: countRows[0].total } });
+  const result = { data: rows, meta: { page, limit, total: countRows[0].total } };
+  setCache(cacheKey, result, 120000);
+  setShortCacheHeaders(res);
+  res.json(result);
 });
 
 const createTeamMember = asyncHandler(async (req, res) => {
@@ -22,6 +36,7 @@ const createTeamMember = asyncHandler(async (req, res) => {
     'INSERT INTO team_members (name, designation, image_url, featured) VALUES (?, ?, ?, ?)',
     [req.body.name, req.body.designation, imageUrl, req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0]
   );
+  invalidateCache('team:');
   res.status(201).json(await findById('team_members', result.insertId));
 });
 
@@ -41,6 +56,7 @@ const updateTeamMember = asyncHandler(async (req, res) => {
 const deleteTeamMember = asyncHandler(async (req, res) => {
   const deleted = await deleteById('team_members', req.params.id);
   if (!deleted) return res.status(404).json({ message: 'Team member not found.' });
+  invalidateCache('team:');
   res.json({ message: 'Team member deleted successfully.' });
 });
 

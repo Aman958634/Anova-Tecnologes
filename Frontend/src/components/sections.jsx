@@ -156,12 +156,10 @@ export function HomeServicesSection() {
 
     window.addEventListener('anova:data-updated', onDataUpdated);
     window.addEventListener('storage', onStorage);
-    const intervalId = window.setInterval(fetchServices, 10000);
 
     return () => {
       window.removeEventListener('anova:data-updated', onDataUpdated);
       window.removeEventListener('storage', onStorage);
-      window.clearInterval(intervalId);
     };
   }, [fetchServices]);
 
@@ -329,6 +327,8 @@ export function ServicesSection() {
                       <img
                         src={buildImageUrl(service.image_url)}
                         alt={service.title}
+                        loading="lazy"
+                        decoding="async"
                         onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
                         className="h-full w-full object-cover bg-[#f5f7fb]"
                       />
@@ -611,6 +611,8 @@ export function ProjectsSection() {
                   <img
                     src={buildImageUrl(project.image_url)}
                     alt={project.title}
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
                     className="h-full w-full object-cover bg-[#f0f3fa]"
                   />
@@ -708,7 +710,7 @@ export function TestimonialsSection() {
               </div>
               <p className="mt-5 text-[0.92rem] italic leading-7 text-slate-600">“{item.review}”</p>
               <div className="mt-6 flex items-center gap-3">
-                <img src={buildImageUrl(item.photo_url)} alt={item.name} onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-10 w-10 rounded-full object-cover bg-white" />
+                <img src={buildImageUrl(item.photo_url)} alt={item.name} loading="lazy" decoding="async" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-10 w-10 rounded-full object-cover bg-white" />
                 <div>
                   <h3 className="text-sm font-semibold text-[#163c88]">{item.name}</h3>
                   <p className="text-[0.76rem] text-slate-500">{item.designation}</p>
@@ -730,7 +732,7 @@ export function TeamSection() {
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {fallbackTeam.map((member) => (
             <SectionCard key={member.id} className="overflow-hidden p-0">
-              <img src={member.image} alt={member.name} onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-72 w-full object-cover bg-[#f8fafc]" />
+              <img src={member.image} alt={member.name} loading="lazy" decoding="async" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-72 w-full object-cover bg-[#f8fafc]" />
               <div className="space-y-2 p-6 text-center">
                 <h3 className="text-lg font-semibold text-[#163c88]">{member.name}</h3>
                 <p className="text-sm text-slate-500">{member.designation}</p>

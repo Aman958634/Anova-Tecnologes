@@ -1,5 +1,10 @@
 const asyncHandler = require('../utils/asyncHandler');
 const { pool } = require('../config/db');
+const { getCache, setCache, invalidateCache } = require('../utils/simpleCache');
+
+const setShortCacheHeaders = (res) => {
+  res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=30');
+};
 
 const DEFAULT_STATS = {
   projects_completed: '156+',
@@ -27,7 +32,16 @@ async function ensureStatsRow() {
 }
 
 const getSiteStats = asyncHandler(async (req, res) => {
+  const cacheKey = 'site_stats:latest';
+  const cached = getCache(cacheKey);
+  if (cached) {
+    setShortCacheHeaders(res);
+    return res.json(cached);
+  }
+
   const stats = await ensureStatsRow();
+  setCache(cacheKey, stats, 120000);
+  setShortCacheHeaders(res);
   res.json(stats);
 });
 
@@ -43,6 +57,7 @@ const updateSiteStats = asyncHandler(async (req, res) => {
     'UPDATE site_stats SET projects_completed = ?, happy_clients = ?, years_experience = ?, team_members = ? WHERE id = 1',
     [projectsCompleted, happyClients, yearsExperience, teamMembers]
   );
+  invalidateCache('site_stats:');
 
   const [rows] = await pool.query('SELECT * FROM site_stats WHERE id = 1 LIMIT 1');
   res.json(rows[0]);

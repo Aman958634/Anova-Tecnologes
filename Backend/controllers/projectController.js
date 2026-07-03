@@ -1,6 +1,7 @@
 const asyncHandler = require('../utils/asyncHandler');
 const { pool } = require('../config/db');
 const { findById, deleteById } = require('../models/baseModel');
+const { getCache, setCache, invalidateCache } = require('../utils/simpleCache');
 
 const parseTags = (value) => {
   if (!value) return [];
@@ -15,11 +16,21 @@ const parseTags = (value) => {
   }
 };
 
+const setShortCacheHeaders = (res) => {
+  res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=30');
+};
+
 const listProjects = asyncHandler(async (req, res) => {
   const search = req.query.search ? `%${req.query.search}%` : '%';
   const page = Math.max(Number(req.query.page) || 1, 1);
   const limit = Math.min(Math.max(Number(req.query.limit) || 12, 1), 100);
   const offset = (page - 1) * limit;
+  const cacheKey = `projects:${search}:${page}:${limit}`;
+  const cached = getCache(cacheKey);
+  if (cached) {
+    setShortCacheHeaders(res);
+    return res.json(cached);
+  }
 
   const [rows] = await pool.query(
     'SELECT * FROM projects WHERE title LIKE ? OR description LIKE ? ORDER BY featured DESC, id DESC LIMIT ? OFFSET ?',
@@ -27,7 +38,10 @@ const listProjects = asyncHandler(async (req, res) => {
   );
   const formatted = rows.map((row) => ({ ...row, tags: parseTags(row.tags) }));
   const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM projects WHERE title LIKE ? OR description LIKE ?', [search, search]);
-  res.json({ data: formatted, meta: { page, limit, total: countRows[0].total } });
+  const result = { data: formatted, meta: { page, limit, total: countRows[0].total } };
+  setCache(cacheKey, result, 120000);
+  setShortCacheHeaders(res);
+  res.json(result);
 });
 
 const createProject = asyncHandler(async (req, res) => {
@@ -37,6 +51,7 @@ const createProject = asyncHandler(async (req, res) => {
     'INSERT INTO projects (title, description, image_url, live_demo_url, tags, featured) VALUES (?, ?, ?, ?, ?, ?)',
     [req.body.title, req.body.description, imageUrl, req.body.live_demo_url || null, tags, req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0]
   );
+  invalidateCache('projects:');
   res.status(201).json(await findById('projects', result.insertId));
 });
 
@@ -51,6 +66,7 @@ const updateProject = asyncHandler(async (req, res) => {
     'UPDATE projects SET title = ?, description = ?, image_url = ?, live_demo_url = ?, tags = ?, featured = ? WHERE id = ?',
     [req.body.title, req.body.description, imageUrl, req.body.live_demo_url || null, tags, req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0, req.params.id]
   );
+  invalidateCache('projects:');
   const updated = await findById('projects', req.params.id);
   updated.tags = parseTags(updated.tags);
   res.json(updated);
@@ -59,6 +75,7 @@ const updateProject = asyncHandler(async (req, res) => {
 const deleteProject = asyncHandler(async (req, res) => {
   const deleted = await deleteById('projects', req.params.id);
   if (!deleted) return res.status(404).json({ message: 'Project not found.' });
+  invalidateCache('projects:');
   res.json({ message: 'Project deleted successfully.' });
 });
 

@@ -1,6 +1,7 @@
 const asyncHandler = require('../utils/asyncHandler');
 const { pool } = require('../config/db');
 const { findById, deleteById } = require('../models/baseModel');
+const { getCache, setCache, invalidateCache } = require('../utils/simpleCache');
 
 const parseKeyFeatures = (value) => {
   if (!value) return [];
@@ -24,18 +25,31 @@ const normalizeService = (row) => ({
   key_features: parseKeyFeatures(row.key_features)
 });
 
+const setShortCacheHeaders = (res) => {
+  res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=30');
+};
+
 const listServices = asyncHandler(async (req, res) => {
   const search = req.query.search ? `%${req.query.search}%` : '%';
   const page = Math.max(Number(req.query.page) || 1, 1);
   const limit = Math.min(Math.max(Number(req.query.limit) || 12, 1), 100);
   const offset = (page - 1) * limit;
+  const cacheKey = `services:${search}:${page}:${limit}`;
+  const cached = getCache(cacheKey);
+  if (cached) {
+    setShortCacheHeaders(res);
+    return res.json(cached);
+  }
 
   const [rows] = await pool.query(
     'SELECT * FROM services WHERE title LIKE ? OR description LIKE ? ORDER BY featured DESC, id DESC LIMIT ? OFFSET ?',
     [search, search, limit, offset]
   );
   const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM services WHERE title LIKE ? OR description LIKE ?', [search, search]);
-  res.json({ data: rows.map(normalizeService), meta: { page, limit, total: countRows[0].total } });
+  const result = { data: rows.map(normalizeService), meta: { page, limit, total: countRows[0].total } };
+  setCache(cacheKey, result, 120000);
+  setShortCacheHeaders(res);
+  res.json(result);
 });
 
 const createService = asyncHandler(async (req, res) => {
@@ -45,6 +59,7 @@ const createService = asyncHandler(async (req, res) => {
     'INSERT INTO services (title, description, icon, key_features, image_url, featured) VALUES (?, ?, ?, ?, ?, ?)',
     [title, description, icon || null, serializeKeyFeatures(key_features), imageUrl, featured === '1' || featured === 'true' ? 1 : 0]
   );
+  invalidateCache('services:');
   res.status(201).json(normalizeService(await findById('services', result.insertId)));
 });
 
@@ -65,12 +80,14 @@ const updateService = asyncHandler(async (req, res) => {
       req.params.id
     ]
   );
+  invalidateCache('services:');
   res.json(normalizeService(await findById('services', req.params.id)));
 });
 
 const deleteService = asyncHandler(async (req, res) => {
   const deleted = await deleteById('services', req.params.id);
   if (!deleted) return res.status(404).json({ message: 'Service not found.' });
+  invalidateCache('services:');
   res.json({ message: 'Service deleted successfully.' });
 });
 
