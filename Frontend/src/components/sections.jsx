@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowRight, BarChart3, CheckCircle2, Clock3, Code2, Cloud, Cpu, Database, Globe, GraduationCap, Heart, HeartHandshake, LayoutPanelTop, Link2, Mail, MapPin, Megaphone, Monitor, Palette, Phone, PlayCircle, ShoppingCart, Smartphone, Star, ShieldCheck, UtensilsCrossed } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { buildImageUrl, starsFromRating } from '../utils/helpers';
+import { buildImageUrl, imageFallbackByKey, starsFromRating } from '../utils/helpers';
 import { fallbackServices, fallbackTeam, fallbackTestimonials } from '../utils/siteData';
 import SectionHeading from './SectionHeading';
 import api from '../services/api';
@@ -684,11 +684,11 @@ export function ProjectsSection() {
                 {/* Image area */}
                 <div className="relative h-[210px] overflow-hidden">
                   <img
-                    src={buildImageUrl(project.image_url)}
+                    src={buildImageUrl(project.image_url, imageFallbackByKey(project.title))}
                     alt={project.title}
                     loading="lazy"
                     decoding="async"
-                    onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
+                    onError={(e) => { e.currentTarget.src = imageFallbackByKey(project.title); }}
                     className="h-full w-full object-cover bg-[#f0f3fa]"
                   />
                   {/* Category chip */}
@@ -814,11 +814,11 @@ export function TeamSection() {
           {fallbackTeam.map((member) => (
             <SectionCard key={member.id} className="overflow-hidden p-0">
               <img
-                src={buildImageUrl(member.image_url || member.image)}
+                src={buildImageUrl(member.image_url || member.image, imageFallbackByKey(member.name))}
                 alt={member.name}
                 loading="lazy"
                 decoding="async"
-                onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
+                onError={(e) => { e.currentTarget.src = imageFallbackByKey(member.name); }}
                 className="h-72 w-full object-cover bg-[#f8fafc]"
               />
               <div className="space-y-2 p-6 text-center">
