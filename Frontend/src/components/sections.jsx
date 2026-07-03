@@ -596,10 +596,7 @@ export function ProjectsSection() {
     return ['All', ...Array.from(tags).slice(0, 4)];
   }, [projects]);
 
-  const filtered = useMemo(() => {
-    if (activeFilter === 'All') return projects;
-    return projects.filter((p) => Array.isArray(p.tags) && p.tags.includes(activeFilter));
-  }, [projects, activeFilter]);
+  const filtered = useMemo(() => projects, [projects]);
 
   const tagIcon = (tag = '') => {
     const t = tag.toLowerCase();
