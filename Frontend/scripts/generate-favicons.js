@@ -22,9 +22,18 @@ const sharp = require('sharp');
 
     const sizes = [16, 32, 48, 64, 192, 512];
 
+    // Generate standard favicons (contain with transparent padding)
     for (const s of sizes) {
       const outPath = path.join(outDir, `favicon-${s}x${s}.png`);
       await base.clone().resize(s, s).toFile(outPath);
+      console.log('Written', outPath);
+    }
+
+    // Generate "zoomed" favicons where logo fills the canvas (fit: cover)
+    const zoomBase = sharp(srcPath).resize({ width: 512, height: 512, fit: 'cover', position: 'centre' }).png();
+    for (const s of sizes) {
+      const outPath = path.join(outDir, `favicon-zoom-${s}x${s}.png`);
+      await zoomBase.clone().resize(s, s).toFile(outPath);
       console.log('Written', outPath);
     }
 
