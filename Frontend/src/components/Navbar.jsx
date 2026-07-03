@@ -63,13 +63,20 @@ export default function Navbar() {
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center gap-3">
-          <Link to="/contact" className={`rounded-2xl px-4 py-2.5 text-base font-medium transition sm:px-5 sm:py-3 sm:text-[1.02rem] ${isLightHeader ? 'bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.24)] hover:bg-[#2563eb]' : 'border border-white/15 bg-white text-[#1d4ed8] hover:bg-white/90'} lg:rounded-full`}>
-            Get in Touch
-          </Link>
+          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }}>
+            <Link to="/contact" className={`rounded-2xl px-4 py-2.5 text-base font-medium transition sm:px-5 sm:py-3 sm:text-[1.02rem] ${isLightHeader ? 'bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.24)] hover:bg-[#2563eb]' : 'border border-white/15 bg-white text-[#1d4ed8] hover:bg-white/90'} lg:rounded-full`}>
+              Get in Touch
+            </Link>
+          </motion.div>
 
-          <button onClick={() => setOpen((value) => !value)} className={`flex h-11 w-11 items-center justify-center rounded-full lg:hidden ${isLightHeader ? 'text-slate-900' : 'text-white'}`}>
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          <motion.button
+            onClick={() => setOpen((value) => !value)}
+            whileTap={{ scale: 0.92 }}
+            transition={{ duration: 0.2 }}
+            className={`flex h-11 w-11 items-center justify-center rounded-full lg:hidden ${isLightHeader ? 'text-slate-900' : 'text-white'}`}
+          >
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </motion.button>
         </div>
       </div>
 

@@ -44,7 +44,9 @@ export default function About() {
     };
   }, []);
 
-  const heroImage = teamMembers[0]?.image_url || teamMembers[0]?.image;
+  const heroImageSource = teamMembers.find((member) => member.image_url || member.image) || teamMembers[0];
+  const heroImage = heroImageSource?.image_url || heroImageSource?.image;
+  const heroImageFallback = imageFallbackByKey(heroImageSource?.name || 'team');
 
   return (
     <div className="bg-white text-slate-900">
@@ -87,11 +89,11 @@ export default function About() {
           <div className="justify-self-center">
             <div className="overflow-hidden rounded-[18px] shadow-[0_20px_55px_rgba(15,23,42,0.18)]">
               <img
-                src={buildImageUrl(heroImage, imageFallbackByKey(teamMembers[0]?.name || 'team'))}
+                src={buildImageUrl(heroImage, heroImageFallback)}
                 alt="Team collaboration"
                 loading="lazy"
                 decoding="async"
-                onError={(e) => { e.currentTarget.src = imageFallbackByKey(teamMembers[0]?.name || 'team'); }}
+                onError={(e) => { e.currentTarget.src = heroImageFallback; }}
                 className="h-[420px] w-full object-cover"
               />
             </div>
