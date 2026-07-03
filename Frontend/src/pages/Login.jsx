@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import BrandMark from '../components/BrandMark';
 
 export default function Login() {
   const { login } = useAuth();
@@ -38,9 +37,14 @@ export default function Login() {
         transition={{ duration: 0.35, delay: 0.05, ease: 'easeOut' }}
         className="w-full max-w-md rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(11,37,91,0.96),rgba(14,44,104,0.96))] p-8 shadow-[0_28px_80px_rgba(5,20,50,0.35)]"
       >
-        <BrandMark compact />
-        <p className="mt-6 text-sm font-semibold uppercase tracking-[0.28em] text-cyan-300">Admin Access</p>
-        <h1 className="mt-2 text-3xl font-semibold text-white">Sign in to the dashboard</h1>
+        <div className="mb-6 flex items-center gap-3">
+          <img src="/logoanova-white.png" alt="Anova Technologies" className="h-12 w-auto object-contain" />
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-cyan-300">Admin Access</p>
+            <p className="text-xl font-semibold text-white">Anova Technologies</p>
+          </div>
+        </div>
+        <h1 className="text-3xl font-semibold text-white">Sign in to the dashboard</h1>
         <p className="mt-3 text-sm leading-6 text-white/70">Use your admin email and password to access the dashboard.</p>
 
         <form onSubmit={submit} className="mt-8 grid gap-4">
