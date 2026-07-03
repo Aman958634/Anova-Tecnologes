@@ -47,10 +47,13 @@ export default function Navbar() {
               key={link.path}
               to={link.path}
               className={({ isActive }) =>
-                `text-[1.12rem] font-normal transition ${isActive ? 'text-[#2f80ff]' : isLightHeader ? 'text-slate-700 hover:text-[#2f80ff]' : 'text-white hover:text-[#9fc1ff]'}`
+                `group relative overflow-hidden text-[1.12rem] font-normal transition ${isActive ? 'text-[#2f80ff]' : isLightHeader ? 'text-slate-700 hover:text-[#2f80ff]' : 'text-white hover:text-[#9fc1ff]'}`
               }
             >
-              {link.label}
+              <span className="relative z-10">{link.label}</span>
+              <span
+                className={`absolute left-0 -bottom-1 h-[2px] rounded-full transition-all duration-300 ${isActive ? 'w-full' : 'w-0 group-hover:w-full'} ${isLightHeader ? 'bg-[#2563eb]' : 'bg-[#9fc1ff]'}`}
+              />
             </NavLink>
           ))}
         </nav>

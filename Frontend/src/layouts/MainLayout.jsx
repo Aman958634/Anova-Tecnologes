@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import Lenis from '@studio-freight/lenis';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -108,14 +108,17 @@ export default function MainLayout({ children }) {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <motion.main
-        key={location.pathname}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.32, ease: 'easeOut' }}
-      >
-        {children}
-      </motion.main>
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={location.pathname}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.32, ease: 'easeOut' }}
+        >
+          {children}
+        </motion.main>
+      </AnimatePresence>
       <Footer />
     </div>
   );

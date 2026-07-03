@@ -565,7 +565,6 @@ export function AboutSection() {
 
 export function ProjectsSection() {
   const [projects, setProjects] = useState([]);
-  const [activeFilter, setActiveFilter] = useState('All');
   const [liked, setLiked] = useState({});
 
   const fetchProjects = useCallback(async () => {
@@ -671,27 +670,8 @@ export function ProjectsSection() {
           </p>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {allTags.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => setActiveFilter(tag)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-medium transition ${
-                activeFilter === tag
-                  ? 'bg-[#2f6df7] text-white shadow-[0_6px_18px_rgba(47,109,247,0.3)]'
-                  : 'border border-[#d4dff5] bg-white text-[#3c4f7a] hover:border-[#2f6df7] hover:text-[#2f6df7]'
-              }`}
-            >
-              {tag !== 'All' ? tagIcon(tag) : null}
-              {tag}
-            </button>
-          ))}
-        </div>
-
-        {/* Cards grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((project, index) => (
+          {projects.map((project, index) => (
             <motion.div
               key={project.id || project.title}
               initial={{ opacity: 0, y: 20 }}
