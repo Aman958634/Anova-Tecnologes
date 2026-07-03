@@ -20,7 +20,7 @@ const sharp = require('sharp');
       .resize({ width: maxSide, height: maxSide, fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
       .png();
 
-    const sizes = [16, 32, 48, 64, 192, 512];
+    const sizes = [16, 32, 48, 180, 64, 192, 512];
 
     // Generate standard favicons (contain with transparent padding)
     for (const s of sizes) {
