@@ -86,12 +86,12 @@ export default function About() {
             </div>
           </div>
 
-          <div className="justify-self-end">
+          <div className="justify-self-center lg:justify-self-end">
             <motion.div
               initial={{ opacity: 0, x: 18 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="overflow-hidden rounded-[18px] shadow-[0_20px_55px_rgba(15,23,42,0.18)] w-[420px]"
+              className="overflow-hidden rounded-[18px] shadow-[0_20px_55px_rgba(15,23,42,0.18)] w-full max-w-[420px]"
             >
               <img
                 src={buildImageUrl(heroImage, heroImageFallback)}
@@ -99,7 +99,7 @@ export default function About() {
                 loading="lazy"
                 decoding="async"
                 onError={(e) => { e.currentTarget.src = heroImageFallback; }}
-                className="h-[420px] w-full object-cover"
+                className="w-full h-auto sm:h-[420px] object-cover rounded-[18px]"
               />
             </motion.div>
           </div>
