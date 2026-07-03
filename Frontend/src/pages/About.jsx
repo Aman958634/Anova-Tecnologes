@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lightbulb, Target, Users } from 'lucide-react';
 import api from '../services/api';
-import { buildImageUrl } from '../utils/helpers';
+import { buildImageUrl, imageFallbackByKey } from '../utils/helpers';
 import { fallbackTeam } from '../utils/siteData';
 
 export default function About() {
@@ -44,7 +44,7 @@ export default function About() {
     };
   }, []);
 
-  const heroImage = teamMembers[0]?.image_url || teamMembers[0]?.image || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80';
+  const heroImage = teamMembers[0]?.image_url || teamMembers[0]?.image;
 
   return (
     <div className="bg-white text-slate-900">
@@ -87,11 +87,11 @@ export default function About() {
           <div className="justify-self-center">
             <div className="overflow-hidden rounded-[18px] shadow-[0_20px_55px_rgba(15,23,42,0.18)]">
               <img
-                src={buildImageUrl(heroImage)}
+                src={buildImageUrl(heroImage, imageFallbackByKey(teamMembers[0]?.name || 'team'))}
                 alt="Team collaboration"
                 loading="lazy"
                 decoding="async"
-                onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80'; }}
+                onError={(e) => { e.currentTarget.src = imageFallbackByKey(teamMembers[0]?.name || 'team'); }}
                 className="h-[420px] w-full object-cover"
               />
             </div>
@@ -172,11 +172,11 @@ export default function About() {
                   transition={{ duration: 0.45 }}
                   className="overflow-hidden rounded-[14px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.05)]"
                 >
-                  {member.image || member.image_url ? (
+                  {member.image_url || member.image ? (
                     <img
-                      src={buildImageUrl(member.image || member.image_url)}
+                      src={buildImageUrl(member.image_url || member.image, imageFallbackByKey(member.name))}
                       alt={member.name}
-                      onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
+                      onError={(e) => { e.currentTarget.src = imageFallbackByKey(member.name); }}
                       className="h-[250px] w-full object-cover bg-[#eaf1ff]"
                     />
                   ) : (
