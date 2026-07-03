@@ -7,7 +7,56 @@ import SectionHeading from './SectionHeading';
 import api from '../services/api';
 
 function SectionCard({ children, className = '' }) {
-  return <div className={`card-animate rounded-[22px] border border-slate-200 bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)] ${className}`}>{children}</div>;
+  return (
+    <motion.div
+      whileHover={{ y: -6, scale: 1.002 }}
+      whileTap={{ scale: 0.997 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+      className={`card-animate rounded-[22px] border border-slate-200 bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)] ${className}`}>
+      {children}
+    </motion.div>
+  );
+}
+
+const sectionReveal = {
+  hidden: { opacity: 0, y: 26 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }
+};
+
+function AnimatedCounter({ value, duration = 1200, delay = 80, className = '' }) {
+  const [count, setCount] = useState(0);
+  const [suffix, setSuffix] = useState('');
+
+  useEffect(() => {
+    const parsedValue = Number(String(value).replace(/[^0-9]/g, '')) || 0;
+    const parsedSuffix = String(value).replace(/[0-9]/g, '');
+    setSuffix(parsedSuffix);
+
+    let frame = null;
+    let start = null;
+
+    const animate = (timestamp) => {
+      if (!start) start = timestamp;
+      const elapsed = timestamp - start - delay;
+      if (elapsed < 0) {
+        frame = requestAnimationFrame(animate);
+        return;
+      }
+
+      const progress = Math.min(elapsed / duration, 1);
+      setCount(Math.round(parsedValue * progress));
+      if (progress < 1) {
+        frame = requestAnimationFrame(animate);
+      }
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [value, duration, delay]);
+
+  return <span className={className}>{count}{suffix}</span>;
 }
 
 const SERVICE_ICON_MAP = [
@@ -72,8 +121,24 @@ export function HeroSection() {
             transition={{ duration: 0.55, delay: 0.2 }}
             className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
           >
-            <a href="#contact" className="btn-primary min-w-[190px]">Start Your Project</a>
-            <a href="#projects" className="btn-secondary min-w-[190px]">View Our Work</a>
+            <motion.a
+              whileHover={{ y: -2, scale: 1.01 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+              href="#contact"
+              className="btn-primary min-w-[190px]"
+            >
+              Start Your Project
+            </motion.a>
+            <motion.a
+              whileHover={{ y: -2, scale: 1.01 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+              href="#projects"
+              className="btn-secondary min-w-[190px]"
+            >
+              View Our Work
+            </motion.a>
           </motion.div>
 
         </div>
@@ -164,7 +229,14 @@ export function HomeServicesSection() {
   }, [fetchServices]);
 
   return (
-    <section id="services" className="bg-[#f3f5f8] py-12 text-slate-900 sm:py-14">
+    <motion.section
+      id="services"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.18 }}
+      className="bg-[#f3f5f8] py-12 text-slate-900 sm:py-14"
+    >
       <div className="section-shell">
         <motion.div
           initial="hidden"
@@ -210,7 +282,7 @@ export function HomeServicesSection() {
           ))}
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
@@ -413,7 +485,14 @@ export function AboutSection() {
   }, [fetchStats]);
 
   return (
-    <section id="about" className="bg-[#eef4ff] py-24 text-slate-900">
+    <motion.section
+      id="about"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.18 }}
+      className="bg-[#eef4ff] py-24 text-slate-900"
+    >
       <div className="section-shell grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div>
           <SectionHeading
@@ -464,14 +543,23 @@ export function AboutSection() {
       </div>
 
       <div className="section-shell mt-16 grid gap-4 rounded-[22px] bg-white px-6 py-8 shadow-[0_8px_30px_rgba(15,23,42,0.05)] sm:grid-cols-4">
-        {stats.map(([value, label]) => (
-          <div key={label} className="card-animate rounded-xl px-2 py-3 text-center">
-            <p className="text-[2rem] font-semibold leading-none text-[#15387c]">{value}</p>
+        {stats.map(([value, label], index) => (
+          <motion.div
+            key={label}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.4, delay: index * 0.08 }}
+            className="card-animate rounded-xl px-2 py-3 text-center"
+          >
+            <p className="text-[2rem] font-semibold leading-none text-[#15387c]">
+              <AnimatedCounter value={value} className="inline-block" />
+            </p>
             <p className="mt-2 text-[0.7rem] font-medium uppercase tracking-[0.22em] text-slate-500">{label}</p>
-          </div>
+          </motion.div>
         ))}
       </div>
-    </section>
+    </motion.section>
   );
 }
 
@@ -560,7 +648,14 @@ export function ProjectsSection() {
   };
 
   return (
-    <section id="projects" className="bg-[#f0f3fa] py-16 text-slate-900 sm:py-20">
+    <motion.section
+      id="projects"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.2 }}
+      className="bg-[#f0f3fa] py-16 text-slate-900 sm:py-20"
+    >
       <div className="section-shell space-y-10">
 
         {/* Header */}
@@ -601,10 +696,13 @@ export function ProjectsSection() {
               key={project.id || project.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -4, scale: 1.004 }}
+              whileTap={{ scale: 0.997 }}
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.32, delay: index * 0.05 }}
+              transition={{ duration: 0.32, delay: index * 0.05, type: 'spring', stiffness: 240, damping: 24 }}
+              className="card-animate"
             >
-              <div className="card-animate overflow-hidden rounded-[18px] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.08)] transition hover:shadow-[0_16px_36px_rgba(15,23,42,0.13)]">
+              <div className="overflow-hidden rounded-[18px] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.08)] transition hover:shadow-[0_16px_36px_rgba(15,23,42,0.13)]">
 
                 {/* Image area */}
                 <div className="relative h-[210px] overflow-hidden">
@@ -664,7 +762,7 @@ export function ProjectsSection() {
         </div>
 
       </div>
-    </section>
+    </motion.section>
   );
 }
 
@@ -699,7 +797,13 @@ export function TestimonialsSection() {
   }, [fetchTestimonials]);
 
   return (
-    <section className="bg-white py-24 text-slate-900">
+    <motion.section
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.2 }}
+      className="bg-white py-24 text-slate-900"
+    >
       <div className="section-shell space-y-10">
         <SectionHeading center eyebrow="Client Success Stories" title="Client Success Stories" description="Trusted results that speak for themselves." />
         <div className="grid gap-6 lg:grid-cols-3">
@@ -720,7 +824,7 @@ export function TestimonialsSection() {
           ))}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
@@ -758,7 +862,14 @@ export function BlogSection() {
   ];
 
   return (
-    <section id="blog" className="bg-white py-20 sm:py-24">
+    <motion.section
+      id="blog"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.2 }}
+      className="bg-white py-20 sm:py-24"
+    >
       <div className="section-shell space-y-10">
         <SectionHeading eyebrow="Blog" title="Fresh content to support credibility and SEO." description="Search-friendly article cards with dates, categories, and clear calls to action." />
         <div className="grid gap-6 lg:grid-cols-3">
@@ -778,13 +889,20 @@ export function BlogSection() {
           ))}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
 export function ContactSection() {
   return (
-    <section id="contact" className="relative overflow-hidden bg-[#102c66] py-20 text-white sm:py-24">
+    <motion.section
+      id="contact"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.18 }}
+      className="relative overflow-hidden bg-[#102c66] py-20 text-white sm:py-24"
+    >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,156,255,0.18),_transparent_45%)]" />
       <div className="section-shell relative flex flex-col items-center text-center">
         <h2 className="max-w-4xl text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[2.4rem]">Ready to Transform Your Digital Presence?</h2>
@@ -795,6 +913,6 @@ export function ContactSection() {
           Contact Us Today
         </a>
       </div>
-    </section>
+    </motion.section>
   );
 }
