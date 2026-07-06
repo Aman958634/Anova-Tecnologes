@@ -13,9 +13,21 @@ export function buildImageUrl(url, fallback = null) {
   let path = String(url).replace(/\\+/g, '/').trim();
   if (!path.startsWith('/')) path = `/${path}`;
 
-  const apiUrl = import.meta.env.VITE_API_URL || 'https://anova-tecnologes-production.up.railway.app/api';
-  const backendUrl = String(apiUrl).replace(/\/+$/, '').replace(/\/api$/, '');
-  return `${backendUrl}${path}`;
+  // If a VITE API URL is configured (useful for local development or custom deployments),
+  // prefer it. Otherwise, on production hosts (like Vercel) use a proxied `/api` route
+  // so the browser requests go to the same origin and Vercel's rewrites will forward them.
+  const configuredApi = import.meta.env.VITE_API_URL;
+  if (configuredApi) {
+    const apiUrl = String(configuredApi).replace(/\/+$/, '');
+    // If VITE_API_URL includes an /api suffix, strip it and join with path
+    const backendUrl = apiUrl.replace(/\/api$/, '');
+    return `${backendUrl}${path}`;
+  }
+
+  // Default: return the uploads path as-is (e.g. /uploads/filename). On production
+  // we add a Vercel rewrite so requests to /uploads/* are forwarded to the backend
+  // upload folder. This avoids embedding the backend hostname into the client.
+  return path;
 }
 
 export function imageFallbackByKey(key) {
