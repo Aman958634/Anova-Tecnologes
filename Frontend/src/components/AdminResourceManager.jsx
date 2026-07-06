@@ -146,6 +146,11 @@ export default function AdminResourceManager({ resource, title, description }) {
     }
   };
 
+  const isPlaceholderImageUrl = (value) => {
+    if (!value) return false;
+    return typeof value === 'string' && value.includes('images.unsplash.com');
+  };
+
   const buildPayload = () => {
     const payload = new FormData();
     Object.entries(form).forEach(([key, value]) => {
@@ -156,6 +161,9 @@ export default function AdminResourceManager({ resource, title, description }) {
       }
       if (key === 'photo' && value) {
         payload.append('photo', value);
+        return;
+      }
+      if ((key === 'image_url' || key === 'photo_url') && isPlaceholderImageUrl(value)) {
         return;
       }
       // Ensure tags and key_features are sent as JSON arrays when provided as comma-separated strings
@@ -184,6 +192,9 @@ export default function AdminResourceManager({ resource, title, description }) {
       }
       if (key === 'photo' && value) {
         payload.append('photo', value);
+        return;
+      }
+      if ((key === 'image_url' || key === 'photo_url') && isPlaceholderImageUrl(value)) {
         return;
       }
       if (key === 'tags' && typeof value === 'string') {
@@ -257,7 +268,7 @@ export default function AdminResourceManager({ resource, title, description }) {
       setBusy(true);
       const payloadObj = { ...form, remove_image: true, image: null };
       const payload = buildFormDataFrom(payloadObj);
-      const response = await api.put(`${endpoint}/${form.id}`, payload, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const response = await api.put(`${endpoint}/${form.id}`, payload);
       toast.success('Image removed');
       // update local form state to reflect removed image
       setForm((current) => ({ ...current, image_url: response.data.image_url || null, remove_image: false, image: null }));
