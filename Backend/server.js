@@ -11,6 +11,7 @@ const bcrypt = require('bcryptjs');
 const { pool, testConnection } = require('./config/db');
 const routes = require('./routes');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
+const { ensureChatbotTables } = require('./controllers/chatbotController');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -329,6 +330,9 @@ async function bootstrap() {
 
     await seedDefaultBlogs();
     console.log('✅ Default blogs ready');
+
+    await ensureChatbotTables();
+    console.log('✅ Chatbot tables ready');
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);

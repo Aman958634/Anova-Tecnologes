@@ -8,6 +8,7 @@ const teamRoutes = require('./teamRoutes');
 const contactRoutes = require('./contactRoutes');
 const dashboardRoutes = require('./dashboardRoutes');
 const statsRoutes = require('./statsRoutes');
+const chatbotRoutes = require('./chatbotRoutes');
 
 const router = express.Router();
 
@@ -20,5 +21,6 @@ router.use('/team', teamRoutes);
 router.use('/contact', contactRoutes);
 router.use('/admin', dashboardRoutes);
 router.use('/stats', statsRoutes);
+router.use('/chatbot', chatbotRoutes);
 
 module.exports = router;

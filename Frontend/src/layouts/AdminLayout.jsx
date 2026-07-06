@@ -1,7 +1,7 @@
 import { Link, NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import { LayoutDashboard, LogOut, Mail, Newspaper, Shapes, Star, FolderKanban, Users, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, LogOut, Mail, Newspaper, Shapes, Star, FolderKanban, Users, BarChart3, Bot } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const adminLinks = [
@@ -12,7 +12,8 @@ const adminLinks = [
   { label: 'Stats', path: '/admin/stats', icon: BarChart3 },
   { label: 'Blogs', path: '/admin/blogs', icon: Newspaper },
   { label: 'Testimonials', path: '/admin/testimonials', icon: Star },
-  { label: 'Contacts', path: '/admin/contacts', icon: Mail }
+  { label: 'Contacts', path: '/admin/contacts', icon: Mail },
+  { label: 'Chatbot Leads', path: '/admin/chatbot-leads', icon: Bot }
 ];
 
 export default function AdminLayout({ children }) {
