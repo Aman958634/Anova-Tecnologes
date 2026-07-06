@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const RAILWAY_BACKEND_URL = 'https://anova-tecnologes-production.up.railway.app/api';
+const DEFAULT_API_BASE_URL = '/api';
 
 function getApiBaseUrl() {
-  const rawUrl = import.meta.env.VITE_API_URL || RAILWAY_BACKEND_URL;
+  const rawUrl = import.meta.env.VITE_API_URL || DEFAULT_API_BASE_URL;
   const baseUrl = rawUrl.replace(/\/+$/, '');
   return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
 }
