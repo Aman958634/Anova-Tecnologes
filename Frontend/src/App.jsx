@@ -17,6 +17,7 @@ const AdminStats = lazy(() => import('./pages/AdminStats'));
 const AdminBlogs = lazy(() => import('./pages/AdminBlogs'));
 const AdminTestimonials = lazy(() => import('./pages/AdminTestimonials'));
 const AdminContacts = lazy(() => import('./pages/AdminContacts'));
+const AdminChatbotLeads = lazy(() => import('./pages/AdminChatbotLeads'));
 
 function PublicRoute({ element }) {
   return <MainLayout>{element}</MainLayout>;
