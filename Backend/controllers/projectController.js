@@ -16,6 +16,24 @@ const parseTags = (value) => {
   }
 };
 
+const isPlaceholderImage = (url) => {
+  if (!url) return false;
+  const s = String(url).trim();
+  // Treat common Unsplash placeholder URLs (used by the frontend helper) as "no image"
+  if (s.includes('images.unsplash.com')) return true;
+  // Add any other known placeholder patterns here
+  return false;
+};
+
+const normalizeImageInput = (input, file) => {
+  // If a file was uploaded, prefer the uploaded file path
+  if (file && file.filename) return `/uploads/${file.filename}`;
+  if (!input) return null;
+  const value = String(input).trim();
+  if (isPlaceholderImage(value)) return null;
+  return value || null;
+};
+
 const setShortCacheHeaders = (res) => {
   res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=30');
 };
@@ -45,7 +63,7 @@ const listProjects = asyncHandler(async (req, res) => {
 });
 
 const createProject = asyncHandler(async (req, res) => {
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.image_url || null;
+  const imageUrl = normalizeImageInput(req.body.image_url, req.file);
   const tags = JSON.stringify(parseTags(req.body.tags));
   const [result] = await pool.query(
     'INSERT INTO projects (title, description, image_url, live_demo_url, tags, featured) VALUES (?, ?, ?, ?, ?, ?)',
@@ -60,7 +78,7 @@ const updateProject = asyncHandler(async (req, res) => {
   if (!existing) return res.status(404).json({ message: 'Project not found.' });
 
   const shouldRemoveImage = req.body.remove_image === 'true' || req.body.remove_image === '1';
-  const imageUrl = shouldRemoveImage ? null : (req.file ? `/uploads/${req.file.filename}` : (req.body.image_url !== undefined ? req.body.image_url || null : existing.image_url));
+  const imageUrl = shouldRemoveImage ? null : normalizeImageInput(req.body.image_url, req.file) || existing.image_url;
   const tags = JSON.stringify(parseTags(req.body.tags || existing.tags));
   await pool.query(
     'UPDATE projects SET title = ?, description = ?, image_url = ?, live_demo_url = ?, tags = ?, featured = ? WHERE id = ?',
