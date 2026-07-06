@@ -51,20 +51,27 @@ function ChatbotWidget() {
   };
 
   const handleQuickAction = async (action) => {
+    console.log('[Chatbot] Quick action clicked:', action);
     setInput(action);
     await sendMessage(action);
   };
 
   const sendMessage = async (messageText = input) => {
     const text = (messageText || '').trim();
-    if (!text) return;
+    console.log('[Chatbot] sendMessage called', { messageText, input, text, sessionId });
+    if (!text) {
+      console.warn('[Chatbot] sendMessage aborted because text is empty');
+      return;
+    }
 
     appendMessage(text, 'user');
     setInput('');
     setIsLoading(true);
 
     try {
+      console.log('[Chatbot] Sending request to /chatbot/reply');
       const response = await api.post('/chatbot/reply', { message: text, session_id: sessionId });
+      console.log('[Chatbot] Received response', response?.data);
       const reply = response?.data?.reply || response?.data?.data?.reply || response?.data?.message;
       if (!reply) {
         throw new Error('Invalid chatbot response payload');
@@ -170,7 +177,7 @@ function ChatbotWidget() {
             {!leadMode ? (
               <div className="flex flex-wrap gap-2">
                 {QUICK_ACTIONS.map((action) => (
-                  <button key={action} onClick={() => handleQuickAction(action)} className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-[#163c88] hover:text-[#163c88]">
+                  <button key={action} type="button" onClick={() => handleQuickAction(action)} className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-[#163c88] hover:text-[#163c88]">
                     {action}
                   </button>
                 ))}
@@ -180,7 +187,7 @@ function ChatbotWidget() {
             <div id="chatbot-end" />
           </div>
 
-          <form onSubmit={(event) => { event.preventDefault(); leadMode ? submitLead(event) : sendMessage(); }} className="border-t border-slate-200 bg-white p-3">
+          <form onSubmit={(event) => { event.preventDefault(); console.log('[Chatbot] form submit'); leadMode ? submitLead(event) : sendMessage(); }} className="border-t border-slate-200 bg-white p-3">
             {leadMode ? (
               <div className="mb-3 space-y-2 text-sm text-slate-600">
                 <input value={leadForm.name} onChange={(event) => setLeadForm((current) => ({ ...current, name: event.target.value }))} placeholder="Your name" className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[#163c88]" />
