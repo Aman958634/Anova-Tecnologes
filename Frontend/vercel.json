@@ -1,7 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/(.*)",
+      "destination": "https://anova-tecnologes-production.up.railway.app/api/$1"
+    },
+    {
+      "source": "(.*)",
       "destination": "/index.html"
     }
   ]
