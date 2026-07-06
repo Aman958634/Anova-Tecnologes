@@ -59,7 +59,10 @@ function ChatbotWidget() {
 
     try {
       const response = await api.post('/chatbot/reply', { message: text, session_id: sessionId });
-      const reply = response?.data?.data?.reply || 'Thanks! Our team will follow up soon.';
+      const reply = response?.data?.reply || response?.data?.data?.reply || response?.data?.message;
+      if (!reply) {
+        throw new Error('Invalid chatbot response payload');
+      }
       appendMessage(reply, 'assistant');
 
       if (['book', 'contact', 'consultation', 'project'].some((word) => text.toLowerCase().includes(word))) {
@@ -67,7 +70,16 @@ function ChatbotWidget() {
         appendMessage('We can collect your project details now. Please share a few details so we can follow up.', 'assistant');
       }
     } catch (error) {
-      appendMessage('Sorry, I could not respond right now. Please try again or contact us directly.', 'assistant');
+      console.error('Chatbot request failed:', {
+        message: error.message,
+        response: error?.response?.data || error?.response,
+        request: error?.request
+      });
+      const backendMessage = error?.response?.data?.message || error?.response?.data?.error;
+      appendMessage(
+        backendMessage || 'Sorry, I could not respond right now. Please try again or contact us directly.',
+        'assistant'
+      );
     } finally {
       setIsLoading(false);
     }

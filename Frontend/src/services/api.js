@@ -16,30 +16,6 @@ const api = axios.create({
   }
 });
 
-// Runtime health-check: if the configured backend host cannot be reached (DNS or network
-// error), fall back to a relative `/api` so sites deployed on the same domain (Vercel)
-// can proxy requests to the API. This prevents repeated `ERR_NAME_NOT_RESOLVED` errors
-// in browser consoles when the configured host is invalid or unreachable.
-(async function ensureReachableBase() {
-  try {
-    const healthUrl = `${api.defaults.baseURL.replace(/\/+$/, '')}/health`;
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch(healthUrl, { method: 'GET', signal: controller.signal, cache: 'no-store' });
-    clearTimeout(id);
-    if (!res.ok) throw new Error('unhealthy');
-  } catch (err) {
-    // fallback to relative path only once
-    try {
-      api.defaults.baseURL = '/api';
-      // minimal console note so devtools show the reason once
-      console.info('API base unreachable; falling back to /api');
-    } catch (e) {
-      // ignore
-    }
-  }
-})();
-
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('anova-token');
   if (token) {

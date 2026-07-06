@@ -124,6 +124,9 @@ async function createChatReply(req, res) {
 
     return res.json({
       success: true,
+      reply,
+      provider: process.env.CHATBOT_PROVIDER || 'knowledge',
+      session_id: sessionId,
       data: {
         reply,
         provider: process.env.CHATBOT_PROVIDER || 'knowledge',
