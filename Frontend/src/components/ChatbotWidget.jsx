@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MessageCircle, Send, X, Sparkles, Bot, User } from 'lucide-react';
+import { MessageCircle, Send, X, Sparkles, Bot, User, Maximize, Minimize } from 'lucide-react';
 import api from '../services/api';
 
 const QUICK_ACTIONS = [
@@ -22,6 +22,7 @@ const initialMessages = [
 
 function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState(initialMessages);
   const [sessionId] = useState(() => `site-${Math.random().toString(36).slice(2, 10)}`);
   const [input, setInput] = useState('');
@@ -42,6 +43,11 @@ function ChatbotWidget() {
 
   const appendMessage = (text, role = 'assistant') => {
     setMessages((current) => [...current, { id: Date.now() + Math.random(), role, text }]);
+  };
+
+  const toggleExpand = () => {
+    setIsExpanded((s) => !s);
+    setIsOpen(true);
   };
 
   const handleQuickAction = async (action) => {
@@ -123,7 +129,7 @@ function ChatbotWidget() {
           <span>Talk to ANOVA</span>
         </button>
       ) : (
-        <div className="w-[min(92vw,380px)] overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.18)]">
+        <div className={`${isExpanded ? 'w-[min(96vw,760px)] h-[90vh]' : 'w-[min(92vw,380px)]'} overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.18)]`}>
           <div className="flex items-center justify-between bg-[#102c66] px-4 py-3 text-white">
             <div className="flex items-center gap-2">
               <div className="grid h-9 w-9 place-items-center rounded-full bg-white/15">
@@ -134,12 +140,17 @@ function ChatbotWidget() {
                 <p className="text-xs text-slate-200">Online now</p>
               </div>
             </div>
-            <button onClick={() => setIsOpen(false)} className="rounded-full p-2 hover:bg-white/10">
-              <X className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={toggleExpand} title={isExpanded ? 'Shrink' : 'Expand'} className="rounded-full p-2 hover:bg-white/10">
+                {isExpanded ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+              </button>
+              <button onClick={() => setIsOpen(false)} className="rounded-full p-2 hover:bg-white/10">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
-          <div className="flex max-h-[420px] flex-col gap-3 overflow-y-auto bg-[#f7f9fc] p-4">
+          <div className={`flex flex-col gap-3 overflow-y-auto bg-[#f7f9fc] p-4 ${isExpanded ? 'max-h-[70vh]' : 'max-h-[420px]'}`}>
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-6 ${message.role === 'user' ? 'bg-[#163c88] text-white' : 'bg-white text-slate-700 shadow-sm'}`}>
