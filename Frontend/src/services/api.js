@@ -3,8 +3,23 @@ import axios from 'axios';
 const DEFAULT_API_BASE_URL = '/api';
 
 function getApiBaseUrl() {
+  // When the site runs on Vercel (or localhost during local dev), prefer a relative
+  // `/api` path so that the hosting platform can proxy requests to the backend.
+  // This avoids baked-in build-time URLs (like Railway) causing client-side
+  // DNS failures if the host is unreachable.
+  try {
+    if (typeof window !== 'undefined') {
+      const host = window.location.hostname || '';
+      if (host.endsWith('.vercel.app') || host === 'localhost' || host === '127.0.0.1') {
+        return DEFAULT_API_BASE_URL;
+      }
+    }
+  } catch (e) {
+    // ignore and fall back to env
+  }
+
   const rawUrl = import.meta.env.VITE_API_URL || DEFAULT_API_BASE_URL;
-  const baseUrl = rawUrl.replace(/\/+$/, '');
+  const baseUrl = String(rawUrl || DEFAULT_API_BASE_URL).replace(/\/+$/, '');
   return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
 }
 
