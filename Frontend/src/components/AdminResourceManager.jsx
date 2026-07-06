@@ -209,13 +209,19 @@ export default function AdminResourceManager({ resource, title, description }) {
     try {
       const method = form.id ? 'put' : 'post';
       const url = `${endpoint}${form.id ? `/${form.id}` : ''}`;
-      const response = await api[method](url, buildPayload(), { headers: { 'Content-Type': 'multipart/form-data' } });
+      // Let the browser set `Content-Type` with proper boundary for FormData.
+      const response = await api[method](url, buildPayload());
       // store image override so public pages show the newly uploaded image immediately after refresh
       // no persistent preview override — do not store preview across refresh
       toast.success(`${title} saved successfully`);
       closeForm();
       fetchRows();
       notifyDataUpdated();
+      // update preview if server returned image url
+      const returnedImageUrl = response?.data?.image_url || response?.data?.data?.image_url || response?.data?.image_url;
+      if (returnedImageUrl) {
+        setPreviewUrl(buildImageUrl(returnedImageUrl));
+      }
       if (previewUrl && previewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(previewUrl);
       }
