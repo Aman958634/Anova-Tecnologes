@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://anova-tecnologes-production.up.railway.app/api/$1"
+      "destination": "https://anova-tecnologes-production.railway.app/api/$1"
     },
     {
       "source": "/uploads/(.*)",
-      "destination": "https://anova-tecnologes-production.up.railway.app/uploads/$1"
+      "destination": "https://anova-tecnologes-production.railway.app/uploads/$1"
     },
     {
       "source": "(.*)",
