@@ -84,17 +84,16 @@ const SERVICE_ICON_MAP = [
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-[#0a2a66] text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(60,123,255,0.24),_rgba(10,42,102,0)_42%)]" />
-      <div className="absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-[#5c7dff]/20 blur-3xl" />
+    <section className="relative overflow-hidden bg-[#0a2a66]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(60,123,255,0.22),_rgba(10,42,102,0)_44%)]" />
       <div className="section-shell relative flex min-h-[calc(100vh-5rem)] items-center py-20 lg:py-24">
-        <div className="grid w-full grid-cols-1 items-center gap-10 lg:grid-cols-12">
-          <div className="col-span-6 lg:col-span-5">
+        <div className="grid w-full grid-cols-1 items-center gap-8 lg:grid-cols-12">
+          <div className="col-span-7 text-center lg:text-left">
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45 }}
-              className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/90"
+              className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/90"
             >
               <span className="h-2.5 w-2.5 rounded-full bg-[#4ea1ff]" /> Premium IT Solutions Agency
             </motion.p>
@@ -103,41 +102,39 @@ export function HeroSection() {
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.05 }}
-              className="text-[2.9rem] font-semibold tracking-tight text-white sm:text-[4rem] lg:text-[4.6rem]"
+              className="mx-auto max-w-5xl text-[2.8rem] font-semibold leading-[1.05] tracking-tight text-white sm:text-[4rem] lg:text-[4.8rem]"
             >
-              Your Idea, Our Technology,
-              <span className="block bg-gradient-to-r from-white via-[#dce9ff] to-[#9fc1ff] bg-clip-text text-transparent">
-                Your Online Success
-              </span>
+              <span className="bg-gradient-to-r from-white via-[#dce9ff] to-[#9fc1ff] bg-clip-text text-transparent">Your Idea, Our Technology, Your Online Success</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.12 }}
-              className="mt-6 max-w-2xl text-lg leading-8 text-white/80"
+              className="mx-auto mt-6 max-w-3xl text-[1.1rem] leading-9 text-white/90 sm:text-[1.2rem]"
             >
-              We design and deliver high-end digital experiences with deep analytics, secure cloud platforms, and conversion-focused product design.
+              We build scalable digital solutions that grow your business. From enterprise web applications to engaging digital marketing campaigns.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.2 }}
-              className="mt-10 flex flex-col gap-4 sm:flex-row"
+              className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start"
             >
               <motion.a
-                whileHover={{ y: -2, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ y: -2, scale: 1.01 }}
+                whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 320, damping: 24 }}
                 href="#contact"
                 className="btn-primary min-w-[190px]"
               >
                 Start Your Project
               </motion.a>
+
               <motion.a
-                whileHover={{ y: -2, scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                whileHover={{ y: -2, scale: 1.01 }}
+                whileTap={{ scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 320, damping: 24 }}
                 href="#projects"
                 className="btn-secondary min-w-[190px]"
@@ -145,145 +142,65 @@ export function HeroSection() {
                 View Our Work
               </motion.a>
             </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.28 }}
-              className="mt-10 grid gap-4 sm:grid-cols-2"
-            >
-              <div className="rounded-[20px] border border-white/10 bg-white/5 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.15)]">
-                <div className="flex items-center gap-3 text-sm text-white/80">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#3e62ff]/15 text-[#a6c6ff]">
-                    <Monitor className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white">Dashboard Analytics</p>
-                    <p className="mt-1 text-xs text-white/70">Real-time insights for smarter decisions.</p>
-                  </div>
-                </div>
-              </div>
-              <div className="rounded-[20px] border border-white/10 bg-white/5 p-5 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
-                <div className="flex items-center gap-3 text-sm text-white/80">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#00d2ff]/15 text-[#9ee8ff]">
-                    <Smartphone className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white">Mobile-first UX</p>
-                    <p className="mt-1 text-xs text-white/70">Polished mobile experiences that convert.</p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
           </div>
 
-          <div className="col-span-6 lg:col-span-7">
+          <div className="col-span-5 hidden lg:block">
             <motion.div
-              initial={{ opacity: 0, x: 64 }}
+              initial={{ opacity: 0, x: 24 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.15 }}
-              className="relative mx-auto max-w-[640px]"
+              transition={{ duration: 0.6 }}
+              className="relative mx-auto max-w-[420px]"
             >
-              <div className="absolute -left-8 top-10 z-10 h-32 w-32 rounded-full bg-[#1f4ee9]/20 blur-3xl" />
-              <div className="absolute right-0 top-10 z-20 h-24 w-24 rounded-full bg-[#4fc3ff]/20 blur-3xl" />
-              <div className="absolute left-0 top-24 z-30 h-20 w-20 rounded-full border border-white/10 bg-white/5" />
+              <div className="absolute -inset-6 -z-10 rounded-[20px] bg-gradient-to-br from-[#183a88] to-[#083069] opacity-60 blur-3xl" />
 
-              <div className="relative overflow-hidden rounded-[30px] border border-white/10 bg-[#07184e]/80 p-6 shadow-[0_40px_120px_rgba(0,0,0,0.2)]">
-                <div className="absolute -left-10 -top-10 h-24 w-24 rounded-full bg-[#57a0ff]/20 blur-3xl" />
-                <div className="absolute right-8 bottom-10 h-20 w-20 rounded-full bg-[#4a8cff]/15 blur-3xl" />
-                <div className="relative flex flex-col gap-6 rounded-[24px] border border-white/10 bg-[#0d1c4d]/80 p-5">
-                  <div className="flex items-center justify-between gap-4">
+              <div className="relative mx-auto w-[420px]">
+                <div className="rounded-[16px] border border-white/10 bg-gradient-to-b from-white/6 to-white/3 p-4 shadow-[0_30px_60px_rgba(2,6,23,0.35)]">
+                  <div className="h-[240px] w-full overflow-hidden rounded-[10px] bg-white/5">
+                    <img
+                      src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80"
+                      alt="dashboard"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                <motion.div
+                  whileHover={{ y: -6 }}
+                  className="absolute -right-6 -top-8 z-10 w-40 transform rounded-xl border border-white/10 bg-white/10 p-3 shadow-lg"
+                >
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-white/90" />
                     <div>
-                      <p className="text-sm uppercase tracking-[0.24em] text-slate-300">Product Metrics</p>
-                      <p className="mt-2 text-xl font-semibold text-white">Performance Pulse</p>
+                      <div className="h-3 w-24 rounded bg-white/30" />
+                      <div className="mt-2 h-2 w-16 rounded bg-white/20" />
                     </div>
-                    <div className="rounded-2xl bg-white/10 px-3 py-2 text-xs text-white/80">Live</div>
                   </div>
+                </motion.div>
 
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="rounded-[24px] bg-white/5 p-4">
-                      <div className="mb-3 flex items-center justify-between text-sm text-white/70">
-                        <span>Users</span>
-                        <span>+18%</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-white/10">
-                        <div className="h-2 w-3/4 rounded-full bg-gradient-to-r from-[#4ea1ff] to-[#85d4ff]" />
-                      </div>
-                    </div>
-                    <div className="rounded-[24px] bg-white/5 p-4">
-                      <div className="mb-3 flex items-center justify-between text-sm text-white/70">
-                        <span>Conversion</span>
-                        <span>72%</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-white/10">
-                        <div className="h-2 w-3/5 rounded-full bg-gradient-to-r from-[#93c7ff] to-[#d7f2ff]" />
-                      </div>
-                    </div>
+                <motion.div
+                  initial={{ scale: 0.96 }}
+                  whileHover={{ scale: 1.02 }}
+                  className="absolute -left-8 bottom-[-28px] z-20 w-24 transform rounded-2xl border border-white/10 bg-white/6 p-2 shadow-[0_12px_30px_rgba(2,6,23,0.3)]"
+                >
+                  <div className="h-44 w-full overflow-hidden rounded-[10px] bg-white/8">
+                    <img
+                      src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80"
+                      alt="mobile"
+                      className="h-full w-full object-cover"
+                    />
                   </div>
+                </motion.div>
 
-                  <div className="rounded-[26px] border border-white/10 bg-white/5 p-4">
-                    <div className="flex items-center justify-between text-sm text-white/70">
-                      <span>Schedule</span>
-                      <span>Today</span>
-                    </div>
-                    <div className="mt-4 space-y-3">
-                      <div className="rounded-3xl bg-[#0d2654]/90 p-3 text-sm text-white/80">Campaign review meeting</div>
-                      <div className="rounded-3xl bg-[#0d2654]/90 p-3 text-sm text-white/80">Backend optimization sprint</div>
-                    </div>
-                  </div>
-                </div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="absolute right-4 bottom-12 z-30 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-sm text-white/90"
+                >
+                  <CheckCircle2 className="h-4 w-4 text-white/90" />
+                  <span>Fast, Secure, Scalable</span>
+                </motion.div>
               </div>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.88 }}
-                whileHover={{ scale: 0.96, y: -6 }}
-                transition={{ duration: 0.4 }}
-                className="absolute -bottom-10 left-10 z-40 w-48 rounded-[26px] border border-white/10 bg-white/10 p-4 shadow-[0_28px_70px_rgba(0,0,0,0.16)] backdrop-blur"
-              >
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-300">Insights</p>
-                <div className="mt-3 flex items-center gap-3 text-white/90">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#46b7ff]/20 text-[#a8e6ff]">
-                    <Star className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">Campaign ROI</p>
-                    <p className="text-xs text-white/60">+28% growth this week</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.25 }}
-                className="absolute top-8 right-8 z-30 w-40 rounded-[28px] border border-white/10 bg-white/10 p-4 shadow-[0_24px_50px_rgba(6,22,77,0.35)]"
-              >
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#81c1ff]/15 text-[#dff3ff]">
-                    <Cpu className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-white">System Health</p>
-                    <p className="text-xs text-white/60">99.9% uptime</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 28 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.3 }}
-                className="absolute -right-8 bottom-0 z-20 h-36 w-36 rounded-[34px] border border-white/10 bg-[#4495ff]/15 shadow-[0_40px_100px_rgba(46,105,255,0.1)]"
-              >
-                <div className="absolute inset-0 rounded-[34px] bg-gradient-to-br from-[#4a8cff]/40 to-transparent" />
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.45, delay: 0.28 }}
-                className="absolute -left-12 top-12 z-20 h-20 w-20 rounded-full bg-gradient-to-r from-[#1f4ee9] via-[#5a92ff] to-[#9fd9ff] shadow-[0_24px_80px_rgba(79,174,255,0.22)]"
-              />
             </motion.div>
           </div>
         </div>
