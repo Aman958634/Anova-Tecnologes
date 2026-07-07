@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import AdminLayout from '../layouts/AdminLayout';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -32,7 +33,8 @@ export default function AdminChatbotLeads() {
   };
 
   return (
-    <div className="space-y-6">
+    <AdminLayout>
+      <div className="space-y-6">
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="text-xl font-semibold text-slate-900">Chatbot Leads</h2>
         <p className="mt-2 text-sm text-slate-600">Manage project inquiries collected from the website chatbot.</p>
@@ -65,5 +67,6 @@ export default function AdminChatbotLeads() {
         </div>
       )}
     </div>
+  </AdminLayout>
   );
 }
