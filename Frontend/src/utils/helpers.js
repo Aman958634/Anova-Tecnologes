@@ -18,9 +18,12 @@ export function buildImageUrl(url, fallback = null) {
   // so the browser requests go to the same origin and Vercel's rewrites will forward them.
   const configuredApi = import.meta.env.VITE_API_URL;
   if (configuredApi) {
-    const apiUrl = String(configuredApi).replace(/\/+$/, '');
+    let apiUrl = String(configuredApi).trim().replace(/\/+$/, '');
+    if (!/^https?:\/\//i.test(apiUrl)) {
+      apiUrl = `https://${apiUrl}`;
+    }
     // If VITE_API_URL includes an /api suffix, strip it and join with path
-    const backendUrl = apiUrl.replace(/\/api$/, '');
+    const backendUrl = apiUrl.replace(/\/api$/i, '');
     return `${backendUrl}${path}`;
   }
 

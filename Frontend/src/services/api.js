@@ -8,7 +8,10 @@ function getApiBaseUrl() {
   // rewrites/proxies are not configured or temporarily failing).
   const rawEnv = import.meta.env.VITE_API_URL;
   if (rawEnv) {
-    const cleaned = String(rawEnv).replace(/\/+$/, '');
+    let cleaned = String(rawEnv).trim().replace(/\/+$/, '');
+    if (!/^https?:\/\//i.test(cleaned)) {
+      cleaned = `https://${cleaned}`;
+    }
     return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
   }
 
