@@ -55,8 +55,17 @@ const corsOptions = {
 // MIDDLEWARE
 // =========================
 app.use(cors(corsOptions));
-// Ensure preflight OPTIONS requests are handled for all routes
-app.options('*', cors(corsOptions));
+// Handle preflight requests without using wildcard route registration that can
+// crash on newer path-to-regexp versions.
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.sendStatus(204);
+    return;
+  }
+  next();
+});
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(compression());
 app.use(express.json({ limit: '2mb' }));
