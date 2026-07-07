@@ -89,88 +89,118 @@ export function HeroSection() {
       <div className="section-shell relative flex min-h-[calc(100vh-5rem)] items-center py-20 lg:py-24">
         <div className="grid w-full grid-cols-1 items-center gap-8 lg:grid-cols-12">
           <div className="col-span-7 text-center lg:text-left">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-            className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/90"
-          >
-            <span className="h-2.5 w-2.5 rounded-full bg-[#4ea1ff]" /> Premium IT Solutions Agency
-          </motion.p>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.05 }}
-            className="mx-auto max-w-5xl text-[2.8rem] font-semibold leading-[1.05] tracking-tight text-white sm:text-[4rem] lg:text-[4.8rem]"
-          >
-            <span className="bg-gradient-to-r from-white via-[#dce9ff] to-[#9fc1ff] bg-clip-text text-transparent">Your Idea, Our Technology, Your Online Success</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.12 }}
-            className="mx-auto mt-6 max-w-3xl text-[1.1rem] leading-9 text-white/90 sm:text-[1.2rem]"
-          >
-            We build scalable digital solutions that grow your business. From enterprise web applications to engaging digital marketing campaigns.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.2 }}
-            className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start"
-          >
-            <motion.a
-              whileHover={{ y: -2, scale: 1.01 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-              href="#contact"
-              className="btn-primary min-w-[190px]"
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45 }}
+              className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/90"
             >
-              Start Your Project
-            </motion.a>
+              <span className="h-2.5 w-2.5 rounded-full bg-[#4ea1ff]" /> Premium IT Solutions Agency
+            </motion.p>
 
-            <div className="col-span-5 hidden lg:block">
-              <motion.div initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }} className="relative mx-auto max-w-[420px]">
-                {/* Background device shadow */}
-                <div className="absolute -inset-6 -z-10 rounded-[20px] bg-gradient-to-br from-[#183a88] to-[#083069] opacity-60 blur-3xl" />
+            <motion.h1
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.05 }}
+              className="mx-auto max-w-5xl text-[2.8rem] font-semibold leading-[1.05] tracking-tight text-white sm:text-[4rem] lg:text-[4.8rem]"
+            >
+              <span className="bg-gradient-to-r from-white via-[#dce9ff] to-[#9fc1ff] bg-clip-text text-transparent">Your Idea, Our Technology, Your Online Success</span>
+            </motion.h1>
 
-                {/* Laptop mockup */}
-                <div className="relative mx-auto w-[420px]">
-                  <div className="rounded-[16px] border border-white/10 bg-gradient-to-b from-white/6 to-white/3 p-4 shadow-[0_30px_60px_rgba(2,6,23,0.35)]">
-                    <div className="h-[240px] w-full overflow-hidden rounded-[10px] bg-white/5">
-                      <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80" alt="dashboard" className="h-full w-full object-cover" />
+            <motion.p
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.12 }}
+              className="mx-auto mt-6 max-w-3xl text-[1.1rem] leading-9 text-white/90 sm:text-[1.2rem]"
+            >
+              We build scalable digital solutions that grow your business. From enterprise web applications to engaging digital marketing campaigns.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 28 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.2 }}
+              className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row lg:justify-start"
+            >
+              <motion.a
+                whileHover={{ y: -2, scale: 1.01 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+                href="#contact"
+                className="btn-primary min-w-[190px]"
+              >
+                Start Your Project
+              </motion.a>
+              <motion.a
+                whileHover={{ y: -2, scale: 1.01 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+                href="#projects"
+                className="btn-secondary min-w-[190px]"
+              >
+                View Our Work
+              </motion.a>
+            </motion.div>
+          </div>
+
+          <div className="col-span-5 hidden lg:block">
+            <motion.div
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="relative mx-auto max-w-[420px]"
+            >
+              <div className="absolute -inset-6 -z-10 rounded-[20px] bg-gradient-to-br from-[#183a88] to-[#083069] opacity-60 blur-3xl" />
+
+              <div className="relative mx-auto w-[420px]">
+                <div className="rounded-[16px] border border-white/10 bg-gradient-to-b from-white/6 to-white/3 p-4 shadow-[0_30px_60px_rgba(2,6,23,0.35)]">
+                  <div className="h-[240px] w-full overflow-hidden rounded-[10px] bg-white/5">
+                    <img
+                      src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80"
+                      alt="dashboard"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                <motion.div
+                  whileHover={{ y: -6 }}
+                  className="absolute -right-6 -top-8 z-10 w-40 transform rounded-xl border border-white/10 bg-white/10 p-3 shadow-lg"
+                >
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="h-5 w-5 text-white/90" />
+                    <div>
+                      <div className="h-3 w-24 rounded bg-white/30" />
+                      <div className="mt-2 h-2 w-16 rounded bg-white/20" />
                     </div>
                   </div>
-                  {/* Floating dashboard card */}
-                  <motion.div whileHover={{ y: -6 }} className="absolute -right-6 -top-8 z-10 w-40 transform rounded-xl border border-white/10 bg-white/10 p-3 shadow-lg">
-                    <div className="flex items-center gap-2">
-                      <BarChart3 className="h-5 w-5 text-white/90" />
-                      <div>
-                        <div className="h-3 w-24 rounded bg-white/30" />
-                        <div className="mt-2 h-2 w-16 rounded bg-white/20" />
-                      </div>
-                    </div>
-                  </motion.div>
+                </motion.div>
 
-                  {/* Mobile mockup */}
-                  <motion.div initial={{ scale: 0.96 }} whileHover={{ scale: 1.02 }} className="absolute -left-8 bottom-[-28px] z-20 w-24 transform rounded-2xl border border-white/10 bg-white/6 p-2 shadow-[0_12px_30px_rgba(2,6,23,0.3)]">
-                    <div className="h-44 w-full overflow-hidden rounded-[10px] bg-white/8">
-                      <img src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80" alt="mobile" className="h-full w-full object-cover" />
-                    </div>
-                  </motion.div>
+                <motion.div
+                  initial={{ scale: 0.96 }}
+                  whileHover={{ scale: 1.02 }}
+                  className="absolute -left-8 bottom-[-28px] z-20 w-24 transform rounded-2xl border border-white/10 bg-white/6 p-2 shadow-[0_12px_30px_rgba(2,6,23,0.3)]"
+                >
+                  <div className="h-44 w-full overflow-hidden rounded-[10px] bg-white/8">
+                    <img
+                      src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?auto=format&fit=crop&w=800&q=80"
+                      alt="mobile"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </motion.div>
 
-                  {/* Floating feature chip */}
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="absolute right-4 bottom-12 z-30 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-sm text-white/90">
-                    <CheckCircle2 className="h-4 w-4 text-white/90" />
-                    <span>Fast, Secure, Scalable</span>
-                  </motion.div>
-                </div>
-              </motion.div>
-            </div>
-
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="absolute right-4 bottom-12 z-30 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-sm text-white/90"
+                >
+                  <CheckCircle2 className="h-4 w-4 text-white/90" />
+                  <span>Fast, Secure, Scalable</span>
+                </motion.div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>
