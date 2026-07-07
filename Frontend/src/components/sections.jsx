@@ -173,13 +173,6 @@ export function HeroSection() {
 
           </div>
         </div>
-      </section>
-            >
-              View Our Work
-            </motion.a>
-          </motion.div>
-
-        </div>
       </div>
     </section>
   );
