@@ -3,34 +3,45 @@ import axios from 'axios';
 const DEFAULT_API_BASE_URL = '/api';
 
 function getApiBaseUrl() {
-  // When the site runs on Vercel (or localhost during local dev), prefer a relative
-  // `/api` path so that the hosting platform can proxy requests to the backend.
-  // This avoids baked-in build-time URLs (like Railway) causing client-side
-  // DNS failures if the host is unreachable.
+  // If a VITE_API_URL is provided in the environment, prefer it. This makes
+  // production deployments call the backend directly (useful when platform
+  // rewrites/proxies are not configured or temporarily failing).
+  const rawEnv = import.meta.env.VITE_API_URL;
+  if (rawEnv) {
+    const cleaned = String(rawEnv).replace(/\/+$/, '');
+    return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
+  }
+
+  // Otherwise fall back to relative `/api` for hosting platforms that proxy
+  // (Vercel) or for local development.
   try {
     if (typeof window !== 'undefined') {
       const host = window.location.hostname || '';
-      if (host.endsWith('.vercel.app') || host === 'localhost' || host === '127.0.0.1') {
+      if (host === 'localhost' || host === '127.0.0.1') {
         return DEFAULT_API_BASE_URL;
       }
     }
   } catch (e) {
-    // ignore and fall back to env
+    // ignore and fall back
   }
 
-  const rawUrl = import.meta.env.VITE_API_URL || DEFAULT_API_BASE_URL;
-  const baseUrl = String(rawUrl || DEFAULT_API_BASE_URL).replace(/\/+$/, '');
-  return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
+  return DEFAULT_API_BASE_URL;
 }
 
 const api = axios.create({
   baseURL: getApiBaseUrl(),
-  timeout: 15000,
+  timeout: 30000,
   headers: {
     Accept: 'application/json'
   }
 });
 console.log('[API] Created axios instance with baseURL:', api.defaults.baseURL);
+
+// Optional: allow cross-site cookies if your backend uses them. Toggle via env.
+if (import.meta.env.VITE_API_WITH_CREDENTIALS === 'true') {
+  api.defaults.withCredentials = true;
+  console.log('[API] withCredentials enabled');
+}
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('anova-token');
