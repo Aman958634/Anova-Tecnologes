@@ -125,6 +125,7 @@ export default function AdminResourceManager({ resource, title, description }) {
     }
     if (resource === 'team') {
       setForm({ ...row, image: null, remove_image: false });
+      setPreviewUrl(row.image_url ? buildImageUrl(row.image_url) : null);
       setIsFormOpen(true);
       return;
     }
