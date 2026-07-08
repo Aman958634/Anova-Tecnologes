@@ -13,6 +13,12 @@ export function buildImageUrl(url, fallback = null) {
   let path = String(url).replace(/\\+/g, '/').trim();
   if (!path.startsWith('/')) path = `/${path}`;
 
+  // If a bare filename is stored in the DB (for example: image-1234.png),
+  // assume it belongs under /uploads/ so the browser requests the correct path.
+  if (/^\/[^\/]+\.[a-z0-9]{2,5}$/i.test(path) && !path.startsWith('/uploads/')) {
+    path = `/uploads${path}`;
+  }
+
   // If a VITE API URL is configured (useful for local development or custom deployments),
   // prefer it. Otherwise, on production hosts (like Vercel) use a proxied `/api` route
   // so the browser requests go to the same origin and Vercel's rewrites will forward them.
