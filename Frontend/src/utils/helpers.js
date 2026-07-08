@@ -30,17 +30,19 @@ export function buildImageUrl(url, fallback = null) {
     }
     // If VITE_API_URL includes an /api suffix, strip it and join with path
     const backendUrl = apiUrl.replace(/\/api$/i, '');
-    // If running in a browser and the current host is Vercel (or localhost for dev),
-    // prefer the proxied relative `/uploads` path so the platform rewrite will
-    // forward the request to the backend origin. This avoids CORB/CORS issues
-    // caused by directly requesting cross-origin assets when a proxy is available.
+
+    // For upload assets, request the backend directly instead of relying on
+    // a frontend rewrite that may not be configured or may fail in production.
+    if (path.startsWith('/uploads/')) {
+      return `${backendUrl}${path}`;
+    }
+
     try {
       if (typeof window !== 'undefined') {
         const hostname = (window.location && window.location.hostname) || '';
-        const isVercelHost = hostname.endsWith('.vercel.app');
         const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
-        if (isVercelHost || isLocal) {
-          return path; // use relative path so rewrites/proxy handle the request
+        if (isLocal) {
+          return path; // local dev can use relative /uploads if proxy is configured
         }
       }
     } catch (e) {
