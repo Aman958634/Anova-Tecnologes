@@ -460,7 +460,23 @@ export default function AdminResourceManager({ resource, title, description }) {
             <>
               <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.name || ''} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} placeholder="Member name" required />
               <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.designation || ''} onChange={(event) => setForm((current) => ({ ...current, designation: event.target.value }))} placeholder="Designation" required />
-              <input type="file" accept="image/*" onChange={(event) => setForm((current) => ({ ...current, image: event.target.files?.[0] || null, remove_image: false }))} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] md:col-span-2" />
+              <input type="file" accept="image/*" onChange={(event) => {
+                const file = event.target.files?.[0] || null;
+                setForm((current) => ({ ...current, image: file, remove_image: false }));
+                if (file) {
+                  const url = URL.createObjectURL(file);
+                  setPreviewUrl((old) => {
+                    if (old && old.startsWith('blob:')) URL.revokeObjectURL(old);
+                    return url;
+                  });
+                }
+              }} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] md:col-span-2" />
+              {previewUrl ? (
+                <div className="md:col-span-2 mt-2">
+                  <p className="text-xs text-slate-500">Current / selected image preview</p>
+                  <img src={previewUrl} alt="team preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-32 w-full rounded-md object-cover bg-white" />
+                </div>
+              ) : null}
               <label className="flex items-center gap-2 text-sm text-[#163c88]"><input type="checkbox" checked={Boolean(form.featured)} onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))} /> Featured</label>
               {form.id ? (
                 <label className="flex items-center gap-2 text-sm text-[#163c88]"><input type="checkbox" checked={Boolean(form.remove_image)} onChange={(event) => setForm((current) => ({ ...current, remove_image: event.target.checked }))} /> Remove current image</label>
