@@ -1,5 +1,7 @@
 const asyncHandler = require('../utils/asyncHandler');
 const { pool } = require('../config/db');
+const fs = require('fs');
+const path = require('path');
 const { findById, deleteById } = require('../models/baseModel');
 const { getCache, setCache, invalidateCache } = require('../utils/simpleCache');
 
@@ -23,6 +25,24 @@ const listTeamMembers = asyncHandler(async (req, res) => {
     'SELECT * FROM team_members WHERE name LIKE ? OR designation LIKE ? ORDER BY featured DESC, id DESC LIMIT ? OFFSET ?',
     [search, search, limit, offset]
   );
+  // Validate uploaded image paths: if a row references an uploads file that
+  // does not exist on disk (e.g. not deployed to production), clear the
+  // `image_url` so the frontend falls back to initials/placeholders and
+  // avoids noisy 404 requests.
+  const uploadsDir = path.join(__dirname, '..', process.env.UPLOAD_DIR || 'uploads');
+  for (const r of rows) {
+    if (r.image_url && String(r.image_url).startsWith('/uploads/')) {
+      const filename = path.basename(r.image_url);
+      const filePath = path.join(uploadsDir, filename);
+      try {
+        if (!fs.existsSync(filePath)) {
+          r.image_url = null;
+        }
+      } catch (err) {
+        r.image_url = null;
+      }
+    }
+  }
   const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM team_members WHERE name LIKE ? OR designation LIKE ?', [search, search]);
   const result = { data: rows, meta: { page, limit, total: countRows[0].total } };
   setCache(cacheKey, result, 120000);

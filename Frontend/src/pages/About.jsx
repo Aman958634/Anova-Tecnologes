@@ -48,6 +48,77 @@ export default function About() {
   const heroImage = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80';
   const heroImageFallback = imageFallbackByKey('team');
 
+  function TeamMemberCard({ member }) {
+    const [src, setSrc] = useState(null);
+
+    useEffect(() => {
+      let active = true;
+      const candidate = member.image_url || member.image;
+      if (!candidate) {
+        setSrc(imageFallbackByKey(member.name));
+        return () => { active = false; };
+      }
+
+      // Build a usable URL (relative or absolute)
+      const url = buildImageUrl(candidate, imageFallbackByKey(member.name));
+
+      // Check resource existence with a HEAD fetch to avoid attaching a failing
+      // <img> src immediately which triggers a visible 404 in the console.
+      (async () => {
+        try {
+          const res = await fetch(url, { method: 'HEAD', mode: 'cors' });
+          if (!active) return;
+          if (res.ok) {
+            setSrc(url);
+          } else {
+            setSrc(imageFallbackByKey(member.name));
+          }
+        } catch (err) {
+          if (!active) return;
+          setSrc(imageFallbackByKey(member.name));
+        }
+      })();
+
+      return () => { active = false; };
+    }, [member]);
+
+    const initials = member.name
+      .split(' ')
+      .map((part) => part[0])
+      .slice(0, 1)
+      .join('')
+      .toUpperCase();
+
+    return (
+      <motion.div
+        key={member.id}
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.35 }}
+        transition={{ duration: 0.45 }}
+        className="overflow-hidden rounded-[14px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.05)]"
+      >
+        {src ? (
+          <img
+            src={src}
+            alt={member.name}
+            onError={(e) => { e.currentTarget.src = imageFallbackByKey(member.name); }}
+            className="h-[250px] w-full object-cover bg-[#eaf1ff]"
+          />
+        ) : (
+          <div className="flex h-[250px] items-center justify-center bg-[#eaf1ff]">
+            <span className="text-3xl font-semibold text-[#2f6df7]">{initials}</span>
+          </div>
+        )}
+
+        <div className="border-t border-slate-200 px-4 py-4 text-center">
+          <h3 className="text-[0.95rem] font-bold tracking-tight text-[#163c88]">{member.name}</h3>
+          <p className="mt-1 text-xs text-slate-500">{member.designation}</p>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <div className="bg-white text-slate-900">
       <section className="bg-[#102c66] px-4 py-16 text-center text-white sm:py-20">
@@ -162,42 +233,9 @@ export default function About() {
           </motion.div>
 
           <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {teamMembers.map((member) => {
-              const initials = member.name
-                .split(' ')
-                .map((part) => part[0])
-                .slice(0, 1)
-                .join('')
-                .toUpperCase();
-
-              return (
-                <motion.div
-                  key={member.id}
-                  initial={{ opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.35 }}
-                  transition={{ duration: 0.45 }}
-                  className="overflow-hidden rounded-[14px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.05)]"
-                >
-                  {member.image_url || member.image ? (
-                    <img
-                      src={buildImageUrl(member.image_url || member.image, imageFallbackByKey(member.name))}
-                      alt={member.name}
-                      onError={(e) => { e.currentTarget.src = imageFallbackByKey(member.name); }}
-                      className="h-[250px] w-full object-cover bg-[#eaf1ff]"
-                    />
-                  ) : (
-                    <div className="flex h-[250px] items-center justify-center bg-[#eaf1ff]">
-                      <span className="text-3xl font-semibold text-[#2f6df7]">{initials}</span>
-                    </div>
-                  )}
-                  <div className="border-t border-slate-200 px-4 py-4 text-center">
-                    <h3 className="text-[0.95rem] font-bold tracking-tight text-[#163c88]">{member.name}</h3>
-                    <p className="mt-1 text-xs text-slate-500">{member.designation}</p>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {teamMembers.map((member) => (
+              <TeamMemberCard key={member.id} member={member} />
+            ))}
           </div>
         </div>
       </section>
