@@ -33,7 +33,7 @@ function getApiBaseUrl() {
 
 const api = axios.create({
   baseURL: getApiBaseUrl(),
-  timeout: 30000,
+  timeout: 120000,
   headers: {
     Accept: 'application/json'
   }
@@ -45,6 +45,14 @@ if (import.meta.env.VITE_API_WITH_CREDENTIALS === 'true') {
   api.defaults.withCredentials = true;
   console.log('[API] withCredentials enabled');
 }
+
+api.interceptors.request.use((config) => {
+  if (config.data instanceof FormData) {
+    // Allow uploads more time on slow networks or larger image files.
+    config.timeout = 120000;
+  }
+  return config;
+});
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('anova-token');
