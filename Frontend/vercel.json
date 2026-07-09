@@ -1,19 +1,20 @@
 {
-  "routes": [
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "env": {},
+  "functions": {
+    "api/[...path].js": {
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
     {
-      "handle": "filesystem"
+      "source": "/uploads/:path*",
+      "destination": "https://anova-tecnologes-production.railway.app/uploads/:path*"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "https://anova-tecnologes-production.railway.app/api/$1"
-    },
-    {
-      "src": "/uploads/(.*)",
-      "dest": "https://anova-tecnologes-production.railway.app/uploads/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/:path*",
+      "destination": "/index.html"
     }
   ]
 }
