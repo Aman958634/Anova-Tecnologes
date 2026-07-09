@@ -83,63 +83,74 @@ const SERVICE_ICON_MAP = [
 ];
 
 export function HeroSection() {
+  const heroImage = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80';
+
   return (
-    <section className="relative overflow-hidden bg-[#0a2a66]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(60,123,255,0.22),_rgba(10,42,102,0)_44%)]" />
-      <div className="section-shell relative flex min-h-[calc(100vh-5rem)] items-center py-20 lg:py-24">
-        <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-center text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/90"
+    <section className="relative overflow-hidden bg-[#0b2659] text-white">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(96,140,255,0.16),_rgba(11,38,89,0.70)_45%)]" />
+      <div className="section-shell relative py-20 lg:py-24">
+        <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <motion.div
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.55, ease: 'easeOut' }}
+            className="max-w-2xl lg:max-w-none"
           >
-            <span className="h-2.5 w-2.5 rounded-full bg-[#4ea1ff]" /> Premium IT Solutions Agency
-          </motion.p>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/95 shadow-[0_8px_30px_rgba(0,0,0,0.10)]">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#5ab4ff]" /> Premium IT Solutions Agency
+            </span>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.05 }}
-            className="mx-auto max-w-4xl text-[2.8rem] font-semibold leading-[1.05] tracking-tight text-white sm:text-[4rem] lg:text-[4.8rem]"
-          >
-            <span className="bg-gradient-to-r from-white via-[#dce9ff] to-[#9fc1ff] bg-clip-text text-transparent">Your Idea, Our Technology, Your Online Success</span>
-          </motion.h1>
+            <h1 className="mt-8 text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Building Digital Products That Drive Growth & Create Impact
+            </h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.12 }}
-            className="mx-auto mt-6 max-w-3xl text-[1.1rem] leading-9 text-white/90 sm:text-[1.2rem]"
-          >
-            We build scalable digital solutions that grow your business. From enterprise web applications to engaging digital marketing campaigns.
-          </motion.p>
+            <p className="mt-6 max-w-xl text-base leading-8 text-white/80 sm:text-lg">
+              We build scalable web applications, mobile apps, AI solutions, and cloud platforms that help businesses automate, innovate, and grow faster.
+            </p>
+
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <a href="#contact" className="inline-flex items-center justify-center rounded-full bg-[#2471ff] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#1f5fe6]">
+                Get Free Consultation
+              </a>
+              <a href="#projects" className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-8 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
+                View Our Work
+              </a>
+            </div>
+
+            <div className="mt-12 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.12)]">
+                <p className="text-sm text-slate-200">Projects Delivered</p>
+                <p className="mt-3 text-3xl font-semibold text-white">500+</p>
+              </div>
+              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.12)]">
+                <p className="text-sm text-slate-200">Client Satisfaction</p>
+                <p className="mt-3 text-3xl font-semibold text-white">99%</p>
+              </div>
+            </div>
+          </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.2 }}
-            className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
+            initial={{ opacity: 0, x: 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.55, ease: 'easeOut' }}
+            className="relative"
           >
-            <motion.a
-              whileHover={{ y: -2, scale: 1.01 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-              href="#contact"
-              className="btn-primary min-w-[190px]"
-            >
-              Start Your Project
-            </motion.a>
-
-            <motion.a
-              whileHover={{ y: -2, scale: 1.01 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-              href="#projects"
-              className="btn-secondary min-w-[190px]"
-            >
-              View Our Work
-            </motion.a>
+            <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#122d62] shadow-[0_45px_80px_rgba(7,25,74,0.35)]">
+              <img
+                src={heroImage}
+                alt="Digital products hero"
+                className="h-[520px] w-full object-cover sm:h-[560px]"
+                loading="eager"
+              />
+            </div>
+            <div className="absolute left-6 top-6 hidden rounded-3xl border border-white/15 bg-white/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.12)] sm:block">
+              <p className="text-xs uppercase tracking-[0.22em] text-white/70">Featured Service</p>
+              <p className="mt-2 text-lg font-semibold text-white">Web & Mobile Development</p>
+            </div>
+            <div className="absolute bottom-6 right-6 hidden rounded-3xl border border-white/15 bg-white/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.12)] sm:block">
+              <p className="text-xs uppercase tracking-[0.22em] text-white/70">Support</p>
+              <p className="mt-2 text-lg font-semibold text-white">24/7 Dedicated Team</p>
+            </div>
           </motion.div>
         </div>
       </div>
