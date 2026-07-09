@@ -83,7 +83,7 @@ const SERVICE_ICON_MAP = [
 ];
 
 export function HeroSection() {
-  const heroImage = '/laptop-hero.svg';
+  const heroVideo = encodeURI('/Hailuo_Video_# AI Video Prompt – ANOVA Tech_530769532315910148.mp4');
 
   return (
     <section className="relative overflow-hidden bg-[#0b2659] text-white">
@@ -136,11 +136,13 @@ export function HeroSection() {
             className="relative"
           >
             <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#122d62] shadow-[0_45px_80px_rgba(7,25,74,0.35)]">
-              <img
-                src={heroImage}
-                alt="Digital products hero"
+              <video
+                src={heroVideo}
+                muted
+                autoPlay
+                loop
+                playsInline
                 className="h-[520px] w-full object-cover sm:h-[560px]"
-                loading="eager"
               />
             </div>
             <div className="absolute left-6 top-6 hidden rounded-3xl border border-white/15 bg-white/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.12)] sm:block">
