@@ -4,19 +4,17 @@ const DEFAULT_API_BASE_URL = '/api';
 
 function getApiBaseUrl() {
   const rawEnv = import.meta.env.VITE_API_URL;
-  const isDev = import.meta.env.DEV;
 
-  // In local development, use a configured backend URL when available.
-  if (isDev && rawEnv) {
-    let cleaned = String(rawEnv).trim().replace(/\/+$/, '');
+  // Use a configured backend URL when provided, including in production.
+  // If the URL already includes /api, keep it; otherwise use it as the backend root.
+  if (rawEnv) {
+    let cleaned = String(rawEnv).trim().replace(/\/+$/'', '');
     if (!/^https?:\/\//i.test(cleaned)) {
       cleaned = `https://${cleaned}`;
     }
-    return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
+    return cleaned;
   }
 
-  // In production, always use the relative proxy route so the frontend works
-  // consistently with Vercel rewrites and avoids external DNS/resolution issues.
   return DEFAULT_API_BASE_URL;
 }
 
