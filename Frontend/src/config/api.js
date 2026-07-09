@@ -3,6 +3,13 @@ import axios from 'axios';
 const DEFAULT_API_BASE_URL = '/api';
 
 export const API_BASE_URL = (() => {
+  // On Vercel production, always use relative /api for proxy routing
+  // Ignore any VITE_API_URL env var that points to external backends
+  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+    return DEFAULT_API_BASE_URL;
+  }
+  
+  // For local dev, allow VITE_API_URL override
   const configured = typeof import.meta.env.VITE_API_URL === 'string' ? import.meta.env.VITE_API_URL.trim() : '';
   const cleaned = configured.replace(/\/+$/, '');
   return cleaned || DEFAULT_API_BASE_URL;
