@@ -1,6 +1,26 @@
 {
   "rewrites": [
     {
+      "source": "/google(.*).html",
+      "destination": "/google$1.html"
+    },
+    {
+      "source": "/robots.txt",
+      "destination": "/robots.txt"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/sitemap.xml"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/favicon.ico"
+    },
+    {
+      "source": "/manifest.json",
+      "destination": "/manifest.json"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "https://anova-tecnologes-production.railway.app/api/$1"
     },
@@ -9,7 +29,7 @@
       "destination": "https://anova-tecnologes-production.railway.app/uploads/$1"
     },
     {
-      "source": "(.*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
