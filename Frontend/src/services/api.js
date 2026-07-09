@@ -3,11 +3,11 @@ import axios from 'axios';
 const DEFAULT_API_BASE_URL = '/api';
 
 function getApiBaseUrl() {
-  // If a VITE_API_URL is provided in the environment, prefer it. This makes
-  // production deployments call the backend directly (useful when platform
-  // rewrites/proxies are not configured or temporarily failing).
   const rawEnv = import.meta.env.VITE_API_URL;
-  if (rawEnv) {
+  const isDev = import.meta.env.DEV;
+
+  // In local development, use a configured backend URL when available.
+  if (isDev && rawEnv) {
     let cleaned = String(rawEnv).trim().replace(/\/+$/, '');
     if (!/^https?:\/\//i.test(cleaned)) {
       cleaned = `https://${cleaned}`;
@@ -15,19 +15,8 @@ function getApiBaseUrl() {
     return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
   }
 
-  // Otherwise fall back to relative `/api` for hosting platforms that proxy
-  // (Vercel) or for local development.
-  try {
-    if (typeof window !== 'undefined') {
-      const host = window.location.hostname || '';
-      if (host === 'localhost' || host === '127.0.0.1') {
-        return DEFAULT_API_BASE_URL;
-      }
-    }
-  } catch (e) {
-    // ignore and fall back
-  }
-
+  // In production, always use the relative proxy route so the frontend works
+  // consistently with Vercel rewrites and avoids external DNS/resolution issues.
   return DEFAULT_API_BASE_URL;
 }
 

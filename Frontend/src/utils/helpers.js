@@ -19,42 +19,25 @@ export function buildImageUrl(url, fallback = null) {
     path = `/uploads${path}`;
   }
 
-  // If a VITE API URL is configured (useful for local development or custom deployments),
-  // prefer it. Otherwise, on production hosts (like Vercel) use a proxied `/api` route
-  // so the browser requests go to the same origin and Vercel's rewrites will forward them.
+  // If a VITE API URL is configured, use it for local development only.
+  // In production, keep upload URLs relative so Vercel rewrites /uploads/* back
+  // to the backend host and avoid DNS/host resolution problems in the browser.
   const configuredApi = import.meta.env.VITE_API_URL;
-  if (configuredApi) {
+  const isDev = import.meta.env.DEV;
+  if (configuredApi && isDev) {
     let apiUrl = String(configuredApi).trim().replace(/\/+$/, '');
     if (!/^https?:\/\//i.test(apiUrl)) {
       apiUrl = `https://${apiUrl}`;
     }
-    // If VITE_API_URL includes an /api suffix, strip it and join with path
     const backendUrl = apiUrl.replace(/\/api$/i, '');
 
-    // For upload assets, request the backend directly instead of relying on
-    // a frontend rewrite that may not be configured or may fail in production.
     if (path.startsWith('/uploads/')) {
       return `${backendUrl}${path}`;
     }
-
-    try {
-      if (typeof window !== 'undefined') {
-        const hostname = (window.location && window.location.hostname) || '';
-        const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
-        if (isLocal) {
-          return path; // local dev can use relative /uploads if proxy is configured
-        }
-      }
-    } catch (e) {
-      // ignore and fall back to absolute backend URL
-    }
-
-    return `${backendUrl}${path}`;
   }
 
-  // Default: return the uploads path as-is (e.g. /uploads/filename). On production
-  // we add a Vercel rewrite so requests to /uploads/* are forwarded to the backend
-  // upload folder. This avoids embedding the backend hostname into the client.
+  // Default: return the uploads path as-is (e.g. /uploads/filename).
+  // Production relies on Vercel route rewrites instead of embedding the backend host.
   return path;
 }
 
