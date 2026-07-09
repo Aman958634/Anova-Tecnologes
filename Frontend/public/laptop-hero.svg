@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#132a5b" />
+      <stop offset="100%" stop-color="#0d1a3c" />
+    </linearGradient>
+    <linearGradient id="screenGrad" x1="180" y1="180" x2="1020" y2="620" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0d3466" />
+      <stop offset="100%" stop-color="#112a5f" />
+    </linearGradient>
+    <linearGradient id="laptopShadow" x1="220" y1="610" x2="980" y2="690" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(0,0,0,0.15)" />
+      <stop offset="100%" stop-color="rgba(0,0,0,0)" />
+    </linearGradient>
+    <radialGradient id="highlight" cx="0.5" cy="0.3" r="0.7">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.28)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="800" rx="40" fill="url(#bg)" />
+  <circle cx="980" cy="90" r="90" fill="rgba(114,152,255,0.14)" />
+  <circle cx="250" cy="680" r="120" fill="rgba(77,196,255,0.08)" />
+  <circle cx="940" cy="580" r="42" fill="rgba(255,255,255,0.08)" />
+  <g opacity="0.98">
+    <rect x="140" y="160" width="920" height="500" rx="40" fill="#1c2c5d" />
+    <rect x="170" y="210" width="860" height="340" rx="28" fill="url(#screenGrad)" />
+    <rect x="180" y="220" width="840" height="160" rx="20" fill="#0d3d84" />
+    <rect x="180" y="400" width="840" height="120" rx="18" fill="#132f68" />
+    <rect x="220" y="240" width="160" height="28" rx="12" fill="#4a85ff" />
+    <rect x="220" y="286" width="380" height="24" rx="12" fill="#4371d8" />
+    <rect x="220" y="328" width="140" height="20" rx="10" fill="#3c63c5" />
+    <rect x="380" y="328" width="180" height="20" rx="10" fill="#3c63c5" />
+    <rect x="220" y="368" width="520" height="14" rx="7" fill="#3959b9" />
+    <rect x="220" y="394" width="520" height="14" rx="7" fill="#2f4c96" />
+    <rect x="220" y="420" width="520" height="14" rx="7" fill="#26407f" />
+    <path d="M585 488H650C658.284 488 665 494.716 665 503V518C665 526.284 658.284 533 650 533H585C576.716 533 570 526.284 570 518V503C570 494.716 576.716 488 585 488Z" fill="#0e2d61"/>
+    <path d="M560 480H680V560H560V480Z" fill="#0b2249" />
+    <rect x="180" y="556" width="840" height="24" rx="12" fill="#243c7a" />
+    <rect x="170" y="570" width="860" height="22" rx="11" fill="#092348" />
+    <rect x="240" y="504" width="180" height="4" rx="2" fill="#2d4a8f" />
+    <rect x="480" y="504" width="280" height="4" rx="2" fill="#2d4a8f" />
+    <path d="M260 440H760V504H260V440Z" fill="#15418c" opacity="0.9" />
+    <path d="M310 462H720V486H310V462Z" fill="#2d79ff" />
+    <rect x="220" y="584" width="760" height="12" rx="6" fill="#0f1f47" />
+    <rect x="250" y="606" width="700" height="4" rx="2" fill="#112b5e" />
+    <rect x="520" y="208" width="360" height="34" rx="16" fill="rgba(255,255,255,0.1)" />
+    <rect x="260" y="500" width="80" height="4" rx="2" fill="#3d67c4" />
+    <rect x="360" y="500" width="80" height="4" rx="2" fill="#3d67c4" />
+    <rect x="460" y="500" width="80" height="4" rx="2" fill="#3d67c4" />
+  </g>
+  <rect x="280" y="220" width="660" height="375" rx="25" fill="url(#highlight)" />
+  <ellipse cx="600" cy="720" rx="350" ry="40" fill="url(#laptopShadow)" />
+</svg>
