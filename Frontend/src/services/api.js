@@ -4,15 +4,17 @@ const DEFAULT_API_BASE_URL = '/api';
 
 function getApiBaseUrl() {
   const rawEnv = import.meta.env.VITE_API_URL;
+  const isDev = import.meta.env.DEV;
 
-  // Use a configured backend URL when provided, including in production.
-  // If the URL already includes /api, keep it; otherwise use it as the backend root.
-  if (rawEnv) {
+  // In development, use the configured backend URL if provided.
+  // In production, use a relative /api route so Vercel rewrites handle the request
+  // and avoid relying on a possibly invalid or unavailable backend hostname.
+  if (isDev && rawEnv) {
     let cleaned = String(rawEnv).trim().replace(/\/+$/, '');
     if (!/^https?:\/\//i.test(cleaned)) {
       cleaned = `https://${cleaned}`;
     }
-    return cleaned;
+    return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
   }
 
   return DEFAULT_API_BASE_URL;
