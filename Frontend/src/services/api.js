@@ -1,20 +1,16 @@
 import axios from 'axios';
 
-const DEFAULT_API_BASE_URL = '/api';
+const DEFAULT_API_BASE_URL = 'https://anova-tecnologes-production.up.railway.app/api';
 
 function getApiBaseUrl() {
   const rawEnv = import.meta.env.VITE_API_URL;
-  const isDev = import.meta.env.DEV;
+  const configuredApi = typeof rawEnv === 'string' ? rawEnv.trim() : '';
 
-  // In development, use the configured backend URL if provided.
-  // In production, use a relative /api route so Vercel rewrites handle the request
-  // and avoid relying on a possibly invalid or unavailable backend hostname.
-  if (isDev && rawEnv) {
-    let cleaned = String(rawEnv).trim().replace(/\/+$/, '');
-    if (!/^https?:\/\//i.test(cleaned)) {
-      cleaned = `https://${cleaned}`;
-    }
-    return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
+  // Prefer explicit VITE_API_URL when configured. If not set, fall back to the
+  // Railway deployment API base URL for production usage.
+  if (configuredApi) {
+    const cleaned = configuredApi.replace(/\/+$/, '');
+    return /^https?:\/\//i.test(cleaned) ? cleaned : `https://${cleaned}`;
   }
 
   return DEFAULT_API_BASE_URL;
