@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-const DEFAULT_API_BASE_URL = 'https://anova-tecnologes-production.up.railway.app/api';
+const DEFAULT_API_BASE_URL = '/api';
 
 export const API_BASE_URL = (() => {
   const configured = typeof import.meta.env.VITE_API_URL === 'string' ? import.meta.env.VITE_API_URL.trim() : '';
   const cleaned = configured.replace(/\/+$/, '');
-  return cleaned ? (/^https?:\/\//i.test(cleaned) ? cleaned : `https://${cleaned}`) : DEFAULT_API_BASE_URL;
+  return cleaned || DEFAULT_API_BASE_URL;
 })();
 
 export const API_ORIGIN = API_BASE_URL.replace(/\/api$/i, '');

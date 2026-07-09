@@ -5,7 +5,7 @@
     },
     {
       "src": "/api/(.*)",
-      "dest": "https://anova-tecnologes-production.railway.app/$1"
+      "dest": "https://anova-tecnologes-production.railway.app/api/$1"
     },
     {
       "src": "/uploads/(.*)",
