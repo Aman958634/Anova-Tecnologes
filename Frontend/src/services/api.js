@@ -8,7 +8,7 @@ function getApiBaseUrl() {
   // Use a configured backend URL when provided, including in production.
   // If the URL already includes /api, keep it; otherwise use it as the backend root.
   if (rawEnv) {
-    let cleaned = String(rawEnv).trim().replace(/\/+$/'', '');
+    let cleaned = String(rawEnv).trim().replace(/\/+$/, '');
     if (!/^https?:\/\//i.test(cleaned)) {
       cleaned = `https://${cleaned}`;
     }
