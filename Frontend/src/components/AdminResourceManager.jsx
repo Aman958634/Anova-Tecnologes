@@ -440,14 +440,14 @@ export default function AdminResourceManager({ resource, title, description }) {
       </div>
 
       {supportsForm && isFormOpen ? (
-        <form onSubmit={onSubmit} className="grid gap-3 rounded-2xl border border-[#d9e7ff] bg-white p-5 shadow-[0_12px_28px_rgba(47,109,247,0.08)] md:grid-cols-2">
+        <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded-2xl border border-[#d9e7ff] bg-white p-5 shadow-[0_12px_28px_rgba(47,109,247,0.08)] md:grid-cols-2">
           {resource === 'services' ? (
             <>
-              <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.title || ''} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} placeholder="Service title" required />
-              <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.icon || ''} onChange={(event) => setForm((current) => ({ ...current, icon: event.target.value }))} placeholder="Icon name" />
-              <textarea className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none md:col-span-2" rows="4" value={form.description || ''} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} placeholder="Description" required />
-              <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none md:col-span-2" value={form.key_features || ''} onChange={(event) => setForm((current) => ({ ...current, key_features: event.target.value }))} placeholder="Key features (comma separated)" />
-              <input type="url" className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.image_url || ''} onChange={(event) => setForm((current) => ({ ...current, image_url: event.target.value }))} placeholder="Image URL (https://...)" />
+              <input className="input-field" value={form.title || ''} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} placeholder="Service title" required />
+              <input className="input-field" value={form.icon || ''} onChange={(event) => setForm((current) => ({ ...current, icon: event.target.value }))} placeholder="Icon name" />
+              <textarea className="input-field md:col-span-2" rows="4" value={form.description || ''} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} placeholder="Description" required />
+              <input className="input-field md:col-span-2" value={form.key_features || ''} onChange={(event) => setForm((current) => ({ ...current, key_features: event.target.value }))} placeholder="Key features (comma separated)" />
+              <input type="url" className="input-field" value={form.image_url || ''} onChange={(event) => setForm((current) => ({ ...current, image_url: event.target.value }))} placeholder="Image URL (https://...)" />
               <button type="button" className="ml-2 text-sm text-[#1e4db8] underline" onClick={() => {
                 if (form.image_url) setPreviewUrl(buildImageUrl(form.image_url));
               }}>Preview URL</button>
@@ -461,11 +461,11 @@ export default function AdminResourceManager({ resource, title, description }) {
                     return url;
                   });
                 }
-              }} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
+              }} className="input-field" />
               {previewUrl ? (
                 <div className="md:col-span-2 mt-2 relative">
                   <button type="button" onClick={handleRemoveImage} className="absolute right-2 top-2 z-10 inline-flex items-center gap-2 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100">Delete image</button>
-                  <img src={previewUrl} alt="preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-32 w-full rounded-md object-cover bg-white" />
+                  <img src={previewUrl} alt="preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-40 sm:h-32 w-full rounded-md object-cover bg-white" />
                 </div>
               ) : null}
               <label className="flex items-center gap-2 text-sm text-[#163c88]"><input type="checkbox" checked={Boolean(form.featured)} onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))} /> Featured</label>
@@ -553,11 +553,11 @@ export default function AdminResourceManager({ resource, title, description }) {
             </>
           ) : null}
 
-          <div className="flex gap-2 md:col-span-2">
-            <button type="submit" disabled={busy} className="inline-flex flex-1 items-center justify-center rounded-xl bg-[#2f6df7] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2458d0] disabled:opacity-50">
+          <div className="flex flex-col-reverse gap-2 sm:flex-row md:col-span-2">
+            <button type="submit" disabled={busy} className="inline-flex w-full items-center justify-center rounded-xl bg-[#2f6df7] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2458d0] disabled:opacity-50 sm:w-auto sm:flex-1">
               {busy ? 'Saving...' : form.id ? 'Update' : 'Create'}
             </button>
-            <button type="button" onClick={closeForm} className="inline-flex items-center justify-center rounded-xl border border-[#d9e7ff] bg-[#f2f7ff] px-4 py-2 text-sm font-semibold text-[#1e4db8] transition hover:bg-[#e8f1ff]">
+            <button type="button" onClick={closeForm} className="inline-flex w-full items-center justify-center rounded-xl border border-[#d9e7ff] bg-[#f2f7ff] px-4 py-2 text-sm font-semibold text-[#1e4db8] transition hover:bg-[#e8f1ff] sm:w-auto">
               Cancel
             </button>
           </div>
