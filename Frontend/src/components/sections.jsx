@@ -125,7 +125,7 @@ export function HeroSection() {
             transition={{ duration: 0.55, ease: 'easeOut' }}
             className="relative"
           >
-            <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#122d62] shadow-[0_45px_80px_rgba(7,25,74,0.35)]">
+            <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#122d62] shadow-[0_45px_80px_rgba(7,25,74,0.35)] relative">
               <video
                 poster="/laptop-hero.svg"
                 preload="metadata"
@@ -138,6 +138,18 @@ export function HeroSection() {
                 <source src={heroVideo} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
+
+              {/* Marquee overlay: duplicated content for seamless loop */}
+              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-[#071637]/80 to-transparent py-3">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6">
+                  <div className="marquee overflow-hidden">
+                    <div className="marquee-track inline-flex whitespace-nowrap animate-marquee">
+                      <span className="mx-8 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions.</span>
+                      <span className="mx-8 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
