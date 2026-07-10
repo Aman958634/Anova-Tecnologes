@@ -1,20 +1,23 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "env": {},
   "functions": {
     "api/[...path].js": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "memory": 1024
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/uploads/:path*",
-      "destination": "https://anova-tecnologes-production.railway.app/uploads/:path*"
+      "src": "/uploads/(.*)",
+      "dest": "https://anova-tecnologes-production.railway.app/uploads/$1"
     },
     {
-      "source": "/:path*",
-      "destination": "/index.html"
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
