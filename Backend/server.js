@@ -82,24 +82,7 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Serve uploads with explicit CORS headers to avoid CORB/CORS issues when
-// the frontend proxies or directly requests static assets.
-app.use(
-  '/uploads',
-  (req, res, next) => {
-    // Allow the configured origins, fallback to wildcard during public asset access
-    const origin = req.headers.origin;
-    if (origin && allowedOrigins.includes(origin)) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
-    } else {
-      res.setHeader('Access-Control-Allow-Origin', '*');
-    }
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
-  },
-  express.static(uploadsDir, { maxAge: '30d', immutable: true })
-);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Extra safety: ensure other responses include CORS header if middleware missed it
 app.use((req, res, next) => {

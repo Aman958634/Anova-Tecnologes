@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const asyncHandler = require('../utils/asyncHandler');
 const { pool } = require('../config/db');
 const { findById, deleteById } = require('../models/baseModel');
@@ -16,22 +18,48 @@ const parseTags = (value) => {
   }
 };
 
+const buildAbsoluteImageUrl = (req, imagePath) => {
+  if (!imagePath) return null;
+  if (/^https?:\/\//i.test(imagePath)) return imagePath;
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
+  return `${baseUrl}${imagePath}`;
+};
+
+const mapProjectRow = (row, req) => ({
+  ...row,
+  tags: parseTags(row.tags),
+  image: row.image_url || null,
+  imageUrl: buildAbsoluteImageUrl(req, row.image_url),
+  demoUrl: row.live_demo_url || null
+});
+
 const isPlaceholderImage = (url) => {
   if (!url) return false;
   const s = String(url).trim();
-  // Treat common Unsplash placeholder URLs (used by the frontend helper) as "no image"
   if (s.includes('images.unsplash.com')) return true;
-  // Add any other known placeholder patterns here
   return false;
 };
 
 const normalizeImageInput = (input, file) => {
-  // If a file was uploaded, prefer the uploaded file path
-  if (file && file.filename) return `/uploads/${file.filename}`;
+  if (file && file.filename) {
+    return `/uploads/projects/${file.filename}`;
+  }
   if (!input) return null;
   const value = String(input).trim();
   if (isPlaceholderImage(value)) return null;
   return value || null;
+};
+
+const removeUploadedFile = async (imageUrl) => {
+  if (!imageUrl || !imageUrl.startsWith('/uploads/')) return;
+  const filePath = path.join(__dirname, '..', imageUrl.replace(/^\//, ''));
+  try {
+    if (fs.existsSync(filePath)) {
+      await fs.promises.unlink(filePath);
+    }
+  } catch {
+    // Ignore deletion failures; avoid blocking response.
+  }
 };
 
 const setShortCacheHeaders = (res) => {
@@ -54,7 +82,7 @@ const listProjects = asyncHandler(async (req, res) => {
     'SELECT * FROM projects WHERE title LIKE ? OR description LIKE ? ORDER BY featured DESC, id DESC LIMIT ? OFFSET ?',
     [search, search, limit, offset]
   );
-  const formatted = rows.map((row) => ({ ...row, tags: parseTags(row.tags) }));
+  const formatted = rows.map((row) => mapProjectRow(row, req));
   const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM projects WHERE title LIKE ? OR description LIKE ?', [search, search]);
   const result = {
     success: true,
@@ -72,8 +100,7 @@ const getProjectById = asyncHandler(async (req, res) => {
   if (!project) {
     return res.status(404).json({ success: false, message: 'Project not found.' });
   }
-  project.tags = parseTags(project.tags);
-  res.json({ success: true, data: project, project });
+  res.json({ success: true, data: mapProjectRow(project, req), project: mapProjectRow(project, req) });
 });
 
 const createProject = asyncHandler(async (req, res) => {
@@ -85,8 +112,8 @@ const createProject = asyncHandler(async (req, res) => {
   );
   invalidateCache('projects:');
   const created = await findById('projects', result.insertId);
-  created.tags = parseTags(created.tags);
-  res.status(201).json({ success: true, data: created, project: created });
+  const mapped = mapProjectRow(created, req);
+  res.status(201).json({ success: true, data: mapped, project: mapped });
 });
 
 const updateProject = asyncHandler(async (req, res) => {
@@ -94,7 +121,16 @@ const updateProject = asyncHandler(async (req, res) => {
   if (!existing) return res.status(404).json({ success: false, message: 'Project not found.' });
 
   const shouldRemoveImage = req.body.remove_image === 'true' || req.body.remove_image === '1';
-  const imageUrl = shouldRemoveImage ? null : normalizeImageInput(req.body.image_url, req.file) || existing.image_url;
+  const uploadedImageUrl = normalizeImageInput(req.body.image_url, req.file);
+  const imageUrl = shouldRemoveImage ? null : uploadedImageUrl || existing.image_url;
+
+  if (uploadedImageUrl && existing.image_url && existing.image_url.startsWith('/uploads/projects/')) {
+    await removeUploadedFile(existing.image_url);
+  }
+  if (shouldRemoveImage && existing.image_url && existing.image_url.startsWith('/uploads/projects/')) {
+    await removeUploadedFile(existing.image_url);
+  }
+
   const tags = JSON.stringify(parseTags(req.body.tags || existing.tags));
   await pool.query(
     'UPDATE projects SET title = ?, description = ?, image_url = ?, live_demo_url = ?, tags = ?, featured = ? WHERE id = ?',
@@ -102,15 +138,24 @@ const updateProject = asyncHandler(async (req, res) => {
   );
   invalidateCache('projects:');
   const updated = await findById('projects', req.params.id);
-  updated.tags = parseTags(updated.tags);
-  res.json({ success: true, data: updated, project: updated });
+  const mapped = mapProjectRow(updated, req);
+  res.json({ success: true, data: mapped, project: mapped });
 });
 
 const deleteProject = asyncHandler(async (req, res) => {
+  const project = await findById('projects', req.params.id);
+  if (!project) {
+    return res.status(404).json({ success: false, message: 'Project not found.' });
+  }
+
+  if (project.image_url && project.image_url.startsWith('/uploads/projects/')) {
+    await removeUploadedFile(project.image_url);
+  }
+
   const deleted = await deleteById('projects', req.params.id);
-  if (!deleted) return res.status(404).json({ message: 'Project not found.' });
+  if (!deleted) return res.status(404).json({ success: false, message: 'Project not found.' });
   invalidateCache('projects:');
-  res.json({ message: 'Project deleted successfully.' });
+  res.json({ success: true, message: 'Project deleted successfully.' });
 });
 
 module.exports = { listProjects, getProjectById, createProject, updateProject, deleteProject };

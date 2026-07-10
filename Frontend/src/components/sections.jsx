@@ -700,14 +700,18 @@ export function ProjectsSection() {
 
                 {/* Image area */}
                 <div className="relative h-[210px] overflow-hidden">
-                  <img
-                    src={buildImageUrl(project.image || project.image_url, imageFallbackByKey())}
-                    alt={project.title}
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => { e.currentTarget.src = imageFallbackByKey(); }}
-                    className="h-full w-full object-cover bg-[#f0f3fa]"
-                  />
+                  {project.imageUrl || project.image || project.image_url ? (
+                    <img
+                      src={buildImageUrl(project.imageUrl || project.image || project.image_url)}
+                      alt={project.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover bg-[#f0f3fa]"
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-slate-100" />
+                  )}
+
                   {/* Category chip */}
                   <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${chipColor(index)}`}>
                     {Array.isArray(project.tags) && project.tags[0] ? project.tags[0] : 'Project'}

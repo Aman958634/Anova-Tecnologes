@@ -113,13 +113,23 @@ export default function AdminResourceManager({ resource, title, description }) {
 
   const onEdit = (row) => {
     if (resource === 'projects') {
+      const imageUrlValue = row.image_url || row.imageUrl || '';
+      let relativeImageUrl = imageUrlValue;
+      if (!row.image_url && row.imageUrl) {
+        try {
+          relativeImageUrl = new URL(row.imageUrl).pathname;
+        } catch {
+          relativeImageUrl = row.imageUrl;
+        }
+      }
       setForm({
         ...row,
         tags: Array.isArray(row.tags) ? row.tags.join(', ') : row.tags || '',
         image: null,
+        image_url: relativeImageUrl,
         remove_image: false
       });
-      setPreviewUrl(row.image_url ? buildImageUrl(row.image_url) : null);
+      setPreviewUrl(imageUrlValue ? buildImageUrl(imageUrlValue) : null);
       setIsFormOpen(true);
       return;
     }
@@ -167,7 +177,12 @@ export default function AdminResourceManager({ resource, title, description }) {
       if ((key === 'image_url' || key === 'photo_url') && isPlaceholderImageUrl(value)) {
         return;
       }
-      // Ensure tags and key_features are sent as JSON arrays when provided as comma-separated strings
+      if (key === 'image_url' && form.image) {
+        return;
+      }
+      if (key === 'photo_url' && form.photo) {
+        return;
+      }
       if (key === 'tags' && typeof value === 'string') {
         const arr = value.split(',').map((s) => s.trim()).filter(Boolean);
         payload.append('tags', JSON.stringify(arr));
@@ -196,6 +211,12 @@ export default function AdminResourceManager({ resource, title, description }) {
         return;
       }
       if ((key === 'image_url' || key === 'photo_url') && isPlaceholderImageUrl(value)) {
+        return;
+      }
+      if (key === 'image_url' && obj.image) {
+        return;
+      }
+      if (key === 'photo_url' && obj.photo) {
         return;
       }
       if (key === 'tags' && typeof value === 'string') {
