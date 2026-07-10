@@ -151,6 +151,20 @@ export function HeroSection() {
                 </div>
               </div>
             </div>
+
+            {/* Marquee below the image for hero column */}
+            <div className="mt-4 sm:mt-6">
+              <div className="mx-auto max-w-full px-4 sm:px-6">
+                <div className="rounded-md bg-[#071637]/70 px-3 py-2">
+                  <div className="marquee overflow-hidden">
+                    <div className="marquee-track inline-flex whitespace-nowrap animate-marquee">
+                      <span className="mx-6 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions. &nbsp;Contact us for a free consultation.</span>
+                      <span className="mx-6 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions. &nbsp;Contact us for a free consultation.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
