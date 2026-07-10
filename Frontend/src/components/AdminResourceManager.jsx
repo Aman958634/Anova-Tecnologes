@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import api from '../services/api';
@@ -42,6 +42,8 @@ export default function AdminResourceManager({ resource, title, description }) {
   const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0 });
   const [form, setForm] = useState(initialForms[resource] || {});
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const tableRef = useRef(null);
+  const [highlightedId, setHighlightedId] = useState(null);
 
   const endpoint = endpoints[resource];
   const supportsForm = resource !== 'contacts';
@@ -253,20 +255,33 @@ export default function AdminResourceManager({ resource, title, description }) {
       const url = `${endpoint}${form.id ? `/${form.id}` : ''}`;
       // Let the browser set `Content-Type` with proper boundary for FormData.
       const response = await api[method](url, buildPayload());
-      // store image override so public pages show the newly uploaded image immediately after refresh
-      // no persistent preview override — do not store preview across refresh
       toast.success(`${title} saved successfully`);
+
+      // Preserve old preview blob so we can revoke after closing form
+      const oldPreview = previewUrl;
+      // Close form and refresh rows. For new items, prefer page 1 so the created
+      // record is visible immediately.
       closeForm();
-      fetchRows();
+      if (!form.id) setMeta((c) => ({ ...c, page: 1 }));
+      await fetchRows();
       notifyDataUpdated();
+
+      // Try to find created resource id to highlight it briefly
+      const createdId = response?.data?.data?.id || response?.data?.id || response?.data?.project?.id || null;
+      if (createdId) {
+        setHighlightedId(createdId);
+        window.setTimeout(() => setHighlightedId(null), 3500);
+      }
+
+      // Scroll to the table so mobile users immediately see the new row.
+      window.setTimeout(() => {
+        if (tableRef.current) tableRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 220);
+
       // update preview if server returned image url
       const returnedImageUrl = response?.data?.imageUrl || response?.data?.project?.imageUrl || response?.data?.data?.imageUrl || response?.data?.image_url || response?.data?.project?.image_url || response?.data?.data?.image_url;
-      if (returnedImageUrl) {
-        setPreviewUrl(buildImageUrl(returnedImageUrl));
-      }
-      if (previewUrl && previewUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(previewUrl);
-      }
+      if (returnedImageUrl) setPreviewUrl(buildImageUrl(returnedImageUrl));
+      if (oldPreview && oldPreview.startsWith('blob:')) URL.revokeObjectURL(oldPreview);
     } catch (error) {
       toast.error(error.response?.data?.message || 'Save failed');
     } finally {
@@ -549,42 +564,86 @@ export default function AdminResourceManager({ resource, title, description }) {
         </form>
       ) : null}
 
-      <div className="overflow-hidden rounded-2xl border border-[#d9e7ff] bg-white shadow-[0_12px_28px_rgba(47,109,247,0.08)]">
+      <div ref={tableRef} className="overflow-hidden rounded-2xl border border-[#d9e7ff] bg-white shadow-[0_12px_28px_rgba(47,109,247,0.08)]">
         {rows.length === 0 ? (
           <div className="p-8 text-center text-sm text-[#4a648f]">
             No records found. Click + New to add data for this section.
           </div>
         ) : (
-          <table className="min-w-full text-sm text-[#163c88]">
-            <TableHeader columns={[...columns.map((column) => column.label), 'Actions']} />
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.id} className="border-t border-[#e6efff] hover:bg-[#f8fbff]">
-                  {columns.map((column) => (
-                    <td key={column.key} className="px-4 py-3 align-top max-w-[260px] break-words">
-                      {renderCellValue(column, row)}
-                    </td>
+          <>
+            {/* Desktop / tablet: regular table */}
+            <div className="hidden sm:block">
+              <table className="min-w-full text-sm text-[#163c88]">
+                <TableHeader columns={[...columns.map((column) => column.label), 'Actions']} />
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.id} className={`border-t border-[#e6efff] hover:bg-[#f8fbff] ${highlightedId === row.id ? 'ring-4 ring-[#2f80ff]/30' : ''}`}>
+                      {columns.map((column) => (
+                        <td key={column.key} className="px-4 py-3 align-top max-w-[260px] break-words">
+                          {renderCellValue(column, row)}
+                        </td>
+                      ))}
+                      <td className="px-4 py-3">
+                        {supportsForm ? (
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => onEdit(row)} className="inline-flex items-center gap-1 rounded-lg bg-[#edf4ff] px-3 py-2 text-sm text-[#2f6df7] transition hover:bg-[#dceaff]">
+                              <Pencil className="h-4 w-4" /> Edit
+                            </button>
+                            <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
+                              <Trash2 className="h-4 w-4" /> Delete
+                            </button>
+                          </div>
+                        ) : (
+                          <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
+                            <Trash2 className="h-4 w-4" /> Delete
+                          </button>
+                        )}
+                      </td>
+                    </tr>
                   ))}
-                  <td className="px-4 py-3">
-                    {supportsForm ? (
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => onEdit(row)} className="inline-flex items-center gap-1 rounded-lg bg-[#edf4ff] px-3 py-2 text-sm text-[#2f6df7] transition hover:bg-[#dceaff]">
-                          <Pencil className="h-4 w-4" /> Edit
-                        </button>
-                        <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
-                          <Trash2 className="h-4 w-4" /> Delete
-                        </button>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile: stacked cards for better readability */}
+            <div className="block sm:hidden">
+              <div className="divide-y divide-[#e6efff]">
+                {rows.map((row) => (
+                  <div key={row.id} className={`p-3 ${highlightedId === row.id ? 'ring-4 ring-[#2f80ff]/30 rounded-md' : ''}`}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-sm font-semibold text-[#163c88]">{columns[0] ? renderCellValue(columns[0], row) : (row.title || row.name)}</div>
+                        <div className="mt-1 text-xs text-slate-500">{columns[1] ? renderCellValue(columns[1], row) : ''}</div>
                       </div>
-                    ) : (
-                      <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
-                        <Trash2 className="h-4 w-4" /> Delete
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+
+                      <div className="flex-shrink-0 flex items-center gap-2">
+                        {supportsForm ? (
+                          <>
+                            <button onClick={() => onEdit(row)} className="inline-flex items-center gap-1 rounded-md bg-[#edf4ff] px-3 py-1.5 text-xs text-[#2f6df7] transition hover:bg-[#dceaff]">
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                            <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-md bg-red-50 px-3 py-1.5 text-xs text-red-600 transition hover:bg-red-100">
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </>
+                        ) : (
+                          <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-md bg-red-50 px-3 py-1.5 text-xs text-red-600 transition hover:bg-red-100">
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {/* Optional: render other columns as secondary info */}
+                    {columns.slice(2).map((col) => (
+                      <div key={col.key} className="mt-2 text-xs text-slate-600">
+                        <strong className="text-slate-700">{col.label}: </strong>{renderCellValue(col, row)}
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </>
         )}
       </div>
 
