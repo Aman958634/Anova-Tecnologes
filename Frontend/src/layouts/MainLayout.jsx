@@ -59,7 +59,7 @@ export default function MainLayout({ children }) {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-[#071c46] text-slate-100">
       <Navbar />
       <AnimatePresence mode="wait">
         <motion.main

@@ -25,7 +25,7 @@ export default function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       className={`sticky top-0 z-50 overflow-visible backdrop-blur-sm transition-colors duration-300 ${isLightHeader ? 'border-b border-slate-200 bg-white/95 shadow-[0_1px_0_rgba(15,23,42,0.04)]' : 'bg-[#0a2a66]/95'}`}
     >
-      <div className="section-shell flex h-[90px] items-center gap-4 lg:h-[96px] lg:gap-8">
+      <div className="section-shell flex h-[90px] items-center justify-between gap-4 lg:h-[96px] lg:gap-8">
         <Link to="/" className="group flex shrink-0 items-center">
           <img
             src={isLightHeader ? '/logoanova.png' : '/logoanova-white.png'}
@@ -41,7 +41,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <nav className="hidden flex-1 items-center justify-center gap-8 xl:gap-9 lg:flex">
+        <nav className="hidden flex-1 items-center justify-center gap-6 xl:gap-8 lg:flex">
           {navLinks.map((link) => (
             <NavLink
               key={link.path}
@@ -64,7 +64,7 @@ export default function Navbar() {
 
         <div className="ml-auto flex shrink-0 items-center gap-3">
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }}>
-            <Link to="/contact" className={`rounded-2xl px-4 py-2.5 text-base font-medium transition sm:px-5 sm:py-3 sm:text-[1.02rem] ${isLightHeader ? 'bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.24)] hover:bg-[#2563eb]' : 'border border-white/15 bg-white text-[#1d4ed8] hover:bg-white/90'} lg:rounded-full`}>
+            <Link to="/contact" className={`rounded-full px-4 py-2.5 text-sm font-semibold transition sm:px-5 sm:py-3 ${isLightHeader ? 'bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.24)] hover:bg-[#2563eb]' : 'border border-white/15 bg-white text-[#1d4ed8] hover:bg-white/90'}`}>
               Get in Touch
             </Link>
           </motion.div>
@@ -88,7 +88,7 @@ export default function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             className={`${isLightHeader ? 'border-t border-slate-200 bg-white' : 'bg-[#0a2a66]'} lg:hidden`}
           >
-            <div className="section-shell flex flex-col gap-3 py-5">
+            <div className="section-shell flex flex-col gap-3 py-4">
               {navLinks.map((link) => (
                 <Link key={link.path} to={link.path} onClick={() => setOpen(false)} className={`rounded-2xl px-4 py-3 text-sm transition ${isLightHeader ? 'text-slate-700 hover:bg-slate-100 hover:text-[#2f6df7]' : 'text-slate-300 hover:bg-white/10 hover:text-white'}`}>
                   {link.label}

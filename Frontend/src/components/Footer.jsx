@@ -6,7 +6,7 @@ import { navLinks } from '../utils/siteData';
 export default function Footer() {
   return (
     <footer className="border-t border-[#0f2f6d] bg-[#071d4a] text-white">
-      <div className="section-shell grid gap-10 py-16 md:grid-cols-2 lg:grid-cols-4">
+      <div className="section-shell grid gap-10 py-16 sm:gap-8 md:grid-cols-2 lg:grid-cols-4">
         <motion.div initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.35 }} className="space-y-4">
           <img
             src="/logoanova-white.png"

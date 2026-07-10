@@ -29,7 +29,7 @@ export default function App() {
   }, []);
 
   return (
-    <Suspense fallback={<div className="min-h-screen grid place-items-center bg-white text-slate-900">Loading page…</div>}>
+    <Suspense fallback={<div className="min-h-screen grid place-items-center bg-[#071c46] text-white">Loading page…</div>}>
       <Routes>
         <Route path="/" element={<PublicRoute element={<Home />} />} />
         <Route path="/about" element={<PublicRoute element={<About />} />} />

@@ -45,7 +45,7 @@ export default function AdminLayout({ children }) {
         variants={sidebarVariants}
         initial="hidden"
         animate="show"
-        className="border-r border-brand-200 bg-white p-6"
+        className="border-b border-brand-200 bg-white p-5 sm:p-6 lg:border-b-0 lg:border-r lg:p-6"
       >
         <Link to="/" className="mb-10 flex items-center gap-3">
           <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 via-cyan-500 to-emerald-400 text-white font-bold">A</div>
