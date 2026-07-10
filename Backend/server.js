@@ -43,7 +43,7 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    if (origin.endsWith('.vercel.app') || origin.endsWith('.railway.app')) {
+    if (origin.endsWith('.vercel.app') || origin.endsWith('.railway.app') || origin.endsWith('.onrender.com')) {
       return callback(null, true);
     }
 

@@ -19,25 +19,15 @@ export function buildImageUrl(url, fallback = null) {
     path = `/uploads${path}`;
   }
 
-  // If a VITE API URL is configured, use it for local development only.
-  // In production, keep upload URLs relative so Vercel rewrites /uploads/* back
-  // to the backend host and avoid DNS/host resolution problems in the browser.
-  const configuredApi = import.meta.env.VITE_API_URL;
-  const isDev = import.meta.env.DEV;
-  if (configuredApi && isDev) {
-    let apiUrl = String(configuredApi).trim().replace(/\/+$/, '');
-    if (!/^https?:\/\//i.test(apiUrl)) {
-      apiUrl = `https://${apiUrl}`;
-    }
-    const backendUrl = apiUrl.replace(/\/api$/i, '');
-
-    if (path.startsWith('/uploads/')) {
+  const configuredApi = typeof import.meta.env.VITE_API_URL === 'string' ? import.meta.env.VITE_API_URL.trim() : '';
+  if (configuredApi && path.startsWith('/uploads/')) {
+    if (/^https?:\/\//i.test(configuredApi)) {
+      const backendUrl = configuredApi.replace(/\/+$/, '').replace(/\/api$/i, '');
       return `${backendUrl}${path}`;
     }
+    return path;
   }
 
-  // Default: return the uploads path as-is (e.g. /uploads/filename).
-  // Production relies on Vercel route rewrites instead of embedding the backend host.
   return path;
 }
 

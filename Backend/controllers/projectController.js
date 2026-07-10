@@ -56,10 +56,24 @@ const listProjects = asyncHandler(async (req, res) => {
   );
   const formatted = rows.map((row) => ({ ...row, tags: parseTags(row.tags) }));
   const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM projects WHERE title LIKE ? OR description LIKE ?', [search, search]);
-  const result = { data: formatted, meta: { page, limit, total: countRows[0].total } };
+  const result = {
+    success: true,
+    data: formatted,
+    projects: formatted,
+    meta: { page, limit, total: countRows[0].total }
+  };
   setCache(cacheKey, result, 120000);
   setShortCacheHeaders(res);
   res.json(result);
+});
+
+const getProjectById = asyncHandler(async (req, res) => {
+  const project = await findById('projects', req.params.id);
+  if (!project) {
+    return res.status(404).json({ success: false, message: 'Project not found.' });
+  }
+  project.tags = parseTags(project.tags);
+  res.json({ success: true, data: project, project });
 });
 
 const createProject = asyncHandler(async (req, res) => {
@@ -70,12 +84,14 @@ const createProject = asyncHandler(async (req, res) => {
     [req.body.title, req.body.description, imageUrl, req.body.live_demo_url || null, tags, req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0]
   );
   invalidateCache('projects:');
-  res.status(201).json(await findById('projects', result.insertId));
+  const created = await findById('projects', result.insertId);
+  created.tags = parseTags(created.tags);
+  res.status(201).json({ success: true, data: created, project: created });
 });
 
 const updateProject = asyncHandler(async (req, res) => {
   const existing = await findById('projects', req.params.id);
-  if (!existing) return res.status(404).json({ message: 'Project not found.' });
+  if (!existing) return res.status(404).json({ success: false, message: 'Project not found.' });
 
   const shouldRemoveImage = req.body.remove_image === 'true' || req.body.remove_image === '1';
   const imageUrl = shouldRemoveImage ? null : normalizeImageInput(req.body.image_url, req.file) || existing.image_url;
@@ -87,7 +103,7 @@ const updateProject = asyncHandler(async (req, res) => {
   invalidateCache('projects:');
   const updated = await findById('projects', req.params.id);
   updated.tags = parseTags(updated.tags);
-  res.json(updated);
+  res.json({ success: true, data: updated, project: updated });
 });
 
 const deleteProject = asyncHandler(async (req, res) => {
@@ -97,4 +113,4 @@ const deleteProject = asyncHandler(async (req, res) => {
   res.json({ message: 'Project deleted successfully.' });
 });
 
-module.exports = { listProjects, createProject, updateProject, deleteProject };
+module.exports = { listProjects, getProjectById, createProject, updateProject, deleteProject };

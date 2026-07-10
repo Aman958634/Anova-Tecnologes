@@ -7,15 +7,17 @@
       "memory": 1024
     }
   },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://anova-tecnologes-backend.onrender.com/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://anova-tecnologes-backend.onrender.com/uploads/:path*"
+    }
+  ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/uploads/(.*)",
-      "dest": "https://anova-tecnologes-backend.onrender.com/uploads/$1"
-    },
     {
       "handle": "filesystem"
     },
