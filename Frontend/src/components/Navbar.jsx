@@ -94,7 +94,7 @@ export default function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <Link to="/contact" onClick={() => setOpen(false)} className="btn-primary w-full justify-center">Contact</Link>
+              <Link to="/contact" onClick={() => setOpen(false)} className="btn-primary w-full justify-center">Get in Touch</Link>
             </div>
           </motion.div>
         ) : null}

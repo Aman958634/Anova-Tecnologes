@@ -699,7 +699,7 @@ export function ProjectsSection() {
               <div className="overflow-hidden rounded-[18px] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.08)] transition hover:shadow-[0_16px_36px_rgba(15,23,42,0.13)]">
 
                 {/* Image area */}
-                <div className="relative h-[210px] overflow-hidden">
+                <div className="relative h-[210px] overflow-hidden sm:h-[250px] md:h-[260px] lg:h-[220px]">
                   {project.imageUrl || project.image || project.image_url ? (
                     <img
                       src={buildImageUrl(project.imageUrl || project.image || project.image_url)}
