@@ -45,15 +45,21 @@ export default function AdminLayout({ children }) {
         variants={sidebarVariants}
         initial="hidden"
         animate="show"
-        className="border-b border-brand-200 bg-white p-5 sm:p-6 lg:border-b-0 lg:border-r lg:p-6"
+        className="border-b border-brand-200 bg-slate-950 p-5 sm:p-6 lg:border-b-0 lg:border-r lg:p-6"
       >
-        <Link to="/" className="mb-10 flex items-center gap-3">
-          <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 via-cyan-500 to-emerald-400 text-white font-bold">A</div>
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-brand-700">Admin</p>
-            <p className="text-xs text-brand-600">{user?.name || 'Dashboard'}</p>
+        <div className="mb-8 rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:flex sm:items-center sm:justify-between sm:gap-4">
+          <Link to="/" className="flex items-center gap-3 text-white">
+            <div className="grid h-12 w-12 place-items-center rounded-3xl bg-gradient-to-br from-cyan-500 via-sky-500 to-indigo-500 text-lg font-bold shadow-lg shadow-cyan-500/20">A</div>
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-100">Anova Admin</p>
+              <p className="text-xs text-slate-400">{user?.name || 'Dashboard'}</p>
+            </div>
+          </Link>
+          <div className="mt-4 flex items-center gap-2 rounded-2xl bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-300 sm:mt-0">
+            <span className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+            Online
           </div>
-        </Link>
+        </div>
         <nav className="space-y-2">
           {adminLinks.map((link) => (
             <motion.div key={link.path} variants={itemVariants}>
@@ -61,14 +67,17 @@ export default function AdminLayout({ children }) {
                 to={link.path}
                 end={link.path === '/admin'}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
+                  `group flex items-center gap-3 rounded-[18px] px-4 py-3 text-sm font-medium transition ${
                     isActive
-                      ? 'bg-[#e9f1ff] text-[#1e4db8]'
-                      : 'text-[#4a648f] hover:bg-[#f2f7ff] hover:text-[#1e4db8]'
+                      ? 'bg-slate-100 text-slate-950 shadow-[0_12px_40px_rgba(15,23,42,0.08)]'
+                      : 'text-slate-300 hover:bg-slate-900/80 hover:text-white'
                   }`
                 }
               >
-                <link.icon className="h-4 w-4" /> {link.label}
+                <span className={`grid h-10 w-10 place-items-center rounded-2xl ${isActive ? 'bg-slate-950 text-white' : 'bg-slate-900 text-slate-300'} transition`}>
+                  <link.icon className="h-4 w-4" />
+                </span>
+                <span>{link.label}</span>
               </NavLink>
             </motion.div>
           ))}
@@ -76,7 +85,7 @@ export default function AdminLayout({ children }) {
         <motion.button
           variants={itemVariants}
           onClick={logout}
-          className="mt-10 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#d9e7ff] bg-[#f2f7ff] px-4 py-3 text-sm font-medium text-[#1e4db8] transition hover:bg-[#e6f0ff]"
+          className="mt-10 inline-flex w-full items-center justify-center gap-2 rounded-[18px] bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(15,23,42,0.18)] transition hover:from-slate-800 hover:to-slate-700"
         >
           <LogOut className="h-4 w-4" /> Logout
         </motion.button>
