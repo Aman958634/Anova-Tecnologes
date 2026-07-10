@@ -117,16 +117,6 @@ export function HeroSection() {
               </a>
             </div>
 
-            <div className="mt-12 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.12)]">
-                <p className="text-sm text-slate-200">Projects Delivered</p>
-                <p className="mt-3 text-3xl font-semibold text-white">500+</p>
-              </div>
-              <div className="rounded-[24px] border border-white/10 bg-white/5 p-5 shadow-[0_24px_70px_rgba(0,0,0,0.12)]">
-                <p className="text-sm text-slate-200">Client Satisfaction</p>
-                <p className="mt-3 text-3xl font-semibold text-white">99%</p>
-              </div>
-            </div>
           </motion.div>
 
           <motion.div
@@ -148,14 +138,6 @@ export function HeroSection() {
                 <source src={heroVideo} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
-            </div>
-            <div className="absolute left-6 top-6 hidden rounded-3xl border border-white/15 bg-white/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.12)] sm:block">
-              <p className="text-xs uppercase tracking-[0.22em] text-white/70">Featured Service</p>
-              <p className="mt-2 text-lg font-semibold text-white">Web & Mobile Development</p>
-            </div>
-            <div className="absolute bottom-6 right-6 hidden rounded-3xl border border-white/15 bg-white/10 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.12)] sm:block">
-              <p className="text-xs uppercase tracking-[0.22em] text-white/70">Support</p>
-              <p className="mt-2 text-lg font-semibold text-white">24/7 Dedicated Team</p>
             </div>
           </motion.div>
         </div>
