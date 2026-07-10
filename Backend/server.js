@@ -118,7 +118,8 @@ app.use('/api', routes);
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    time: new Date().toISOString()
+    time: new Date().toISOString(),
+    version: '2.0'
   });
 });
 
