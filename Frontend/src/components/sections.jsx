@@ -139,28 +139,15 @@ export function HeroSection() {
                 Your browser does not support the video tag.
               </video>
 
-              {/* Marquee overlay: duplicated content for seamless loop */}
-              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-[#071637]/80 to-transparent py-3">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6">
-                  <div className="marquee overflow-hidden">
-                    <div className="marquee-track inline-flex whitespace-nowrap animate-marquee">
-                      <span className="mx-8 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions.</span>
-                      <span className="mx-8 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions.</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
-            {/* Marquee below the image for hero column */}
+            {/* Marquee below the hero image */}
             <div className="mt-4 sm:mt-6">
-              <div className="mx-auto max-w-full px-4 sm:px-6">
-                <div className="rounded-md bg-[#071637]/70 px-3 py-2">
-                  <div className="marquee overflow-hidden">
-                    <div className="marquee-track inline-flex whitespace-nowrap animate-marquee">
-                      <span className="mx-6 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions. &nbsp;Contact us for a free consultation.</span>
-                      <span className="mx-6 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions. &nbsp;Contact us for a free consultation.</span>
-                    </div>
+              <div className="rounded-full bg-[#071637]/85 px-4 py-3 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
+                <div className="marquee overflow-hidden">
+                  <div className="marquee-track inline-flex whitespace-nowrap animate-marquee">
+                    <span className="mx-6 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions. Contact us for a free consultation.</span>
+                    <span className="mx-6 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions. Contact us for a free consultation.</span>
                   </div>
                 </div>
               </div>
