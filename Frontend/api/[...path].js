@@ -1,11 +1,11 @@
 /**
- * Vercel Serverless Function: Proxy API requests to Railway backend
- * Routes: /api/* → https://anova-tecnologes-production.railway.app/api/*
+ * Vercel Serverless Function: Proxy API requests to Render backend
+ * Routes: /api/* → https://anova-tecnologes-backend.onrender.com/api/*
  */
 
 const https = require('https');
 
-const RAILWAY_BACKEND = 'https://anova-tecnologes-production.railway.app';
+const RAILWAY_BACKEND = 'https://anova-tecnologes-backend.onrender.com';
 
 module.exports = async (req, res) => {
   try {

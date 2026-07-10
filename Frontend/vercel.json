@@ -10,7 +10,7 @@
   "routes": [
     {
       "src": "/uploads/(.*)",
-      "dest": "https://anova-tecnologes-production.railway.app/uploads/$1"
+      "dest": "https://anova-tecnologes-backend.onrender.com/uploads/$1"
     },
     {
       "handle": "filesystem"
