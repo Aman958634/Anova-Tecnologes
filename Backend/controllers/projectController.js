@@ -55,10 +55,11 @@ const removeUploadedFile = async (imageUrl) => {
   const filePath = path.join(__dirname, '..', imageUrl.replace(/^\//, ''));
   try {
     if (fs.existsSync(filePath)) {
+      console.log('Removing uploaded file:', filePath);
       await fs.promises.unlink(filePath);
     }
-  } catch {
-    // Ignore deletion failures; avoid blocking response.
+  } catch (error) {
+    console.error('Failed to remove uploaded file:', filePath, error);
   }
 };
 
@@ -105,6 +106,10 @@ const getProjectById = asyncHandler(async (req, res) => {
 
 const createProject = asyncHandler(async (req, res) => {
   const imageUrl = normalizeImageInput(req.body.image_url, req.file);
+  if (req.file) {
+    console.log('Uploaded file:', req.file);
+    console.log('Saved path:', imageUrl);
+  }
   const tags = JSON.stringify(parseTags(req.body.tags));
   const [result] = await pool.query(
     'INSERT INTO projects (title, description, image_url, live_demo_url, tags, featured) VALUES (?, ?, ?, ?, ?, ?)',
@@ -124,6 +129,10 @@ const updateProject = asyncHandler(async (req, res) => {
   const uploadedImageUrl = normalizeImageInput(req.body.image_url, req.file);
   const imageUrl = shouldRemoveImage ? null : uploadedImageUrl || existing.image_url;
 
+  if (req.file) {
+    console.log('Uploaded file:', req.file);
+    console.log('Saved path:', uploadedImageUrl);
+  }
   if (uploadedImageUrl && existing.image_url && existing.image_url.startsWith('/uploads/projects/')) {
     await removeUploadedFile(existing.image_url);
   }
@@ -154,6 +163,7 @@ const deleteProject = asyncHandler(async (req, res) => {
 
   const deleted = await deleteById('projects', req.params.id);
   if (!deleted) return res.status(404).json({ success: false, message: 'Project not found.' });
+  console.log('Deleted project and cleaned up image for:', req.params.id);
   invalidateCache('projects:');
   res.json({ success: true, message: 'Project deleted successfully.' });
 });

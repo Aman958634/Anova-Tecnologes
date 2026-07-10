@@ -706,6 +706,7 @@ export function ProjectsSection() {
                       alt={project.title}
                       loading="lazy"
                       decoding="async"
+                      onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
                       className="h-full w-full object-cover bg-[#f0f3fa]"
                     />
                   ) : (

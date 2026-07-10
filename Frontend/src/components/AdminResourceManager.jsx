@@ -251,7 +251,7 @@ export default function AdminResourceManager({ resource, title, description }) {
       fetchRows();
       notifyDataUpdated();
       // update preview if server returned image url
-      const returnedImageUrl = response?.data?.image_url || response?.data?.data?.image_url || response?.data?.image_url;
+      const returnedImageUrl = response?.data?.imageUrl || response?.data?.project?.imageUrl || response?.data?.data?.imageUrl || response?.data?.image_url || response?.data?.project?.image_url || response?.data?.data?.image_url;
       if (returnedImageUrl) {
         setPreviewUrl(buildImageUrl(returnedImageUrl));
       }
@@ -293,7 +293,8 @@ export default function AdminResourceManager({ resource, title, description }) {
       const response = await api.put(`${endpoint}/${form.id}`, payload);
       toast.success('Image removed');
       // update local form state to reflect removed image
-      setForm((current) => ({ ...current, image_url: response.data.image_url || null, remove_image: false, image: null }));
+      const returnedImageUrl = response?.data?.imageUrl || response?.data?.data?.imageUrl || response?.data?.image_url || response?.data?.data?.image_url;
+      setForm((current) => ({ ...current, image_url: returnedImageUrl || null, remove_image: false, image: null }));
       if (previewUrl && previewUrl.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
       setPreviewUrl(null);
       fetchRows();

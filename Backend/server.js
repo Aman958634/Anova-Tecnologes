@@ -18,6 +18,7 @@ app.set('trust proxy', 1);
 const PORT = process.env.PORT || 8080;
 
 const uploadsDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
+const projectUploadsDir = path.join(uploadsDir, 'projects');
 
 
 // =========================
@@ -78,11 +79,11 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 // =========================
 // CREATE UPLOAD FOLDER
 // =========================
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+if (!fs.existsSync(projectUploadsDir)) {
+  fs.mkdirSync(projectUploadsDir, { recursive: true });
 }
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadsDir, { index: false, maxAge: '30d' }));
 
 // Extra safety: ensure other responses include CORS header if middleware missed it
 app.use((req, res, next) => {
