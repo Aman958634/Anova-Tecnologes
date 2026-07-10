@@ -140,18 +140,6 @@ export function HeroSection() {
               </video>
 
             </div>
-
-            {/* Marquee below the hero image */}
-            <div className="mt-4 sm:mt-6">
-              <div className="rounded-full bg-[#071637]/85 px-4 py-3 shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
-                <div className="marquee overflow-hidden">
-                  <div className="marquee-track inline-flex whitespace-nowrap animate-marquee">
-                    <span className="mx-6 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions. Contact us for a free consultation.</span>
-                    <span className="mx-6 text-sm text-white">Talk to ANOVA — We build web, mobile & cloud solutions. Contact us for a free consultation.</span>
-                  </div>
-                </div>
-              </div>
-            </div>
           </motion.div>
         </div>
       </div>
