@@ -701,11 +701,11 @@ export function ProjectsSection() {
                 {/* Image area */}
                 <div className="relative h-[210px] overflow-hidden">
                   <img
-                    src={buildImageUrl(project.image_url, imageFallbackByKey(project.title))}
+                    src={buildImageUrl(project.image || project.image_url, imageFallbackByKey())}
                     alt={project.title}
                     loading="lazy"
                     decoding="async"
-                    onError={(e) => { e.currentTarget.src = imageFallbackByKey(project.title); }}
+                    onError={(e) => { e.currentTarget.src = imageFallbackByKey(); }}
                     className="h-full w-full object-cover bg-[#f0f3fa]"
                   />
                   {/* Category chip */}
@@ -831,11 +831,11 @@ export function TeamSection() {
           {fallbackTeam.map((member) => (
             <SectionCard key={member.id} className="overflow-hidden p-0">
               <img
-                src={buildImageUrl(member.image_url || member.image, imageFallbackByKey(member.name))}
+                src={buildImageUrl(member.image_url || member.image, imageFallbackByKey())}
                 alt={member.name}
                 loading="lazy"
                 decoding="async"
-                onError={(e) => { e.currentTarget.src = imageFallbackByKey(member.name); }}
+                onError={(e) => { e.currentTarget.src = imageFallbackByKey(); }}
                 className="h-72 w-full object-cover bg-[#f8fafc]"
               />
               <div className="space-y-2 p-6 text-center">

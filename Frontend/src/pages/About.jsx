@@ -46,7 +46,7 @@ export default function About() {
 
   // Use the site team-working hero image for the About right-side illustration
   const heroImage = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80';
-  const heroImageFallback = imageFallbackByKey('team');
+  const heroImageFallback = imageFallbackByKey();
 
   function TeamMemberCard({ member }) {
     const [src, setSrc] = useState(null);
@@ -55,12 +55,12 @@ export default function About() {
       let active = true;
       const candidate = member.image_url || member.image;
       if (!candidate) {
-        setSrc(imageFallbackByKey(member.name));
+        setSrc(imageFallbackByKey());
         return () => { active = false; };
       }
 
       // Build a usable URL (relative or absolute)
-      const url = buildImageUrl(candidate, imageFallbackByKey(member.name));
+      const url = buildImageUrl(candidate, imageFallbackByKey());
 
       // Check resource existence with a HEAD fetch to avoid attaching a failing
       // <img> src immediately which triggers a visible 404 in the console.
@@ -71,11 +71,11 @@ export default function About() {
           if (res.ok) {
             setSrc(url);
           } else {
-            setSrc(imageFallbackByKey(member.name));
+            setSrc(imageFallbackByKey());
           }
         } catch (err) {
           if (!active) return;
-          setSrc(imageFallbackByKey(member.name));
+          setSrc(imageFallbackByKey());
         }
       })();
 
@@ -102,7 +102,7 @@ export default function About() {
           <img
             src={src}
             alt={member.name}
-            onError={(e) => { e.currentTarget.src = imageFallbackByKey(member.name); }}
+            onError={(e) => { e.currentTarget.src = imageFallbackByKey(); }}
             className="h-[250px] w-full object-cover bg-[#eaf1ff]"
           />
         ) : (
