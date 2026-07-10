@@ -1,9 +1,10 @@
 {
+  "projectId": "anova-tecnologes",
   "build": {
-    "builder": "nixpacks",
-    "watchPatterns": ["Backend/**"]
+    "builder": "nixpacks"
   },
   "deploy": {
-    "startCommand": "cd Backend && npm start"
+    "startCommand": "cd Backend && npm start",
+    "restartPolicyType": "on_failure"
   }
 }
