@@ -134,8 +134,17 @@ export default function AdminResourceManager({ resource, title, description }) {
       return;
     }
     if (resource === 'team') {
-      setForm({ ...row, image: null, remove_image: false });
-      setPreviewUrl(row.image_url ? buildImageUrl(row.image_url) : null);
+      const imageUrlValue = row.image_url || row.imageUrl || '';
+      let relativeImageUrl = imageUrlValue;
+      if (!row.image_url && row.imageUrl) {
+        try {
+          relativeImageUrl = new URL(row.imageUrl).pathname;
+        } catch {
+          relativeImageUrl = row.imageUrl;
+        }
+      }
+      setForm({ ...row, image: null, image_url: relativeImageUrl, remove_image: false });
+      setPreviewUrl(imageUrlValue ? buildImageUrl(imageUrlValue) : null);
       setIsFormOpen(true);
       return;
     }
@@ -494,7 +503,8 @@ export default function AdminResourceManager({ resource, title, description }) {
                 }
               }} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] md:col-span-2" />
               {previewUrl ? (
-                <div className="md:col-span-2 mt-2">
+                <div className="md:col-span-2 mt-2 relative">
+                  <button type="button" onClick={handleRemoveImage} className="absolute right-2 top-2 z-10 inline-flex items-center gap-2 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100">Delete image</button>
                   <p className="text-xs text-slate-500">Current / selected image preview</p>
                   <img src={previewUrl} alt="team preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-32 w-full rounded-md object-cover bg-white" />
                 </div>

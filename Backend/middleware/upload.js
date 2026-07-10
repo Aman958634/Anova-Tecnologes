@@ -2,17 +2,24 @@ const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
 
-const uploadRoot = path.join(__dirname, '..', 'uploads');
+const uploadRoot = path.join(__dirname, '..', process.env.UPLOAD_DIR || 'uploads');
 const projectUploadDir = path.join(uploadRoot, 'projects');
+const teamUploadDir = path.join(uploadRoot, 'team');
 
-if (!fs.existsSync(projectUploadDir)) {
-  fs.mkdirSync(projectUploadDir, { recursive: true });
+for (const dir of [uploadRoot, projectUploadDir, teamUploadDir]) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
 }
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     if (file.fieldname === 'image' && req.baseUrl && req.baseUrl.includes('/projects')) {
       cb(null, projectUploadDir);
+      return;
+    }
+    if (file.fieldname === 'image' && req.baseUrl && req.baseUrl.includes('/team')) {
+      cb(null, teamUploadDir);
       return;
     }
     cb(null, uploadRoot);

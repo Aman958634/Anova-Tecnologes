@@ -19,6 +19,7 @@ const PORT = process.env.PORT || 8080;
 
 const uploadsDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
 const projectUploadsDir = path.join(uploadsDir, 'projects');
+const teamUploadsDir = path.join(uploadsDir, 'team');
 
 
 // =========================
@@ -79,8 +80,10 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 // =========================
 // CREATE UPLOAD FOLDER
 // =========================
-if (!fs.existsSync(projectUploadsDir)) {
-  fs.mkdirSync(projectUploadsDir, { recursive: true });
+for (const dir of [uploadsDir, projectUploadsDir, teamUploadsDir]) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
 }
 
 app.use('/uploads', express.static(uploadsDir, { index: false, maxAge: '30d' }));
