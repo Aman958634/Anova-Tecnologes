@@ -63,6 +63,12 @@ export default function Navbar() {
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center gap-3">
+          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }}>
+            <Link to="/contact" className={`hidden items-center rounded-full px-4 py-2.5 text-sm font-semibold transition sm:inline-flex sm:px-5 sm:py-3 ${isLightHeader ? 'bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.24)] hover:bg-[#2563eb]' : 'border border-white/15 bg-white text-[#1d4ed8] hover:bg-white/90'}`}>
+              Get in Touch
+            </Link>
+          </motion.div>
+
           <motion.button
             onClick={() => setOpen((value) => !value)}
             whileTap={{ scale: 0.92 }}

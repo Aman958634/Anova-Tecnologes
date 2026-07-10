@@ -74,7 +74,7 @@ export default function AdminLayout({ children }) {
                   }`
                 }
               >
-                <span className={`grid h-10 w-10 place-items-center rounded-2xl ${isActive ? 'bg-slate-950 text-white' : 'bg-slate-900 text-slate-300'} transition`}>
+                <span className="grid h-10 w-10 place-items-center rounded-2xl bg-slate-900 text-slate-300 transition group-hover:bg-slate-800 group-hover:text-white">
                   <link.icon className="h-4 w-4" />
                 </span>
                 <span>{link.label}</span>
