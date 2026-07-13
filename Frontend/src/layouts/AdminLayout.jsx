@@ -27,41 +27,41 @@ export default function AdminLayout({ children }) {
       x: 0,
       transition: {
         duration: 0.32,
-        <motion.aside
+        ease: 'easeOut',
         staggerChildren: 0.05,
         delayChildren: 0.06
       }
-          className="border-b border-brand-200 bg-[#EFF6FF] p-5 sm:p-6 lg:border-b-0 lg:border-r lg:p-6"
+    }
   };
 
-            <Link to="/" className="flex items-center gap-3 text-slate-900">
+  const itemVariants = {
     hidden: { opacity: 0, x: -10 },
     show: { opacity: 1, x: 0 }
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-900">Anova Admin</p>
-                <p className="text-xs text-slate-600">{user?.name || 'Dashboard'}</p>
+  };
+
   return (
     <div className="admin-light min-h-screen bg-brand-50 lg:grid lg:grid-cols-[280px_1fr]">
-            <div className="mt-4 flex items-center gap-2 rounded-2xl bg-white/60 px-3 py-2 text-xs font-medium text-slate-700 sm:mt-0">
-              <span className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+      <motion.aside
+        variants={sidebarVariants}
         initial="hidden"
         animate="show"
-        className="border-b border-brand-200 bg-slate-950 p-5 sm:p-6 lg:border-b-0 lg:border-r lg:p-6"
+        className="border-b border-brand-200 bg-[#EFF6FF] p-5 sm:p-6 lg:border-b-0 lg:border-r lg:p-6"
       >
         <div className="mb-8 rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:flex sm:items-center sm:justify-between sm:gap-4">
-          <Link to="/" className="flex items-center gap-3 text-white">
+          <Link to="/" className="flex items-center gap-3 text-slate-900">
             <div className="grid h-12 w-12 place-items-center rounded-3xl bg-gradient-to-br from-cyan-500 via-sky-500 to-indigo-500 text-lg font-bold shadow-lg shadow-cyan-500/20">A</div>
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-100">Anova Admin</p>
-              <p className="text-xs text-slate-400">{user?.name || 'Dashboard'}</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-900">Anova Admin</p>
+              <p className="text-xs text-slate-600">{user?.name || 'Dashboard'}</p>
             </div>
           </Link>
-                        ? 'bg-white text-slate-900 shadow-[0_12px_40px_rgba(15,23,42,0.08)]'
-                        : 'text-slate-700 hover:bg-[#e6f0ff] hover:text-slate-900'
+          <div className="mt-4 flex items-center gap-2 rounded-2xl bg-white/60 px-3 py-2 text-xs font-medium text-slate-700 sm:mt-0">
+            <span className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
             Online
           </div>
         </div>
         <nav className="space-y-2">
-                  <span className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-slate-900 transition group-hover:bg-[#e6f0ff] group-hover:text-slate-900">
+          {adminLinks.map((link) => (
             <motion.div key={link.path} variants={itemVariants}>
               <NavLink
                 to={link.path}
@@ -69,12 +69,12 @@ export default function AdminLayout({ children }) {
                 className={({ isActive }) =>
                   `group flex items-center gap-3 rounded-[18px] px-4 py-3 text-sm font-medium transition ${
                     isActive
-                      ? 'bg-slate-100 text-slate-950 shadow-[0_12px_40px_rgba(15,23,42,0.08)]'
-                      : 'text-slate-300 hover:bg-slate-900/80 hover:text-white'
+                      ? 'bg-white text-slate-900 shadow-[0_12px_40px_rgba(15,23,42,0.08)]'
+                      : 'text-slate-700 hover:bg-[#e6f0ff] hover:text-slate-900'
                   }`
                 }
               >
-                <span className="grid h-10 w-10 place-items-center rounded-2xl bg-slate-900 text-slate-300 transition group-hover:bg-slate-800 group-hover:text-white">
+                <span className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-slate-900 transition group-hover:bg-[#e6f0ff] group-hover:text-slate-900">
                   <link.icon className="h-4 w-4" />
                 </span>
                 <span>{link.label}</span>
