@@ -679,7 +679,7 @@ export function ProjectsSection() {
               transition={{ duration: 0.32, delay: index * 0.05, type: 'spring', stiffness: 240, damping: 24 }}
               className="card-animate"
             >
-              <div className="overflow-hidden rounded-[18px] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.08)] transition hover:shadow-[0_16px_36px_rgba(15,23,42,0.13)]">
+              <div className="overflow-hidden rounded-[18px] bg-transparent shadow-[0_8px_24px_rgba(15,23,42,0.08)] transition hover:shadow-[0_16px_36px_rgba(15,23,42,0.13)]">
 
                 {/* Image area */}
                 <div className="relative h-[210px] overflow-hidden sm:h-[250px] md:h-[260px] lg:h-[220px]">
