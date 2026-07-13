@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ChatbotWidget from '../components/ChatbotWidget';
+import ThreeBackground from '../components/ThreeBackground';
 
 export default function MainLayout({ children }) {
   const location = useLocation();
@@ -59,7 +60,8 @@ export default function MainLayout({ children }) {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-[#071c46] text-slate-100">
+    <div className="relative min-h-screen bg-[#071c46] text-slate-100">
+      <ThreeBackground />
       <Navbar />
       <AnimatePresence mode="wait">
         <motion.main
