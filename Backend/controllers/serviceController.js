@@ -2,6 +2,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const { pool } = require('../config/db');
 const { findById, deleteById } = require('../models/baseModel');
 const { getCache, setCache, invalidateCache } = require('../utils/simpleCache');
+const { uploadToCloudinary, deleteFromCloudinary, extractPublicIdFromUrl, isCloudinaryUrl, generateFilename } = require('../utils/cloudStorage');
 
 const parseKeyFeatures = (value) => {
   if (!value) return [];
@@ -22,11 +23,24 @@ const serializeKeyFeatures = (value) => JSON.stringify(parseKeyFeatures(value));
 
 const normalizeService = (row) => ({
   ...row,
-  key_features: parseKeyFeatures(row.key_features)
+  key_features: parseKeyFeatures(row.key_features),
 });
 
 const setShortCacheHeaders = (res) => {
   res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=30');
+};
+
+const isPlaceholderImage = (url) => {
+  if (!url) return false;
+  return typeof url === 'string' && url.includes('images.unsplash.com');
+};
+
+const removeCloudImage = async (imageUrl) => {
+  if (!imageUrl || !isCloudinaryUrl(imageUrl)) return;
+  const publicId = extractPublicIdFromUrl(imageUrl);
+  if (publicId) {
+    await deleteFromCloudinary(publicId);
+  }
 };
 
 const listServices = asyncHandler(async (req, res) => {
@@ -54,7 +68,27 @@ const listServices = asyncHandler(async (req, res) => {
 
 const createService = asyncHandler(async (req, res) => {
   const { title, description, icon, featured, key_features } = req.body;
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.image_url || null;
+  let imageUrl = null;
+
+  if (req.file) {
+    try {
+      const filename = generateFilename(req.file.originalname, 'service');
+      const result = await uploadToCloudinary(req.file.buffer, 'services', filename);
+      imageUrl = result.url;
+    } catch (error) {
+      console.error('Cloudinary service image upload failed:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to upload image. Please try again.',
+      });
+    }
+  } else if (req.body.image_url) {
+    const value = String(req.body.image_url).trim();
+    if (!isPlaceholderImage(value)) {
+      imageUrl = value;
+    }
+  }
+
   const [result] = await pool.query(
     'INSERT INTO services (title, description, icon, key_features, image_url, featured) VALUES (?, ?, ?, ?, ?, ?)',
     [title, description, icon || null, serializeKeyFeatures(key_features), imageUrl, featured === '1' || featured === 'true' ? 1 : 0]
@@ -67,17 +101,42 @@ const updateService = asyncHandler(async (req, res) => {
   const existing = await findById('services', req.params.id);
   if (!existing) return res.status(404).json({ message: 'Service not found.' });
 
-  const imageUrl = req.file ? `/uploads/${req.file.filename}` : req.body.image_url || existing.image_url;
+  const { title, description, icon, featured, key_features } = req.body;
+  let imageUrl = existing.image_url;
+
+  if (req.file) {
+    await removeCloudImage(existing.image_url);
+    try {
+      const filename = generateFilename(req.file.originalname, 'service');
+      const result = await uploadToCloudinary(req.file.buffer, 'services', filename);
+      imageUrl = result.url;
+    } catch (error) {
+      console.error('Cloudinary service image upload failed:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to upload image. Please try again.',
+      });
+    }
+  } else if (req.body.image_url) {
+    const value = String(req.body.image_url).trim();
+    if (!isPlaceholderImage(value)) {
+      if (existing.image_url && existing.image_url !== value && isCloudinaryUrl(existing.image_url)) {
+        await removeCloudImage(existing.image_url);
+      }
+      imageUrl = value;
+    }
+  }
+
   await pool.query(
     'UPDATE services SET title = ?, description = ?, icon = ?, key_features = ?, image_url = ?, featured = ? WHERE id = ?',
     [
-      req.body.title,
-      req.body.description,
-      req.body.icon || null,
-      serializeKeyFeatures(req.body.key_features || existing.key_features),
+      title,
+      description,
+      icon || null,
+      serializeKeyFeatures(key_features || existing.key_features),
       imageUrl,
-      req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0,
-      req.params.id
+      featured === '1' || featured === 'true' ? 1 : 0,
+      req.params.id,
     ]
   );
   invalidateCache('services:');
@@ -85,6 +144,10 @@ const updateService = asyncHandler(async (req, res) => {
 });
 
 const deleteService = asyncHandler(async (req, res) => {
+  const existing = await findById('services', req.params.id);
+  if (existing) {
+    await removeCloudImage(existing.image_url);
+  }
   const deleted = await deleteById('services', req.params.id);
   if (!deleted) return res.status(404).json({ message: 'Service not found.' });
   invalidateCache('services:');

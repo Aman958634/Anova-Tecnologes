@@ -6,20 +6,19 @@ export function formatDate(dateValue) {
 export function buildImageUrl(url, fallback = null) {
   const defaultImage = fallback || '/placeholder-image.svg';
   if (!url) return defaultImage;
-  // If already an absolute URL, return as-is
-  if (typeof url === 'string' && url.trim().startsWith('http')) return url;
 
-  // Normalize backslashes and ensure leading slash
-  let path = String(url).replace(/\\+/g, '/').trim();
+  const trimmed = String(url).trim();
+
+  // Absolute URLs (Cloudinary, CDN, external hosts) — pass through as-is
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+
+  // Legacy local paths (/uploads/...) — resolve against the backend API origin
+  let path = trimmed.replace(/\\+/g, '/');
   if (!path.startsWith('/')) path = `/${path}`;
 
-  // If a bare filename is stored in the DB (for example: image-1234.png),
-  // assume it belongs under /uploads/ so the browser requests the correct path.
-  if (/^\/[^\/]+\.[a-z0-9]{2,5}$/i.test(path) && !path.startsWith('/uploads/')) {
-    path = `/uploads${path}`;
-  }
-
-  const configuredApi = typeof import.meta.env.VITE_API_URL === 'string' ? import.meta.env.VITE_API_URL.trim() : '';
+  const configuredApi = typeof import.meta.env.VITE_API_URL === 'string'
+    ? import.meta.env.VITE_API_URL.trim()
+    : '';
   if (configuredApi && path.startsWith('/uploads/')) {
     if (/^https?:\/\//i.test(configuredApi)) {
       const backendUrl = configuredApi.replace(/\/+$/, '').replace(/\/api$/i, '');

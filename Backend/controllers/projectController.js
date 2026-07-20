@@ -1,9 +1,14 @@
-const fs = require('fs');
-const path = require('path');
 const asyncHandler = require('../utils/asyncHandler');
 const { pool } = require('../config/db');
 const { findById, deleteById } = require('../models/baseModel');
 const { getCache, setCache, invalidateCache } = require('../utils/simpleCache');
+const {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+  extractPublicIdFromUrl,
+  isCloudinaryUrl,
+  generateFilename,
+} = require('../utils/cloudStorage');
 
 const parseTags = (value) => {
   if (!value) return [];
@@ -30,7 +35,7 @@ const mapProjectRow = (row, req) => ({
   tags: parseTags(row.tags),
   image: row.image_url || null,
   imageUrl: buildAbsoluteImageUrl(req, row.image_url),
-  demoUrl: row.live_demo_url || null
+  demoUrl: row.live_demo_url || null,
 });
 
 const isPlaceholderImage = (url) => {
@@ -40,26 +45,11 @@ const isPlaceholderImage = (url) => {
   return false;
 };
 
-const normalizeImageInput = (input, file) => {
-  if (file && file.filename) {
-    return `/uploads/projects/${file.filename}`;
-  }
-  if (!input) return null;
-  const value = String(input).trim();
-  if (isPlaceholderImage(value)) return null;
-  return value || null;
-};
-
-const removeUploadedFile = async (imageUrl) => {
-  if (!imageUrl || !imageUrl.startsWith('/uploads/')) return;
-  const filePath = path.join(__dirname, '..', imageUrl.replace(/^\//, ''));
-  try {
-    if (fs.existsSync(filePath)) {
-      console.log('Removing uploaded file:', filePath);
-      await fs.promises.unlink(filePath);
-    }
-  } catch (error) {
-    console.error('Failed to remove uploaded file:', filePath, error);
+const removeCloudImage = async (imageUrl) => {
+  if (!imageUrl || !isCloudinaryUrl(imageUrl)) return;
+  const publicId = extractPublicIdFromUrl(imageUrl);
+  if (publicId) {
+    await deleteFromCloudinary(publicId);
   }
 };
 
@@ -84,12 +74,15 @@ const listProjects = asyncHandler(async (req, res) => {
     [search, search, limit, offset]
   );
   const formatted = rows.map((row) => mapProjectRow(row, req));
-  const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM projects WHERE title LIKE ? OR description LIKE ?', [search, search]);
+  const [countRows] = await pool.query(
+    'SELECT COUNT(*) AS total FROM projects WHERE title LIKE ? OR description LIKE ?',
+    [search, search]
+  );
   const result = {
     success: true,
     data: formatted,
     projects: formatted,
-    meta: { page, limit, total: countRows[0].total }
+    meta: { page, limit, total: countRows[0].total },
   };
   setCache(cacheKey, result, 120000);
   setShortCacheHeaders(res);
@@ -105,15 +98,38 @@ const getProjectById = asyncHandler(async (req, res) => {
 });
 
 const createProject = asyncHandler(async (req, res) => {
-  const imageUrl = normalizeImageInput(req.body.image_url, req.file);
+  let imageUrl = null;
+
   if (req.file) {
-    console.log('Uploaded file:', req.file);
-    console.log('Saved path:', imageUrl);
+    try {
+      const filename = generateFilename(req.file.originalname, 'project');
+      const result = await uploadToCloudinary(req.file.buffer, 'projects', filename);
+      imageUrl = result.url;
+    } catch (error) {
+      console.error('Cloudinary project image upload failed:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to upload image. Please try again.',
+      });
+    }
+  } else if (req.body.image_url) {
+    const value = String(req.body.image_url).trim();
+    if (!isPlaceholderImage(value)) {
+      imageUrl = value;
+    }
   }
+
   const tags = JSON.stringify(parseTags(req.body.tags));
   const [result] = await pool.query(
     'INSERT INTO projects (title, description, image_url, live_demo_url, tags, featured) VALUES (?, ?, ?, ?, ?, ?)',
-    [req.body.title, req.body.description, imageUrl, req.body.live_demo_url || null, tags, req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0]
+    [
+      req.body.title,
+      req.body.description,
+      imageUrl,
+      req.body.live_demo_url || null,
+      tags,
+      req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0,
+    ]
   );
   invalidateCache('projects:');
   const created = await findById('projects', result.insertId);
@@ -126,24 +142,48 @@ const updateProject = asyncHandler(async (req, res) => {
   if (!existing) return res.status(404).json({ success: false, message: 'Project not found.' });
 
   const shouldRemoveImage = req.body.remove_image === 'true' || req.body.remove_image === '1';
-  const uploadedImageUrl = normalizeImageInput(req.body.image_url, req.file);
-  const imageUrl = shouldRemoveImage ? null : uploadedImageUrl || existing.image_url;
+  let imageUrl = existing.image_url;
+
+  if (shouldRemoveImage) {
+    imageUrl = null;
+    await removeCloudImage(existing.image_url);
+  }
 
   if (req.file) {
-    console.log('Uploaded file:', req.file);
-    console.log('Saved path:', uploadedImageUrl);
-  }
-  if (uploadedImageUrl && existing.image_url && existing.image_url.startsWith('/uploads/projects/')) {
-    await removeUploadedFile(existing.image_url);
-  }
-  if (shouldRemoveImage && existing.image_url && existing.image_url.startsWith('/uploads/projects/')) {
-    await removeUploadedFile(existing.image_url);
+    await removeCloudImage(existing.image_url);
+    try {
+      const filename = generateFilename(req.file.originalname, 'project');
+      const result = await uploadToCloudinary(req.file.buffer, 'projects', filename);
+      imageUrl = result.url;
+    } catch (error) {
+      console.error('Cloudinary project image upload failed:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to upload image. Please try again.',
+      });
+    }
+  } else if (req.body.image_url) {
+    const value = String(req.body.image_url).trim();
+    if (!isPlaceholderImage(value)) {
+      if (existing.image_url && existing.image_url !== value && isCloudinaryUrl(existing.image_url)) {
+        await removeCloudImage(existing.image_url);
+      }
+      imageUrl = value;
+    }
   }
 
   const tags = JSON.stringify(parseTags(req.body.tags || existing.tags));
   await pool.query(
     'UPDATE projects SET title = ?, description = ?, image_url = ?, live_demo_url = ?, tags = ?, featured = ? WHERE id = ?',
-    [req.body.title, req.body.description, imageUrl, req.body.live_demo_url || null, tags, req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0, req.params.id]
+    [
+      req.body.title,
+      req.body.description,
+      imageUrl,
+      req.body.live_demo_url || null,
+      tags,
+      req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0,
+      req.params.id,
+    ]
   );
   invalidateCache('projects:');
   const updated = await findById('projects', req.params.id);
@@ -157,13 +197,11 @@ const deleteProject = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: 'Project not found.' });
   }
 
-  if (project.image_url && project.image_url.startsWith('/uploads/projects/')) {
-    await removeUploadedFile(project.image_url);
-  }
+  await removeCloudImage(project.image_url);
 
   const deleted = await deleteById('projects', req.params.id);
   if (!deleted) return res.status(404).json({ success: false, message: 'Project not found.' });
-  console.log('Deleted project and cleaned up image for:', req.params.id);
+  console.log('Deleted project and cleaned up cloud image for:', req.params.id);
   invalidateCache('projects:');
   res.json({ success: true, message: 'Project deleted successfully.' });
 });

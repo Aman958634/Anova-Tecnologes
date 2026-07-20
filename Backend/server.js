@@ -1,6 +1,4 @@
 require('dotenv').config();
-const fs = require('fs');
-const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -16,10 +14,6 @@ const { ensureChatbotTables } = require('./controllers/chatbotController');
 const app = express();
 app.set('trust proxy', 1);
 const PORT = process.env.PORT || 8080;
-
-const uploadsDir = path.join(__dirname, process.env.UPLOAD_DIR || 'uploads');
-const projectUploadsDir = path.join(uploadsDir, 'projects');
-const teamUploadsDir = path.join(uploadsDir, 'team');
 
 
 // =========================
@@ -78,17 +72,8 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 
 // =========================
-// CREATE UPLOAD FOLDER
+// CORS CONFIG (SAFE)
 // =========================
-for (const dir of [uploadsDir, projectUploadsDir, teamUploadsDir]) {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-}
-
-app.use('/uploads', express.static(uploadsDir, { index: false, maxAge: '30d' }));
-
-// Extra safety: ensure other responses include CORS header if middleware missed it
 app.use((req, res, next) => {
   if (!res.getHeader('Access-Control-Allow-Origin')) {
     res.setHeader('Access-Control-Allow-Origin', '*');
