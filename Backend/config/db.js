@@ -3,6 +3,12 @@ const mysql = require('mysql2/promise');
 
 const databaseUrl = process.env.DATABASE_URL || process.env.MYSQL_URL || process.env.CLEARDB_DATABASE_URL;
 
+function toBoolean(value, fallback = false) {
+  if (value === undefined || value === null || value === '') return fallback;
+  const normalized = String(value).trim().toLowerCase();
+  return ['1', 'true', 'yes', 'on'].includes(normalized);
+}
+
 function parseDatabaseUrl(url) {
   const parsed = new URL(url);
   return {
@@ -18,14 +24,26 @@ function parseDatabaseUrl(url) {
  * Railway / Production MySQL config
  */
 const dbConfig = {
-  host: process.env.MYSQLHOST || process.env.MYSQL_HOST || process.env.DATABASE_HOST,
-  port: Number(process.env.MYSQLPORT || process.env.MYSQL_PORT || process.env.DATABASE_PORT || 3306),
-  user: process.env.MYSQLUSER || process.env.MYSQL_USER,
-  password: process.env.MYSQLPASSWORD || process.env.MYSQL_PASSWORD,
-  database: process.env.MYSQLDATABASE || process.env.MYSQL_DATABASE
+  host: process.env.MYSQL_HOST || process.env.DATABASE_HOST || process.env.MYSQLHOST,
+  port: Number(process.env.MYSQL_PORT || process.env.DATABASE_PORT || process.env.MYSQLPORT || 3306),
+  user: process.env.MYSQL_USER || process.env.MYSQLUSER,
+  password: process.env.MYSQL_PASSWORD || process.env.MYSQLPASSWORD,
+  database: process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE
 };
 
-if (databaseUrl) {
+const useSsl = toBoolean(process.env.MYSQL_SSL, false);
+const rejectUnauthorized = toBoolean(process.env.MYSQL_SSL_REJECT_UNAUTHORIZED, true);
+const sslConfig = useSsl
+  ? {
+      rejectUnauthorized,
+    }
+  : undefined;
+
+const hasExplicitMysqlConfig = Boolean(
+  dbConfig.host && dbConfig.port && dbConfig.user && dbConfig.password && dbConfig.database
+);
+
+if (databaseUrl && !hasExplicitMysqlConfig) {
   Object.assign(dbConfig, parseDatabaseUrl(databaseUrl));
 }
 
@@ -67,6 +85,7 @@ const baseConfig = {
 const pool = mysql.createPool({
   ...baseConfig,
   database: dbConfig.database,
+  ssl: sslConfig,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

@@ -54,11 +54,13 @@ If your backend is running on a different URL, set `VITE_API_URL` in a frontend 
 ### Required Backend Environment Variables
 
 - `JWT_SECRET`
-- `MYSQLHOST` / `MYSQL_HOST` (or `DATABASE_URL`)
-- `MYSQLPORT` / `MYSQL_PORT` (or `DATABASE_URL`)
-- `MYSQLUSER` / `MYSQL_USER` (or `DATABASE_URL`)
-- `MYSQLPASSWORD` / `MYSQL_PASSWORD` (or `DATABASE_URL`)
-- `MYSQLDATABASE` / `MYSQL_DATABASE` (or `DATABASE_URL`)
+- `MYSQL_HOST` (Railway public host, do not use internal `mysql.railway.internal` from outside Railway)
+- `MYSQL_PORT` (Railway public TCP port)
+- `MYSQL_USER`
+- `MYSQL_PASSWORD`
+- `MYSQL_DATABASE`
+- `MYSQL_SSL` (`true` or `false`, based on your Railway/MySQL requirement)
+- `MYSQL_SSL_REJECT_UNAUTHORIZED` (`true` by default, set `false` only if your provider requires it)
 - `IMAGEKIT_PUBLIC_KEY`
 - `IMAGEKIT_PRIVATE_KEY`
 - `IMAGEKIT_URL_ENDPOINT`

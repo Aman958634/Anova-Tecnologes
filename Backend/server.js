@@ -72,17 +72,6 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 
 // =========================
-// CORS CONFIG (SAFE)
-// =========================
-app.use((req, res, next) => {
-  if (!res.getHeader('Access-Control-Allow-Origin')) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
-  next();
-});
-
-
-// =========================
 // ROUTES
 // =========================
 app.use('/api', routes);
