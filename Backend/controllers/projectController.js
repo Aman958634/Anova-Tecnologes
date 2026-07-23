@@ -293,6 +293,7 @@ const updateProject = asyncHandler(async (req, res) => {
       method: req.method,
       contentType: req.headers['content-type'] || null,
     });
+    console.log(req.params.id);
 
     const projectId = Number(req.params.id);
     if (!Number.isInteger(projectId) || projectId <= 0) {
@@ -312,12 +313,14 @@ const updateProject = asyncHandler(async (req, res) => {
     }
 
     console.log('[projects:update] Body received', req.body);
+    console.log(req.body);
     console.log('[projects:update] File received', {
       present: Boolean(req.file),
       originalname: req.file?.originalname || null,
       mimetype: req.file?.mimetype || null,
       size: req.file?.size || null,
     });
+    console.log(req.file);
 
     if (req.file) {
       if (!Buffer.isBuffer(req.file.buffer) || req.file.buffer.length === 0) {
@@ -354,7 +357,7 @@ const updateProject = asyncHandler(async (req, res) => {
           imageHash: uploadedAsset.imageHash,
           imageMeta: uploadedAsset.imageMeta,
         };
-        console.log('[projects:update] Upload completed', {
+        console.log('[projects:update] Upload finished', {
           projectId,
           imageFileId: nextAsset.imageFileId,
         });
@@ -393,6 +396,10 @@ const updateProject = asyncHandler(async (req, res) => {
       { column: 'featured', value: nextFeatured },
     ].filter((field) => projectColumns.has(field.column));
 
+    if (!projectColumns.has('image_meta')) {
+      console.warn('[projects:update] image_meta column missing. Update query auto-adjusted to existing columns only.');
+    }
+
     if (updateFields.length === 0) {
       return res.status(500).json({
         success: false,
@@ -411,7 +418,7 @@ const updateProject = asyncHandler(async (req, res) => {
       updatedColumns: updateFields.map((field) => field.column),
     });
     await pool.query(sql, values);
-    console.log('[projects:update] Database update completed', { projectId });
+    console.log('[projects:update] Database update finished', { projectId });
 
     const shouldDeleteOldCloudinary =
       Boolean(req.file || shouldRemoveImage || (externalImageUrl && externalImageUrl !== existingAsset.imageUrl)) &&
