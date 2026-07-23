@@ -22,8 +22,22 @@ function ensureCloudinaryConfigured() {
   }
 }
 
+async function validateCloudinaryConnection() {
+  ensureCloudinaryConfigured();
+  try {
+    await cloudinary.api.ping();
+  } catch (error) {
+    const wrapped = new Error(
+      `Cloudinary credentials are invalid or unreachable: ${error?.message || 'Unknown error'}`
+    );
+    wrapped.statusCode = 500;
+    throw wrapped;
+  }
+}
+
 module.exports = {
   cloudinary,
   ensureCloudinaryConfigured,
   isCloudinaryConfigured,
+  validateCloudinaryConnection,
 };

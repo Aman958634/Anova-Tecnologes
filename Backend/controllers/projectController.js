@@ -117,6 +117,24 @@ const setShortCacheHeaders = (res) => {
   res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=30');
 };
 
+const uploadErrorMessage = (error) => {
+  const message = String(error?.message || '');
+
+  if (message.includes('Cloudinary is not configured')) {
+    return 'Image storage is not configured on server. Please set Cloudinary environment variables.';
+  }
+
+  if (/credentials are invalid|Invalid Signature|unknown api key|authorization required|unauthorized/i.test(message)) {
+    return 'Cloudinary credentials are invalid. Please verify CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.';
+  }
+
+  if (/timeout|ETIMEDOUT|ENOTFOUND|ECONNRESET|socket hang up/i.test(message)) {
+    return 'Cloud image upload failed due to network issue. Please retry.';
+  }
+
+  return 'Failed to upload image to cloud storage. Please try again.';
+};
+
 const listProjects = asyncHandler(async (req, res) => {
   const search = req.query.search ? `%${req.query.search}%` : '%';
   const page = Math.max(Number(req.query.page) || 1, 1);
@@ -175,7 +193,7 @@ const createProject = asyncHandler(async (req, res) => {
       console.error('Cloudinary project image upload failed:', error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to upload image. Please try again.',
+        message: uploadErrorMessage(error),
       });
     }
   }
@@ -229,7 +247,7 @@ const updateProject = asyncHandler(async (req, res) => {
       console.error('Cloudinary project image upload failed:', error);
       return res.status(500).json({
         success: false,
-        message: 'Failed to upload image. Please try again.',
+        message: uploadErrorMessage(error),
       });
     }
   } else if (shouldRemoveImage) {

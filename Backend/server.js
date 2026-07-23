@@ -10,7 +10,7 @@ const { pool, testConnection } = require('./config/db');
 const routes = require('./routes');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 const { ensureChatbotTables } = require('./controllers/chatbotController');
-const { ensureCloudinaryConfigured } = require('./config/cloudinary');
+const { ensureCloudinaryConfigured, validateCloudinaryConnection } = require('./config/cloudinary');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -376,6 +376,9 @@ async function bootstrap() {
 
     ensureCloudinaryConfigured();
     console.log('✅ Cloudinary configuration ready');
+
+    await validateCloudinaryConnection();
+    console.log('✅ Cloudinary connectivity verified');
 
     await ensureDefaultAdmin();
     console.log('✅ Default admin ready');
