@@ -2,7 +2,7 @@ const multer = require('multer');
 const {
   ALLOWED_UPLOAD_MIME_TYPES,
   MAX_UPLOAD_FILE_SIZE_BYTES,
-} = require('../utils/imagekitStorage');
+} = require('../utils/cloudStorage');
 
 const allowedMimeTypes = ALLOWED_UPLOAD_MIME_TYPES;
 const maxFileSize = MAX_UPLOAD_FILE_SIZE_BYTES;

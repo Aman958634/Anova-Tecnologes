@@ -1,11 +1,8 @@
-const cloudinary = require('cloudinary').v2;
+const { cloudinary, ensureCloudinaryConfigured } = require('../config/cloudinary');
 const crypto = require('crypto');
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+const ALLOWED_UPLOAD_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
+const MAX_UPLOAD_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
 function generateFilename(originalname, prefix = 'file') {
   const rawExt = originalname.includes('.')
@@ -18,6 +15,7 @@ function generateFilename(originalname, prefix = 'file') {
 }
 
 function uploadToCloudinary(buffer, folder, filename) {
+  ensureCloudinaryConfigured();
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
@@ -71,6 +69,8 @@ function isCloudinaryUrl(url) {
 }
 
 module.exports = {
+  ALLOWED_UPLOAD_MIME_TYPES,
+  MAX_UPLOAD_FILE_SIZE_BYTES,
   cloudinary,
   generateFilename,
   uploadToCloudinary,

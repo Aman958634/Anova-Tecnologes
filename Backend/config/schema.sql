@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS projects (
   image_file_id VARCHAR(255) DEFAULT NULL,
   image_file_path VARCHAR(512) DEFAULT NULL,
   image_hash CHAR(64) DEFAULT NULL,
+  image_meta JSON NULL,
   live_demo_url VARCHAR(255) DEFAULT NULL,
   tags JSON NULL,
   featured TINYINT(1) DEFAULT 0,

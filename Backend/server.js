@@ -10,6 +10,7 @@ const { pool, testConnection } = require('./config/db');
 const routes = require('./routes');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 const { ensureChatbotTables } = require('./controllers/chatbotController');
+const { ensureCloudinaryConfigured } = require('./config/cloudinary');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -317,6 +318,7 @@ async function ensureProjectImageStorageColumns() {
     { name: 'image_file_id', definition: 'VARCHAR(255) NULL AFTER image_url' },
     { name: 'image_file_path', definition: 'VARCHAR(512) NULL AFTER image_file_id' },
     { name: 'image_hash', definition: 'CHAR(64) NULL AFTER image_file_path' },
+    { name: 'image_meta', definition: 'JSON NULL AFTER image_hash' },
   ];
 
   for (const column of requiredColumns) {
@@ -371,6 +373,9 @@ async function bootstrap() {
   try {
     await testConnection();
     console.log('✅ Database connected');
+
+    ensureCloudinaryConfigured();
+    console.log('✅ Cloudinary configuration ready');
 
     await ensureDefaultAdmin();
     console.log('✅ Default admin ready');
