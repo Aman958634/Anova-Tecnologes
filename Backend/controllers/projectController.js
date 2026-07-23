@@ -3,12 +3,13 @@ const { pool } = require('../config/db');
 const { findById, deleteById } = require('../models/baseModel');
 const { getCache, setCache, invalidateCache } = require('../utils/simpleCache');
 const {
-  uploadToCloudinary,
-  deleteFromCloudinary,
-  extractPublicIdFromUrl,
-  isCloudinaryUrl,
+  uploadToImageKit,
+  deleteFromImageKit,
   generateFilename,
-} = require('../utils/cloudStorage');
+  isImageKitConfigured,
+  optimizeImageBuffer,
+  sha256,
+} = require('../utils/imagekitStorage');
 
 const parseTags = (value) => {
   if (!value) return [];
@@ -35,6 +36,8 @@ const mapProjectRow = (row, req) => ({
   tags: parseTags(row.tags),
   image: row.image_url || null,
   imageUrl: buildAbsoluteImageUrl(req, row.image_url),
+  imageFileId: row.image_file_id || null,
+  imageFilePath: row.image_file_path || null,
   demoUrl: row.live_demo_url || null,
 });
 
@@ -45,12 +48,118 @@ const isPlaceholderImage = (url) => {
   return false;
 };
 
-const removeCloudImage = async (imageUrl) => {
-  if (!imageUrl || !isCloudinaryUrl(imageUrl)) return;
-  const publicId = extractPublicIdFromUrl(imageUrl);
-  if (publicId) {
-    await deleteFromCloudinary(publicId);
+const ensureImageKitReady = () => {
+  if (!isImageKitConfigured()) {
+    const error = new Error('Image uploads are not configured. Missing ImageKit credentials on the server.');
+    error.statusCode = 500;
+    throw error;
   }
+};
+
+const sanitizeExternalImageUrl = (value) => {
+  if (!value) return null;
+  const raw = String(value).trim();
+  if (!raw || isPlaceholderImage(raw)) return null;
+  if (!/^https?:\/\//i.test(raw)) return null;
+  return raw;
+};
+
+const mapUploadedAsset = ({ url, fileId, filePath, hash }) => ({
+  imageUrl: url,
+  imageFileId: fileId,
+  imageFilePath: filePath,
+  imageHash: hash,
+});
+
+const mapExternalAsset = (url) => ({
+  imageUrl: url,
+  imageFileId: null,
+  imageFilePath: null,
+  imageHash: null,
+});
+
+const mapNoAsset = () => ({
+  imageUrl: null,
+  imageFileId: null,
+  imageFilePath: null,
+  imageHash: null,
+});
+
+const toProjectAsset = (row) => ({
+  imageUrl: row?.image_url || null,
+  imageFileId: row?.image_file_id || null,
+  imageFilePath: row?.image_file_path || null,
+  imageHash: row?.image_hash || null,
+});
+
+const hasAssetChanged = (current, next) => (
+  current.imageUrl !== next.imageUrl
+  || current.imageFileId !== next.imageFileId
+  || current.imageFilePath !== next.imageFilePath
+  || current.imageHash !== next.imageHash
+);
+
+const findProjectByImageHash = async (imageHash, excludeId = null) => {
+  if (!imageHash) return null;
+  const values = [imageHash];
+  let query = `
+    SELECT id, image_url, image_file_id, image_file_path, image_hash
+    FROM projects
+    WHERE image_hash = ? AND image_file_id IS NOT NULL
+  `;
+  if (excludeId) {
+    query += ' AND id <> ?';
+    values.push(excludeId);
+  }
+  query += ' ORDER BY id DESC LIMIT 1';
+  const [rows] = await pool.query(query, values);
+  return rows[0] || null;
+};
+
+const deleteImageIfUnreferenced = async (imageFileId) => {
+  if (!imageFileId) return;
+  const [rows] = await pool.query('SELECT COUNT(*) AS total FROM projects WHERE image_file_id = ?', [imageFileId]);
+  if (Number(rows[0]?.total || 0) === 0) {
+    await deleteFromImageKit(imageFileId);
+  }
+};
+
+const buildAssetFromFile = async (file, { folder, excludeId } = {}) => {
+  ensureImageKitReady();
+  const optimized = await optimizeImageBuffer(file.buffer, file.mimetype);
+  const imageHash = sha256(optimized.buffer);
+  const duplicate = await findProjectByImageHash(imageHash, excludeId || null);
+
+  if (duplicate) {
+    return {
+      ...mapUploadedAsset({
+        url: duplicate.image_url,
+        fileId: duplicate.image_file_id,
+        filePath: duplicate.image_file_path,
+        hash: duplicate.image_hash,
+      }),
+      reused: true,
+    };
+  }
+
+  const extension = optimized.extension || 'webp';
+  const baseFilename = generateFilename(file.originalname, 'project').replace(/\.[^.]+$/, '');
+  const result = await uploadToImageKit({
+    buffer: optimized.buffer,
+    folder: folder || '/anova/projects',
+    fileName: `${baseFilename}.${extension}`,
+    tags: ['anova', 'projects'],
+  });
+
+  return {
+    ...mapUploadedAsset({
+      url: result.url,
+      fileId: result.fileId,
+      filePath: result.filePath,
+      hash: imageHash,
+    }),
+    reused: false,
+  };
 };
 
 const setShortCacheHeaders = (res) => {
@@ -98,34 +207,35 @@ const getProjectById = asyncHandler(async (req, res) => {
 });
 
 const createProject = asyncHandler(async (req, res) => {
-  let imageUrl = null;
+  const fallbackImageUrl = sanitizeExternalImageUrl(req.body.image_url);
+  let asset = fallbackImageUrl ? mapExternalAsset(fallbackImageUrl) : mapNoAsset();
 
   if (req.file) {
     try {
-      const filename = generateFilename(req.file.originalname, 'project');
-      const result = await uploadToCloudinary(req.file.buffer, 'projects', filename);
-      imageUrl = result.url;
+      asset = await buildAssetFromFile(req.file, { folder: '/anova/projects' });
     } catch (error) {
-      console.error('Cloudinary project image upload failed:', error);
+      console.error('ImageKit project image upload failed:', error);
       return res.status(500).json({
         success: false,
         message: 'Failed to upload image. Please try again.',
       });
     }
-  } else if (req.body.image_url) {
-    const value = String(req.body.image_url).trim();
-    if (!isPlaceholderImage(value)) {
-      imageUrl = value;
-    }
   }
 
   const tags = JSON.stringify(parseTags(req.body.tags));
   const [result] = await pool.query(
-    'INSERT INTO projects (title, description, image_url, live_demo_url, tags, featured) VALUES (?, ?, ?, ?, ?, ?)',
+    `
+      INSERT INTO projects
+      (title, description, image_url, image_file_id, image_file_path, image_hash, live_demo_url, tags, featured)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
     [
       req.body.title,
       req.body.description,
-      imageUrl,
+      asset.imageUrl,
+      asset.imageFileId,
+      asset.imageFilePath,
+      asset.imageHash,
       req.body.live_demo_url || null,
       tags,
       req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0,
@@ -142,49 +252,64 @@ const updateProject = asyncHandler(async (req, res) => {
   if (!existing) return res.status(404).json({ success: false, message: 'Project not found.' });
 
   const shouldRemoveImage = req.body.remove_image === 'true' || req.body.remove_image === '1';
-  let imageUrl = existing.image_url;
-
-  if (shouldRemoveImage) {
-    imageUrl = null;
-    await removeCloudImage(existing.image_url);
-  }
+  const existingAsset = toProjectAsset(existing);
+  let nextAsset = existingAsset;
+  const externalImageUrl = sanitizeExternalImageUrl(req.body.image_url);
 
   if (req.file) {
-    await removeCloudImage(existing.image_url);
     try {
-      const filename = generateFilename(req.file.originalname, 'project');
-      const result = await uploadToCloudinary(req.file.buffer, 'projects', filename);
-      imageUrl = result.url;
+      const uploadedAsset = await buildAssetFromFile(req.file, {
+        folder: '/anova/projects',
+        excludeId: req.params.id,
+      });
+      if (uploadedAsset.imageHash === existingAsset.imageHash && existingAsset.imageFileId) {
+        nextAsset = existingAsset;
+      } else {
+        nextAsset = {
+          imageUrl: uploadedAsset.imageUrl,
+          imageFileId: uploadedAsset.imageFileId,
+          imageFilePath: uploadedAsset.imageFilePath,
+          imageHash: uploadedAsset.imageHash,
+        };
+      }
     } catch (error) {
-      console.error('Cloudinary project image upload failed:', error);
+      console.error('ImageKit project image upload failed:', error);
       return res.status(500).json({
         success: false,
         message: 'Failed to upload image. Please try again.',
       });
     }
-  } else if (req.body.image_url) {
-    const value = String(req.body.image_url).trim();
-    if (!isPlaceholderImage(value)) {
-      if (existing.image_url && existing.image_url !== value && isCloudinaryUrl(existing.image_url)) {
-        await removeCloudImage(existing.image_url);
-      }
-      imageUrl = value;
-    }
+  } else if (shouldRemoveImage) {
+    nextAsset = mapNoAsset();
+  } else if (externalImageUrl && externalImageUrl !== existingAsset.imageUrl) {
+    nextAsset = mapExternalAsset(externalImageUrl);
   }
 
   const tags = JSON.stringify(parseTags(req.body.tags || existing.tags));
   await pool.query(
-    'UPDATE projects SET title = ?, description = ?, image_url = ?, live_demo_url = ?, tags = ?, featured = ? WHERE id = ?',
+    `
+      UPDATE projects
+      SET title = ?, description = ?, image_url = ?, image_file_id = ?, image_file_path = ?, image_hash = ?, live_demo_url = ?, tags = ?, featured = ?
+      WHERE id = ?
+    `,
     [
       req.body.title,
       req.body.description,
-      imageUrl,
+      nextAsset.imageUrl,
+      nextAsset.imageFileId,
+      nextAsset.imageFilePath,
+      nextAsset.imageHash,
       req.body.live_demo_url || null,
       tags,
       req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0,
       req.params.id,
     ]
   );
+
+  if (hasAssetChanged(existingAsset, nextAsset) && existingAsset.imageFileId && existingAsset.imageFileId !== nextAsset.imageFileId) {
+    await deleteImageIfUnreferenced(existingAsset.imageFileId);
+  }
+
   invalidateCache('projects:');
   const updated = await findById('projects', req.params.id);
   const mapped = mapProjectRow(updated, req);
@@ -197,10 +322,19 @@ const deleteProject = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: 'Project not found.' });
   }
 
-  await removeCloudImage(project.image_url);
+  const oldImageFileId = project.image_file_id || null;
 
   const deleted = await deleteById('projects', req.params.id);
   if (!deleted) return res.status(404).json({ success: false, message: 'Project not found.' });
+
+  if (oldImageFileId) {
+    try {
+      await deleteImageIfUnreferenced(oldImageFileId);
+    } catch (error) {
+      console.error('Project deleted but failed to delete orphaned image from ImageKit:', error);
+    }
+  }
+
   console.log('Deleted project and cleaned up cloud image for:', req.params.id);
   invalidateCache('projects:');
   res.json({ success: true, message: 'Project deleted successfully.' });

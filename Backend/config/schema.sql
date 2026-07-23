@@ -25,11 +25,16 @@ CREATE TABLE IF NOT EXISTS projects (
   title VARCHAR(180) NOT NULL,
   description TEXT NOT NULL,
   image_url VARCHAR(255) DEFAULT NULL,
+  image_file_id VARCHAR(255) DEFAULT NULL,
+  image_file_path VARCHAR(512) DEFAULT NULL,
+  image_hash CHAR(64) DEFAULT NULL,
   live_demo_url VARCHAR(255) DEFAULT NULL,
   tags JSON NULL,
   featured TINYINT(1) DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_projects_image_file_id (image_file_id),
+  INDEX idx_projects_image_hash (image_hash)
 );
 
 CREATE TABLE IF NOT EXISTS blogs (

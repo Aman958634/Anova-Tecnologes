@@ -22,6 +22,9 @@ const endpoints = {
   contacts: '/contact'
 };
 
+const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
+
 function TableHeader({ columns }) {
   return (
     <thead className="bg-[#edf4ff] text-left text-xs uppercase tracking-[0.2em] text-[#2f5ea8]">
@@ -166,6 +169,17 @@ export default function AdminResourceManager({ resource, title, description }) {
       setPreviewUrl(row.photo_url ? buildImageUrl(row.photo_url) : null);
       setIsFormOpen(true);
     }
+  };
+
+  const validateImageFile = (file) => {
+    if (!file) return null;
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      return 'Invalid image type. Use JPG, PNG, WEBP, GIF, or AVIF.';
+    }
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      return 'Image is too large. Maximum allowed size is 5MB.';
+    }
+    return null;
   };
 
   const isPlaceholderImageUrl = (value) => {
@@ -453,6 +467,12 @@ export default function AdminResourceManager({ resource, title, description }) {
               }}>Preview URL</button>
               <input type="file" accept="image/*" onChange={(event) => {
                 const file = event.target.files?.[0] || null;
+                const validationError = validateImageFile(file);
+                if (validationError) {
+                  toast.error(validationError);
+                  event.target.value = '';
+                  return;
+                }
                 setForm((current) => ({ ...current, image: file, remove_image: false }));
                 if (file) {
                   const url = URL.createObjectURL(file);
@@ -480,6 +500,12 @@ export default function AdminResourceManager({ resource, title, description }) {
               <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none md:col-span-2" value={form.tags || ''} onChange={(event) => setForm((current) => ({ ...current, tags: event.target.value }))} placeholder="Tags (comma separated)" />
               <input type="file" accept="image/*" onChange={(event) => {
                 const file = event.target.files?.[0] || null;
+                const validationError = validateImageFile(file);
+                if (validationError) {
+                  toast.error(validationError);
+                  event.target.value = '';
+                  return;
+                }
                 setForm((current) => ({ ...current, image: file, remove_image: false }));
                 if (file) {
                   const url = URL.createObjectURL(file);
@@ -508,6 +534,12 @@ export default function AdminResourceManager({ resource, title, description }) {
               <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.designation || ''} onChange={(event) => setForm((current) => ({ ...current, designation: event.target.value }))} placeholder="Designation" required />
               <input type="file" accept="image/*" onChange={(event) => {
                 const file = event.target.files?.[0] || null;
+                const validationError = validateImageFile(file);
+                if (validationError) {
+                  toast.error(validationError);
+                  event.target.value = '';
+                  return;
+                }
                 setForm((current) => ({ ...current, image: file, remove_image: false }));
                 if (file) {
                   const url = URL.createObjectURL(file);
@@ -536,7 +568,16 @@ export default function AdminResourceManager({ resource, title, description }) {
               <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.title || ''} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} placeholder="Blog title" required />
               <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.category || ''} onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))} placeholder="Category" required />
               <input type="date" className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.published_at || ''} onChange={(event) => setForm((current) => ({ ...current, published_at: event.target.value }))} />
-              <input type="file" accept="image/*" onChange={(event) => setForm((current) => ({ ...current, image: event.target.files?.[0] || null }))} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
+              <input type="file" accept="image/*" onChange={(event) => {
+                const file = event.target.files?.[0] || null;
+                const validationError = validateImageFile(file);
+                if (validationError) {
+                  toast.error(validationError);
+                  event.target.value = '';
+                  return;
+                }
+                setForm((current) => ({ ...current, image: file }));
+              }} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
               <textarea className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none md:col-span-2" rows="3" value={form.excerpt || ''} onChange={(event) => setForm((current) => ({ ...current, excerpt: event.target.value }))} placeholder="Excerpt" required />
               <textarea className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none md:col-span-2" rows="5" value={form.content || ''} onChange={(event) => setForm((current) => ({ ...current, content: event.target.value }))} placeholder="Content" />
             </>
@@ -548,7 +589,16 @@ export default function AdminResourceManager({ resource, title, description }) {
               <input className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.designation || ''} onChange={(event) => setForm((current) => ({ ...current, designation: event.target.value }))} placeholder="Designation" required />
               <input type="number" min="1" max="5" className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.rating || 5} onChange={(event) => setForm((current) => ({ ...current, rating: event.target.value }))} placeholder="Rating" />
               <input type="url" className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none" value={form.photo_url || ''} onChange={(event) => setForm((current) => ({ ...current, photo_url: event.target.value }))} placeholder="Client photo URL (https://...)" />
-              <input type="file" accept="image/*" onChange={(event) => setForm((current) => ({ ...current, photo: event.target.files?.[0] || null }))} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
+              <input type="file" accept="image/*" onChange={(event) => {
+                const file = event.target.files?.[0] || null;
+                const validationError = validateImageFile(file);
+                if (validationError) {
+                  toast.error(validationError);
+                  event.target.value = '';
+                  return;
+                }
+                setForm((current) => ({ ...current, photo: file }));
+              }} className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88]" />
               <textarea className="rounded-xl border border-[#dbe7ff] px-3 py-2 text-sm text-[#163c88] outline-none md:col-span-2" rows="4" value={form.review || ''} onChange={(event) => setForm((current) => ({ ...current, review: event.target.value }))} placeholder="Review" required />
             </>
           ) : null}

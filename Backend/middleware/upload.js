@@ -1,14 +1,19 @@
 const multer = require('multer');
-const crypto = require('crypto');
+const {
+  ALLOWED_UPLOAD_MIME_TYPES,
+  MAX_UPLOAD_FILE_SIZE_BYTES,
+} = require('../utils/imagekitStorage');
 
-const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
-const maxFileSize = 5 * 1024 * 1024;
+const allowedMimeTypes = ALLOWED_UPLOAD_MIME_TYPES;
+const maxFileSize = MAX_UPLOAD_FILE_SIZE_BYTES;
 
 const storage = multer.memoryStorage();
 
 function fileFilter(req, file, cb) {
   if (!allowedMimeTypes.includes(file.mimetype)) {
-    cb(new Error('Only JPG, PNG, WEBP, GIF, or SVG images are allowed.'), false);
+    const error = new Error('Invalid image type. Allowed: JPG, PNG, WEBP, GIF, AVIF.');
+    error.statusCode = 400;
+    cb(error, false);
     return;
   }
   cb(null, true);

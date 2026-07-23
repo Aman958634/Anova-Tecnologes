@@ -323,6 +323,57 @@ async function seedDefaultBlogs() {
   console.log('✅ Default blogs seeded into blogs table');
 }
 
+async function ensureProjectImageStorageColumns() {
+  const requiredColumns = [
+    { name: 'image_file_id', definition: 'VARCHAR(255) NULL AFTER image_url' },
+    { name: 'image_file_path', definition: 'VARCHAR(512) NULL AFTER image_file_id' },
+    { name: 'image_hash', definition: 'CHAR(64) NULL AFTER image_file_path' },
+  ];
+
+  for (const column of requiredColumns) {
+    const [rows] = await pool.query(
+      `
+        SELECT COLUMN_NAME
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'projects'
+          AND COLUMN_NAME = ?
+        LIMIT 1
+      `,
+      [column.name]
+    );
+
+    if (rows.length === 0) {
+      await pool.query(`ALTER TABLE projects ADD COLUMN ${column.name} ${column.definition}`);
+      console.log(`✅ Added projects.${column.name}`);
+    }
+  }
+
+  const requiredIndexes = [
+    { name: 'idx_projects_image_file_id', column: 'image_file_id' },
+    { name: 'idx_projects_image_hash', column: 'image_hash' },
+  ];
+
+  for (const index of requiredIndexes) {
+    const [rows] = await pool.query(
+      `
+        SELECT INDEX_NAME
+        FROM information_schema.STATISTICS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'projects'
+          AND INDEX_NAME = ?
+        LIMIT 1
+      `,
+      [index.name]
+    );
+
+    if (rows.length === 0) {
+      await pool.query(`CREATE INDEX ${index.name} ON projects (${index.column})`);
+      console.log(`✅ Added index ${index.name}`);
+    }
+  }
+}
+
 
 // =========================
 // BOOTSTRAP SERVER
@@ -334,6 +385,9 @@ async function bootstrap() {
 
     await ensureDefaultAdmin();
     console.log('✅ Default admin ready');
+
+    await ensureProjectImageStorageColumns();
+    console.log('✅ Project image storage schema ready');
 
     await seedDefaultServices();
     console.log('✅ Default services ready');

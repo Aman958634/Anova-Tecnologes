@@ -5,7 +5,7 @@ A full-stack premium tech company website inspired by the provided reference, bu
 ## Tech Stack
 
 - Frontend: React.js, Vite, Tailwind CSS, Framer Motion, Lucide React, Axios
-- Backend: Node.js, Express.js, JWT, Multer, MySQL
+- Backend: Node.js, Express.js, JWT, Multer, MySQL, ImageKit, Sharp
 - UI Features: glassmorphism, dark/light mode, responsive layout, smooth animations, reusable sections
 
 ## Project Structure
@@ -24,7 +24,7 @@ project-root/
 
 1. Go to `Backend/`.
 2. Create your MySQL database named `anova_tech_company`.
-3. Update `Backend/.env` with your MySQL credentials and JWT secret.
+3. Update `Backend/.env` with your MySQL credentials, JWT secret, and ImageKit credentials.
 4. Start the API:
 
 ```bash
@@ -50,6 +50,18 @@ npm run dev
 ```
 
 If your backend is running on a different URL, set `VITE_API_URL` in a frontend `.env` file.
+
+### Required Backend Environment Variables
+
+- `JWT_SECRET`
+- `MYSQLHOST` / `MYSQL_HOST` (or `DATABASE_URL`)
+- `MYSQLPORT` / `MYSQL_PORT` (or `DATABASE_URL`)
+- `MYSQLUSER` / `MYSQL_USER` (or `DATABASE_URL`)
+- `MYSQLPASSWORD` / `MYSQL_PASSWORD` (or `DATABASE_URL`)
+- `MYSQLDATABASE` / `MYSQL_DATABASE` (or `DATABASE_URL`)
+- `IMAGEKIT_PUBLIC_KEY`
+- `IMAGEKIT_PRIVATE_KEY`
+- `IMAGEKIT_URL_ENDPOINT`
 
 ## REST API
 
@@ -89,5 +101,6 @@ Each table includes a primary key, `created_at`, and `updated_at` fields.
 
 - The frontend uses route-based pages for Home, About, Services, Projects, Blog, Contact, Login, and Admin Dashboard.
 - Admin routes are protected with JWT auth.
-- Project and blog images are uploaded through Multer and served from `/uploads`.
+- Uploaded images are processed in-memory with Multer, optimized with Sharp, and stored permanently in ImageKit.
+- Project records store `image_url` plus cloud metadata (`image_file_id`, `image_file_path`, `image_hash`) to support safe replace/delete and duplicate prevention.
 - Search, pagination, dark/light mode, and toast notifications are included in the UI.

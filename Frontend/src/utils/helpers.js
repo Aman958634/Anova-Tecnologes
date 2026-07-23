@@ -9,23 +9,22 @@ export function buildImageUrl(url, fallback = null) {
 
   const trimmed = String(url).trim();
 
-  // Absolute URLs (Cloudinary, CDN, external hosts) — pass through as-is
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  // Absolute URLs are used as-is. For ImageKit, apply dynamic optimization params.
+  if (/^https?:\/\//i.test(trimmed)) {
+    try {
+      const parsed = new URL(trimmed);
+      if (parsed.hostname.includes('imagekit.io') && !parsed.searchParams.has('tr')) {
+        parsed.searchParams.set('tr', 'w-1400,q-80,f-auto');
+      }
+      return parsed.toString();
+    } catch {
+      return trimmed;
+    }
+  }
 
-  // Legacy local paths (/uploads/...) — resolve against the backend API origin
+  // Legacy relative paths are still supported for old records.
   let path = trimmed.replace(/\\+/g, '/');
   if (!path.startsWith('/')) path = `/${path}`;
-
-  const configuredApi = typeof import.meta.env.VITE_API_URL === 'string'
-    ? import.meta.env.VITE_API_URL.trim()
-    : '';
-  if (configuredApi && path.startsWith('/uploads/')) {
-    if (/^https?:\/\//i.test(configuredApi)) {
-      const backendUrl = configuredApi.replace(/\/+$/, '').replace(/\/api$/i, '');
-      return `${backendUrl}${path}`;
-    }
-    return path;
-  }
 
   return path;
 }

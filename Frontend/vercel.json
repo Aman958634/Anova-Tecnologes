@@ -11,10 +11,6 @@
     {
       "source": "/api/:path*",
       "destination": "https://anova-tecnologes-backend.onrender.com/api/:path*"
-    },
-    {
-      "source": "/uploads/:path*",
-      "destination": "https://anova-tecnologes-backend.onrender.com/uploads/:path*"
     }
   ],
   "routes": [
