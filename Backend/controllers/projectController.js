@@ -95,6 +95,68 @@ const deleteCloudinaryIfUnreferenced = async (publicId) => {
   }
 };
 
+let cachedProjectColumns = null;
+
+const getProjectColumns = async () => {
+  if (cachedProjectColumns) return cachedProjectColumns;
+
+  try {
+    const [rows] = await pool.query(
+      `
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects'
+      `
+    );
+    cachedProjectColumns = new Set(rows.map((row) => row.COLUMN_NAME));
+  } catch (error) {
+    console.error(error);
+    console.error(error.stack);
+    cachedProjectColumns = new Set([
+      'title',
+      'description',
+      'image_url',
+      'image_file_id',
+      'image_file_path',
+      'image_hash',
+      'image_meta',
+      'live_demo_url',
+      'tags',
+      'featured',
+    ]);
+  }
+
+  return cachedProjectColumns;
+};
+
+const parseFeaturedValue = (value, fallback) => {
+  if (value === undefined || value === null || value === '') {
+    return Number(fallback) === 1 ? 1 : 0;
+  }
+
+  if (typeof value === 'boolean') {
+    return value ? 1 : 0;
+  }
+
+  const normalized = String(value).trim().toLowerCase();
+  if (normalized === '1' || normalized === 'true' || normalized === 'yes') return 1;
+  if (normalized === '0' || normalized === 'false' || normalized === 'no') return 0;
+  return Number(fallback) === 1 ? 1 : 0;
+};
+
+const ensureStringOrFallback = (value, fallback) => {
+  if (value === undefined || value === null) return fallback;
+  return String(value).trim();
+};
+
+const parseTagsForSave = (value, fallbackRawTags) => {
+  const raw = value === undefined ? fallbackRawTags : value;
+  const tagsArray = parseTags(raw)
+    .map((tag) => String(tag).trim())
+    .filter(Boolean);
+  return JSON.stringify(tagsArray);
+};
+
 const buildAssetFromFile = async (file, { folder = 'projects' } = {}) => {
   ensureCloudinaryConfigured();
   const filename = generateFilename(file.originalname, 'project');
@@ -225,71 +287,164 @@ const createProject = asyncHandler(async (req, res) => {
 });
 
 const updateProject = asyncHandler(async (req, res) => {
-  const existing = await findById('projects', req.params.id);
-  if (!existing) return res.status(404).json({ success: false, message: 'Project not found.' });
+  try {
+    console.log('[projects:update] Request received', {
+      projectId: req.params.id,
+      method: req.method,
+      contentType: req.headers['content-type'] || null,
+    });
 
-  const shouldRemoveImage = req.body.remove_image === 'true' || req.body.remove_image === '1';
-  const existingAsset = toProjectAsset(existing);
-  let nextAsset = existingAsset;
-  const externalImageUrl = sanitizeExternalImageUrl(req.body.image_url);
-
-  if (req.file) {
-    try {
-      const uploadedAsset = await buildAssetFromFile(req.file, { folder: 'projects' });
-      nextAsset = {
-        imageUrl: uploadedAsset.imageUrl,
-        imageFileId: uploadedAsset.imageFileId,
-        imageFilePath: uploadedAsset.imageFilePath,
-        imageHash: uploadedAsset.imageHash,
-        imageMeta: uploadedAsset.imageMeta,
-      };
-    } catch (error) {
-      console.error('Cloudinary project image upload failed:', error);
-      return res.status(500).json({
+    const projectId = Number(req.params.id);
+    if (!Number.isInteger(projectId) || projectId <= 0) {
+      return res.status(400).json({
         success: false,
-        message: uploadErrorMessage(error),
+        message: 'Invalid project id.',
+        stack: null,
       });
     }
-  } else if (shouldRemoveImage) {
-    nextAsset = mapNoAsset();
-  } else if (externalImageUrl && externalImageUrl !== existingAsset.imageUrl) {
-    nextAsset = mapExternalAsset(externalImageUrl);
+
+    if (!req.body || typeof req.body !== 'object') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid request body.',
+        stack: null,
+      });
+    }
+
+    console.log('[projects:update] Body received', req.body);
+    console.log('[projects:update] File received', {
+      present: Boolean(req.file),
+      originalname: req.file?.originalname || null,
+      mimetype: req.file?.mimetype || null,
+      size: req.file?.size || null,
+    });
+
+    if (req.file) {
+      if (!Buffer.isBuffer(req.file.buffer) || req.file.buffer.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'Uploaded file is invalid or empty.',
+          stack: null,
+        });
+      }
+    }
+
+    const existing = await findById('projects', projectId);
+    if (!existing) {
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found.',
+        stack: null,
+      });
+    }
+
+    const shouldRemoveImage = req.body.remove_image === 'true' || req.body.remove_image === '1';
+    const existingAsset = toProjectAsset(existing);
+    let nextAsset = existingAsset;
+    const externalImageUrl = sanitizeExternalImageUrl(req.body.image_url);
+
+    if (req.file) {
+      console.log('[projects:update] Upload started', { projectId });
+      try {
+        const uploadedAsset = await buildAssetFromFile(req.file, { folder: 'projects' });
+        nextAsset = {
+          imageUrl: uploadedAsset.imageUrl,
+          imageFileId: uploadedAsset.imageFileId,
+          imageFilePath: uploadedAsset.imageFilePath,
+          imageHash: uploadedAsset.imageHash,
+          imageMeta: uploadedAsset.imageMeta,
+        };
+        console.log('[projects:update] Upload completed', {
+          projectId,
+          imageFileId: nextAsset.imageFileId,
+        });
+      } catch (error) {
+        console.error(error);
+        console.error(error.stack);
+        return res.status(500).json({
+          success: false,
+          message: uploadErrorMessage(error),
+          stack: error.stack,
+        });
+      }
+    } else if (shouldRemoveImage) {
+      nextAsset = mapNoAsset();
+    } else if (externalImageUrl && externalImageUrl !== existingAsset.imageUrl) {
+      nextAsset = mapExternalAsset(externalImageUrl);
+    }
+
+    const nextTitle = ensureStringOrFallback(req.body.title, existing.title);
+    const nextDescription = ensureStringOrFallback(req.body.description, existing.description);
+    const nextLiveDemoUrl = ensureStringOrFallback(req.body.live_demo_url, existing.live_demo_url || null) || null;
+    const nextFeatured = parseFeaturedValue(req.body.featured, existing.featured);
+    const nextTags = parseTagsForSave(req.body.tags, existing.tags);
+
+    const projectColumns = await getProjectColumns();
+    const updateFields = [
+      { column: 'title', value: nextTitle },
+      { column: 'description', value: nextDescription },
+      { column: 'image_url', value: nextAsset.imageUrl },
+      { column: 'image_file_id', value: nextAsset.imageFileId },
+      { column: 'image_file_path', value: nextAsset.imageFilePath },
+      { column: 'image_hash', value: nextAsset.imageHash },
+      { column: 'image_meta', value: nextAsset.imageMeta },
+      { column: 'live_demo_url', value: nextLiveDemoUrl },
+      { column: 'tags', value: nextTags },
+      { column: 'featured', value: nextFeatured },
+    ].filter((field) => projectColumns.has(field.column));
+
+    if (updateFields.length === 0) {
+      return res.status(500).json({
+        success: false,
+        message: 'No valid columns available for update on projects table.',
+        stack: null,
+      });
+    }
+
+    const setClause = updateFields.map((field) => `${field.column} = ?`).join(', ');
+    const sql = `UPDATE projects SET ${setClause} WHERE id = ?`;
+    const values = updateFields.map((field) => field.value);
+    values.push(projectId);
+
+    console.log('[projects:update] Database update started', {
+      projectId,
+      updatedColumns: updateFields.map((field) => field.column),
+    });
+    await pool.query(sql, values);
+    console.log('[projects:update] Database update completed', { projectId });
+
+    const shouldDeleteOldCloudinary =
+      Boolean(req.file || shouldRemoveImage || (externalImageUrl && externalImageUrl !== existingAsset.imageUrl)) &&
+      Boolean(existingAsset.imageFileId) &&
+      existingAsset.imageFileId !== nextAsset.imageFileId;
+
+    if (shouldDeleteOldCloudinary) {
+      try {
+        await deleteCloudinaryIfUnreferenced(existingAsset.imageFileId);
+      } catch (error) {
+        console.error(error);
+        console.error(error.stack);
+      }
+    }
+
+    invalidateCache('projects:');
+    const updated = await findById('projects', projectId);
+    const mapped = mapProjectRow(updated, req);
+
+    return res.json({
+      success: true,
+      message: 'Project updated successfully',
+      project: mapped,
+    });
+  } catch (error) {
+    console.error(error);
+    console.error(error.stack);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to update project.',
+      stack: error.stack,
+    });
   }
-
-  const tags = JSON.stringify(parseTags(req.body.tags || existing.tags));
-  await pool.query(
-    `
-      UPDATE projects
-      SET title = ?, description = ?, image_url = ?, image_file_id = ?, image_file_path = ?, image_hash = ?, image_meta = ?, live_demo_url = ?, tags = ?, featured = ?
-      WHERE id = ?
-    `,
-    [
-      req.body.title,
-      req.body.description,
-      nextAsset.imageUrl,
-      nextAsset.imageFileId,
-      nextAsset.imageFilePath,
-      nextAsset.imageHash,
-      nextAsset.imageMeta,
-      req.body.live_demo_url || null,
-      tags,
-      req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0,
-      req.params.id,
-    ]
-  );
-
-  if (req.file && existingAsset.imageFileId && existingAsset.imageFileId !== nextAsset.imageFileId) {
-    await deleteCloudinaryIfUnreferenced(existingAsset.imageFileId);
-  }
-
-  if (shouldRemoveImage && existingAsset.imageFileId) {
-    await deleteCloudinaryIfUnreferenced(existingAsset.imageFileId);
-  }
-
-  invalidateCache('projects:');
-  const updated = await findById('projects', req.params.id);
-  const mapped = mapProjectRow(updated, req);
-  res.json({ success: true, data: mapped, project: mapped });
 });
 
 const deleteProject = asyncHandler(async (req, res) => {
