@@ -3,15 +3,6 @@ import axios from 'axios';
 const DEFAULT_API_BASE_URL = '/api';
 
 export const API_BASE_URL = (() => {
-  const isBrowser = typeof window !== 'undefined';
-  const host = isBrowser ? window.location.hostname : '';
-  const useProxyOnVercel = /(^|\.)vercel\.app$/i.test(host) || host === 'anova-tecnologes.vercel.app';
-
-  // In production on Vercel, always use same-origin /api so rewrites decide the backend target.
-  if (useProxyOnVercel) {
-    return DEFAULT_API_BASE_URL;
-  }
-
   const configured = typeof import.meta.env.VITE_API_URL === 'string' ? import.meta.env.VITE_API_URL.trim() : '';
   const cleaned = configured.replace(/\/+$/, '');
   return cleaned || DEFAULT_API_BASE_URL;
