@@ -256,6 +256,21 @@ const getProjectById = asyncHandler(async (req, res) => {
 });
 
 const createProject = asyncHandler(async (req, res) => {
+  console.log('Entering createProject()');
+  console.log('[projects:create] Request received', {
+    method: req.method,
+    contentType: req.headers['content-type'] || null,
+  });
+  console.log('[projects:create] Body received', req.body);
+  console.log(req.body);
+  console.log('[projects:create] File received', {
+    present: Boolean(req.file),
+    originalname: req.file?.originalname || null,
+    mimetype: req.file?.mimetype || null,
+    size: req.file?.size || null,
+  });
+  console.log(req.file);
+
   const fallbackImageUrl = sanitizeExternalImageUrl(req.body.image_url);
   let asset = fallbackImageUrl ? mapExternalAsset(fallbackImageUrl) : mapNoAsset();
 
@@ -268,27 +283,31 @@ const createProject = asyncHandler(async (req, res) => {
 
   if (req.file) {
     try {
-        // Root cause previously hidden here: Cloudinary/Multer errors were being flattened into a generic message.
+      console.log('[projects:create] Upload started');
       asset = await buildAssetFromFile(req.file, { folder: 'projects' });
+      console.log('[projects:create] Upload finished', {
+        imageUrl: asset.imageUrl,
+        imageFileId: asset.imageFileId,
+      });
     } catch (error) {
-        console.error(error);
-        console.error(error.stack);
+      console.error(error);
+      console.error(error.stack);
       return res.status(500).json({
         success: false,
-          message: error.message,
-          stack: error.stack,
+        message: error.message,
+        error: error.message,
+        stack: error.stack,
       });
     }
   }
 
   const tags = JSON.stringify(parseTags(req.body.tags));
-  const [result] = await pool.query(
-    `
+  const createSql = `
       INSERT INTO projects
       (title, description, image_url, image_file_id, image_file_path, image_hash, image_meta, live_demo_url, tags, featured)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `,
-    [
+    `;
+  const createValues = [
       req.body.title,
       req.body.description,
       asset.imageUrl,
@@ -299,7 +318,14 @@ const createProject = asyncHandler(async (req, res) => {
       req.body.live_demo_url || null,
       tags,
       req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0,
-    ]
+    ];
+
+  console.log('[projects:create] SQL Query:', createSql);
+  console.log('[projects:create] SQL Values:', createValues);
+
+  const [result] = await pool.query(
+    createSql,
+    createValues
   );
   invalidateCache('projects:');
   const created = await findById('projects', result.insertId);
