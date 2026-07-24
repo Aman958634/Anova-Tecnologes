@@ -88,45 +88,57 @@ const toProjectAsset = (row) => ({
 });
 
 const deleteCloudinaryIfUnreferenced = async (publicId) => {
-  if (!publicId) return;
-  const [rows] = await pool.query('SELECT COUNT(*) AS total FROM projects WHERE image_file_id = ?', [publicId]);
-  if (Number(rows[0]?.total || 0) === 0) {
-    await deleteFromCloudinary(publicId);
+  try {
+    if (!publicId) return;
+    const [rows] = await pool.query('SELECT COUNT(*) AS total FROM projects WHERE image_file_id = ?', [publicId]);
+    if (Number(rows[0]?.total || 0) === 0) {
+      await deleteFromCloudinary(publicId);
+    }
+  } catch (error) {
+    console.error(error);
+    console.error(error.stack);
+    throw error;
   }
 };
 
 let cachedProjectColumns = null;
 
 const getProjectColumns = async () => {
-  if (cachedProjectColumns) return cachedProjectColumns;
-
   try {
-    const [rows] = await pool.query(
-      `
-        SELECT COLUMN_NAME
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects'
-      `
-    );
-    cachedProjectColumns = new Set(rows.map((row) => row.COLUMN_NAME));
+    if (cachedProjectColumns) return cachedProjectColumns;
+
+    try {
+      const [rows] = await pool.query(
+        `
+          SELECT COLUMN_NAME
+          FROM INFORMATION_SCHEMA.COLUMNS
+          WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'projects'
+        `
+      );
+      cachedProjectColumns = new Set(rows.map((row) => row.COLUMN_NAME));
+    } catch (error) {
+      console.error(error);
+      console.error(error.stack);
+      cachedProjectColumns = new Set([
+        'title',
+        'description',
+        'image_url',
+        'image_file_id',
+        'image_file_path',
+        'image_hash',
+        'image_meta',
+        'live_demo_url',
+        'tags',
+        'featured',
+      ]);
+    }
+
+    return cachedProjectColumns;
   } catch (error) {
     console.error(error);
     console.error(error.stack);
-    cachedProjectColumns = new Set([
-      'title',
-      'description',
-      'image_url',
-      'image_file_id',
-      'image_file_path',
-      'image_hash',
-      'image_meta',
-      'live_demo_url',
-      'tags',
-      'featured',
-    ]);
+    throw error;
   }
-
-  return cachedProjectColumns;
 };
 
 const parseFeaturedValue = (value, fallback) => {
@@ -158,21 +170,29 @@ const parseTagsForSave = (value, fallbackRawTags) => {
 };
 
 const buildAssetFromFile = async (file, { folder = 'projects' } = {}) => {
-  ensureCloudinaryConfigured();
-  const filename = generateFilename(file.originalname, 'project');
-  const uploaded = await uploadToCloudinary(file.buffer, folder, filename);
-  return mapUploadedAsset({
-    url: uploaded.url,
-    fileId: uploaded.publicId,
-    filePath: uploaded.publicId,
-    hash: `${uploaded.format || 'raw'}:${uploaded.bytes || 0}:${uploaded.width || 0}x${uploaded.height || 0}`,
-    meta: JSON.stringify({
-      width: uploaded.width || null,
-      height: uploaded.height || null,
-      format: uploaded.format || null,
-      bytes: uploaded.bytes || null,
-    }),
-  });
+  try {
+    ensureCloudinaryConfigured();
+    const filename = generateFilename(file.originalname, 'project');
+    console.log('Cloudinary Upload Starting');
+    const uploaded = await uploadToCloudinary(file.buffer, folder, filename);
+    console.log('Cloudinary Upload Result:', uploaded);
+    return mapUploadedAsset({
+      url: uploaded.url,
+      fileId: uploaded.publicId,
+      filePath: uploaded.publicId,
+      hash: `${uploaded.format || 'raw'}:${uploaded.bytes || 0}:${uploaded.width || 0}x${uploaded.height || 0}`,
+      meta: JSON.stringify({
+        width: uploaded.width || null,
+        height: uploaded.height || null,
+        format: uploaded.format || null,
+        bytes: uploaded.bytes || null,
+      }),
+    });
+  } catch (error) {
+    console.error(error);
+    console.error(error.stack);
+    throw error;
+  }
 };
 
 const setShortCacheHeaders = (res) => {
@@ -415,6 +435,9 @@ const updateProject = asyncHandler(async (req, res) => {
     const sql = `UPDATE projects SET ${setClause} WHERE id = ?`;
     const values = updateFields.map((field) => field.value);
     values.push(projectId);
+
+    console.log('SQL Query:', sql);
+    console.log('SQL Values:', values);
 
     console.log('[projects:update] Database update started', {
       projectId,
