@@ -43,6 +43,16 @@ const removeCloudImage = async (imageUrl) => {
   }
 };
 
+const respondWithError = (res, error, context) => {
+  console.error(`Cloudinary service error (${context}):`, error);
+  console.error(error.stack);
+  return res.status(500).json({
+    success: false,
+    message: error.message,
+    stack: error.stack,
+  });
+};
+
 const listServices = asyncHandler(async (req, res) => {
   const search = req.query.search ? `%${req.query.search}%` : '%';
   const page = Math.max(Number(req.query.page) || 1, 1);
@@ -76,11 +86,7 @@ const createService = asyncHandler(async (req, res) => {
       const result = await uploadToCloudinary(req.file.buffer, 'services', filename);
       imageUrl = result.url;
     } catch (error) {
-      console.error('Cloudinary service image upload failed:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to upload image. Please try again.',
-      });
+      return respondWithError(res, error, 'create');
     }
   } else if (req.body.image_url) {
     const value = String(req.body.image_url).trim();
@@ -111,11 +117,7 @@ const updateService = asyncHandler(async (req, res) => {
       const result = await uploadToCloudinary(req.file.buffer, 'services', filename);
       imageUrl = result.url;
     } catch (error) {
-      console.error('Cloudinary service image upload failed:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to upload image. Please try again.',
-      });
+      return respondWithError(res, error, 'update');
     }
   } else if (req.body.image_url) {
     const value = String(req.body.image_url).trim();

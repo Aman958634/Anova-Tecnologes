@@ -28,6 +28,16 @@ const removeCloudImage = async (imageUrl) => {
   }
 };
 
+const respondWithError = (res, error, context) => {
+  console.error(`Cloudinary team error (${context}):`, error);
+  console.error(error.stack);
+  return res.status(500).json({
+    success: false,
+    message: error.message,
+    stack: error.stack,
+  });
+};
+
 const mapTeamRow = (row, req) => ({
   ...row,
   image: row.image_url || null,
@@ -68,11 +78,7 @@ const createTeamMember = asyncHandler(async (req, res) => {
       const result = await uploadToCloudinary(req.file.buffer, 'team', filename);
       imageUrl = result.url;
     } catch (error) {
-      console.error('Cloudinary team image upload failed:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to upload image. Please try again.',
-      });
+      return respondWithError(res, error, 'create');
     }
   } else if (req.body.image_url) {
     const value = String(req.body.image_url).trim();
@@ -109,11 +115,7 @@ const updateTeamMember = asyncHandler(async (req, res) => {
       const result = await uploadToCloudinary(req.file.buffer, 'team', filename);
       imageUrl = result.url;
     } catch (error) {
-      console.error('Cloudinary team image upload failed:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to upload image. Please try again.',
-      });
+      return respondWithError(res, error, 'update');
     }
   } else if (req.body.image_url) {
     const value = String(req.body.image_url).trim();

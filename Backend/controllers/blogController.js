@@ -16,6 +16,16 @@ const removeCloudImage = async (imageUrl) => {
   }
 };
 
+const respondWithError = (res, error, context) => {
+  console.error(`Cloudinary blog error (${context}):`, error);
+  console.error(error.stack);
+  return res.status(500).json({
+    success: false,
+    message: error.message,
+    stack: error.stack,
+  });
+};
+
 const listBlogs = asyncHandler(async (req, res) => {
   const search = req.query.search ? `%${req.query.search}%` : '%';
   const category = req.query.category ? `%${req.query.category}%` : '%';
@@ -40,11 +50,7 @@ const createBlog = asyncHandler(async (req, res) => {
       const result = await uploadToCloudinary(req.file.buffer, 'blogs', filename);
       imageUrl = result.url;
     } catch (error) {
-      console.error('Cloudinary blog image upload failed:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to upload image. Please try again.',
-      });
+      return respondWithError(res, error, 'create');
     }
   } else if (req.body.image_url) {
     const value = String(req.body.image_url).trim();
@@ -73,11 +79,7 @@ const updateBlog = asyncHandler(async (req, res) => {
       const result = await uploadToCloudinary(req.file.buffer, 'blogs', filename);
       imageUrl = result.url;
     } catch (error) {
-      console.error('Cloudinary blog image upload failed:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to upload image. Please try again.',
-      });
+      return respondWithError(res, error, 'update');
     }
   } else if (req.body.image_url) {
     const value = String(req.body.image_url).trim();
