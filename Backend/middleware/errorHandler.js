@@ -5,14 +5,24 @@ function notFound(req, res, next) {
 }
 
 function errorHandler(err, req, res, next) {
+  console.error('[global:error] request failed', {
+    method: req.method,
+    path: req.originalUrl,
+  });
+  console.error(err);
+  console.error(err && err.stack);
+
   let statusCode = res.statusCode === 200 ? 500 : res.statusCode;
 
   if (err && err.name === 'MulterError') {
     statusCode = 400;
-    if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(statusCode).json({ message: 'Image is too large. Max allowed size is 5MB.' });
-    }
-    return res.status(statusCode).json({ message: 'Invalid upload payload. Please upload one valid image file.' });
+    return res.status(statusCode).json({
+      success: false,
+      message: err.message,
+      code: err.code,
+      name: err.name,
+      stack: err.stack,
+    });
   }
 
   if (err && typeof err.statusCode === 'number') {
@@ -20,8 +30,9 @@ function errorHandler(err, req, res, next) {
   }
 
   res.status(statusCode).json({
-    message: err.message || 'Server error',
-    stack: process.env.NODE_ENV === 'production' ? undefined : err.stack
+    success: false,
+    message: (err && err.message) || 'Server error',
+    stack: err && err.stack,
   });
 }
 

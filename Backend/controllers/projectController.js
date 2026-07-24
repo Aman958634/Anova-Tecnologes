@@ -303,6 +303,7 @@ const createProject = asyncHandler(async (req, res) => {
     console.log('req.file:', req.file);
 
     if (!req.file) {
+      console.log('req.file is undefined');
       console.log('[projects:create] Step 2: req.file undefined, returning 400');
       return res.status(400).json({
         success:false,
@@ -340,7 +341,19 @@ const createProject = asyncHandler(async (req, res) => {
     console.log('[projects:create] SQL Query:', createSql);
     console.log('[projects:create] SQL Values:', createValues);
 
-    const [result] = await pool.query(createSql, createValues);
+    let result;
+    try {
+      [result] = await pool.query(createSql, createValues);
+    } catch (error) {
+      console.error('[projects:create] MySQL INSERT failed');
+      console.error(error);
+      console.error(error.stack);
+      console.error(error.code);
+      console.error(error.errno);
+      console.error(error.sqlMessage);
+      console.error(error.sqlState);
+      throw error;
+    }
     console.log('[projects:create] Step 6: INSERT success', { insertId: result.insertId });
 
     invalidateCache('projects:');
@@ -353,16 +366,14 @@ const createProject = asyncHandler(async (req, res) => {
     console.log('[projects:create] Step 9: Response ready');
     return res.status(201).json({ success: true, data: mapped, project: mapped });
   } catch (error) {
-    console.error('PROJECT ERROR');
     console.error(error);
-    console.error(error.message);
     console.error(error.stack);
     console.error(error.http_code);
     console.error(error.name);
     return res.status(500).json({
       success:false,
-      error:error.message,
-      stack:process.env.NODE_ENV==='development' ? error.stack : undefined
+      message:error.message,
+      stack:error.stack
     });
   }
 });
@@ -397,6 +408,7 @@ const updateProject = asyncHandler(async (req, res) => {
     }
 
     if (!req.file) {
+      console.log('req.file is undefined');
       console.log('[projects:update] Step 4: req.file undefined, returning 400');
       return res.status(400).json({
         success:false,
@@ -437,16 +449,14 @@ const updateProject = asyncHandler(async (req, res) => {
           public_id: nextAsset.imageFileId,
         });
       } catch (error) {
-        console.error('PROJECT ERROR');
         console.error(error);
-        console.error(error.message);
         console.error(error.stack);
         console.error(error.http_code);
         console.error(error.name);
         return res.status(500).json({
           success:false,
-          error:error.message,
-          stack:process.env.NODE_ENV==='development' ? error.stack : undefined
+          message:error.message,
+          stack:error.stack
         });
       }
     } else if (shouldRemoveImage) {
@@ -499,7 +509,18 @@ const updateProject = asyncHandler(async (req, res) => {
       projectId,
       updatedColumns: updateFields.map((field) => field.column),
     });
-    await pool.query(sql, values);
+    try {
+      await pool.query(sql, values);
+    } catch (error) {
+      console.error('[projects:update] MySQL UPDATE failed');
+      console.error(error);
+      console.error(error.stack);
+      console.error(error.code);
+      console.error(error.errno);
+      console.error(error.sqlMessage);
+      console.error(error.sqlState);
+      throw error;
+    }
     console.log('[projects:update] Step 11: Database update finished', { projectId });
 
     const shouldDeleteOldCloudinary =
@@ -531,16 +552,14 @@ const updateProject = asyncHandler(async (req, res) => {
       project: mapped,
     });
   } catch (error) {
-    console.error('PROJECT ERROR');
     console.error(error);
-    console.error(error.message);
     console.error(error.stack);
     console.error(error.http_code);
     console.error(error.name);
     return res.status(500).json({
       success:false,
-      error:error.message,
-      stack:process.env.NODE_ENV==='development' ? error.stack : undefined
+      message:error.message,
+      stack:error.stack
     });
   }
 });
