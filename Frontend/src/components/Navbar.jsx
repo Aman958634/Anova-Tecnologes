@@ -1,6 +1,30 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import {
+  BookOpen,
+  Bot,
+  BriefcaseBusiness,
+  Building2,
+  Calendar,
+  ChevronDown,
+  ChevronRight,
+  Cloud,
+  Code2,
+  FileText,
+  Globe2,
+  Headset,
+  MapPin,
+  Menu,
+  Megaphone,
+  MonitorSmartphone,
+  Palette,
+  Rocket,
+  ShieldCheck,
+  Smartphone,
+  Sparkles,
+  Users,
+  X,
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
@@ -8,52 +32,204 @@ const navItems = [
   {
     label: 'Services',
     path: '/services',
-    children: [
-      { label: 'Web Development', path: '/services#web-development' },
-      { label: 'Mobile Apps', path: '/services#mobile-apps' },
-      { label: 'UI/UX Design', path: '/services#ui-ux-design' },
-      { label: 'AI Solutions', path: '/services#ai-solutions' },
-      { label: 'Cloud & DevOps', path: '/services#cloud-devops' },
-      { label: 'Digital Marketing', path: '/services#digital-marketing' },
-      { label: 'View All Services', path: '/services' },
-    ],
+    menu: {
+      kind: 'mega',
+      columns: [
+        {
+          title: 'Web Development',
+          icon: Code2,
+          items: [
+            { label: 'Custom Website', path: '/services' },
+            { label: 'E-Commerce', path: '/services' },
+            { label: 'CMS Development', path: '/services' },
+            { label: 'Web Application', path: '/services' },
+            { label: 'Progressive Web Apps', path: '/services' },
+          ],
+        },
+        {
+          title: 'Mobile App Development',
+          icon: Smartphone,
+          items: [
+            { label: 'Android App Development', path: '/services' },
+            { label: 'iOS App Development', path: '/services' },
+            { label: 'Flutter App Development', path: '/services' },
+            { label: 'React Native Development', path: '/services' },
+            { label: 'Cross Platform Apps', path: '/services' },
+          ],
+        },
+        {
+          title: 'UI/UX Design',
+          icon: Palette,
+          items: [
+            { label: 'UI Design', path: '/services' },
+            { label: 'UX Research', path: '/services' },
+            { label: 'Wireframing', path: '/services' },
+            { label: 'Prototyping', path: '/services' },
+            { label: 'Design Systems', path: '/services' },
+          ],
+        },
+        {
+          title: 'AI & Digital Solutions',
+          icon: Bot,
+          items: [
+            { label: 'AI Chatbots', path: '/services' },
+            { label: 'OpenAI Integration', path: '/services' },
+            { label: 'Workflow Automation', path: '/services' },
+            { label: 'Machine Learning', path: '/services' },
+            { label: 'Data Analytics', path: '/services' },
+          ],
+        },
+        {
+          title: 'Cloud & DevOps',
+          icon: Cloud,
+          items: [
+            { label: 'AWS Services', path: '/services' },
+            { label: 'Microsoft Azure', path: '/services' },
+            { label: 'Google Cloud', path: '/services' },
+            { label: 'Docker & Kubernetes', path: '/services' },
+            { label: 'CI/CD Automation', path: '/services' },
+          ],
+        },
+        {
+          title: 'Digital Marketing',
+          icon: Megaphone,
+          items: [
+            { label: 'Search Engine Optimization', path: '/services' },
+            { label: 'Google Ads Management', path: '/services' },
+            { label: 'Social Media Marketing', path: '/services' },
+            { label: 'Content Marketing', path: '/services' },
+            { label: 'Analytics & Reporting', path: '/services' },
+          ],
+        },
+      ],
+      promo: {
+        title: 'Need a Custom IT Solution?',
+        description: 'We build scalable, secure, future-ready solutions tailored for your business.',
+        buttonLabel: 'Talk to Our Experts',
+        buttonPath: '/contact',
+        stats: [
+          { value: '150+', label: 'Happy Clients' },
+          { value: '250+', label: 'Projects' },
+          { value: '24/7', label: 'Support' },
+        ],
+      },
+    },
   },
   {
-    label: 'About',
-    path: '/about',
-    children: [
-      { label: 'Company Profile', path: '/about#company-profile' },
-      { label: 'Our Team', path: '/about#our-team' },
-      { label: 'Mission & Vision', path: '/about#mission-vision' },
-      { label: 'Why Choose Us', path: '/about#why-choose-us' },
-      { label: 'Certifications', path: '/about#certifications' },
-      { label: 'Careers', path: '/about#careers' },
-      { label: 'News & Blog', path: '/about#news-blog' },
-    ],
+    label: 'Solutions',
+    path: '/services',
+    menu: {
+      kind: 'list',
+      columns: [
+        {
+          title: 'Solutions',
+          icon: Sparkles,
+          items: [
+            { label: 'AI Chatbot', path: '/services' },
+            { label: 'OpenAI Integration', path: '/services' },
+            { label: 'Automation', path: '/services' },
+            { label: 'Machine Learning', path: '/services' },
+            { label: 'Data Analytics', path: '/services' },
+          ],
+        },
+      ],
+    },
   },
   {
-    label: 'Project',
+    label: 'Industries',
     path: '/projects',
-    children: [
-      { label: 'Portfolio', path: '/projects#portfolio' },
-      { label: 'Case Studies', path: '/projects#case-studies' },
-      { label: 'Client Success Stories', path: '/projects#client-success-stories' },
-      { label: 'Healthcare Projects', path: '/projects#healthcare-projects' },
-      { label: 'E-Commerce Projects', path: '/projects#ecommerce-projects' },
-      { label: 'Mobile Apps', path: '/projects#mobile-apps' },
-      { label: 'Web Applications', path: '/projects#web-applications' },
-    ],
+    menu: {
+      kind: 'list',
+      columns: [
+        {
+          title: 'Industries',
+          icon: BriefcaseBusiness,
+          items: [
+            { label: 'Healthcare', path: '/projects' },
+            { label: 'E-Commerce', path: '/projects' },
+            { label: 'Mobile Apps', path: '/projects' },
+            { label: 'Web Applications', path: '/projects' },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    label: 'Projects',
+    path: '/projects',
+    menu: {
+      kind: 'list',
+      columns: [
+        {
+          title: 'Portfolio',
+          icon: Rocket,
+          items: [
+            { label: 'Portfolio', path: '/projects' },
+            { label: 'Case Studies', path: '/projects' },
+            { label: 'Client Success Stories', path: '/projects' },
+            { label: 'Healthcare Projects', path: '/projects' },
+            { label: 'E-Commerce Projects', path: '/projects' },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    label: 'Resources',
+    path: '/about',
+    menu: {
+      kind: 'list',
+      columns: [
+        {
+          title: 'Resources',
+          icon: BookOpen,
+          items: [
+            { label: 'News & Blog', path: '/about' },
+            { label: 'Certifications', path: '/about' },
+            { label: 'Why Choose Us', path: '/about' },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    label: 'Company',
+    path: '/about',
+    menu: {
+      kind: 'list',
+      columns: [
+        {
+          title: 'Company',
+          icon: Building2,
+          items: [
+            { label: 'Company Profile', path: '/about' },
+            { label: 'Our Team', path: '/about' },
+            { label: 'Mission & Vision', path: '/about' },
+            { label: 'Careers', path: '/about' },
+          ],
+        },
+      ],
+    },
   },
   {
     label: 'Contact',
     path: '/contact',
-    children: [
-      { label: 'Contact Us', path: '/contact#contact-us' },
-      { label: 'Request a Quote', path: '/contact#request-quote' },
-      { label: 'Book Free Consultation', path: '/contact#book-free-consultation' },
-      { label: 'Customer Support', path: '/contact#customer-support' },
-      { label: 'Office Location', path: '/contact#office-location' },
-    ],
+    menu: {
+      kind: 'list',
+      columns: [
+        {
+          title: 'Contact',
+          icon: Headset,
+          items: [
+            { label: 'Contact Us', path: '/contact' },
+            { label: 'Request a Quote', path: '/contact' },
+            { label: 'Book Free Consultation', path: '/contact' },
+            { label: 'Customer Support', path: '/contact' },
+            { label: 'Office Location', path: '/contact' },
+          ],
+        },
+      ],
+    },
   },
 ];
 
@@ -94,6 +270,35 @@ export default function Navbar() {
     }));
   };
 
+  const renderMenuCard = (menuItem) => {
+    const Icon = menuItem.icon || FileText;
+
+    return (
+      <div className="border-r border-white/10 px-4 py-5 last:border-r-0 last:pr-0">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="grid h-9 w-9 place-items-center rounded-2xl bg-white/8 text-[#5da3ff] ring-1 ring-inset ring-white/10">
+            <Icon className="h-4.5 w-4.5" />
+          </span>
+          <h3 className="text-[0.98rem] font-semibold tracking-tight text-white">{menuItem.title}</h3>
+        </div>
+
+        <div className="space-y-2">
+          {menuItem.items.map((child) => (
+            <Link
+              key={`${menuItem.title}-${child.label}`}
+              to={child.path}
+              onClick={() => setOpen(false)}
+              className="group flex items-center gap-2 rounded-xl px-1.5 py-1.5 text-[0.92rem] text-slate-300 transition hover:text-white"
+            >
+              <ChevronRight className="h-3.5 w-3.5 text-[#5da3ff] transition group-hover:translate-x-0.5" />
+              <span>{child.label}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <motion.header
       initial={{ y: -24, opacity: 0 }}
@@ -118,25 +323,23 @@ export default function Navbar() {
           />
         </Link>
 
-        <nav className="hidden flex-1 items-center justify-center gap-6 xl:gap-8 lg:flex">
+        <nav className="hidden flex-1 items-center justify-center gap-4 xl:gap-6 lg:flex">
           {navItems.map((item) => {
             const active = isItemActive(item);
-            const linkBaseClass = isDarkHeader ? 'text-white hover:text-[#d6e6ff]' : 'text-slate-700 hover:text-[#2f80ff]';
-            if (!item.children) {
+            const hasMenu = Boolean(item.menu);
+            const linkBaseClass = isDarkHeader ? 'text-white/85 hover:text-white' : 'text-slate-700 hover:text-[#2f80ff]';
+            if (!hasMenu) {
               return (
                 <NavLink
                   key={item.path}
                   to={item.path}
                   className={({ isActive }) =>
-                    `group relative overflow-hidden text-[1.12rem] font-normal transition ${isActive ? 'text-[#7cb2ff]' : linkBaseClass}`
+                    `group relative rounded-full px-3 py-2 text-[1.02rem] font-medium transition ${isActive ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`
                   }
                 >
                   {({ isActive }) => (
                     <>
                       <span className="relative z-10">{item.label}</span>
-                      <span
-                        className={`absolute left-0 -bottom-1 h-[2px] rounded-full transition-all duration-300 ${isActive ? 'w-full bg-[#7cb2ff]' : 'w-0 bg-[#7cb2ff] group-hover:w-full'}`}
-                      />
                     </>
                   )}
                 </NavLink>
@@ -153,13 +356,10 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setOpenDropdown((current) => (current === item.label ? null : item.label))}
-                  className={`group inline-flex items-center gap-1.5 text-[1.12rem] font-normal transition ${active ? 'text-[#7cb2ff]' : linkBaseClass}`}
+                  className={`group inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-[1.02rem] font-medium transition ${active ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`}
                 >
                   <span>{item.label}</span>
                   <ChevronDown className={`h-4 w-4 transition ${openDropdown === item.label ? 'rotate-180' : ''}`} />
-                  <span
-                    className={`absolute left-0 -bottom-1 h-[2px] rounded-full transition-all duration-300 ${active || openDropdown === item.label ? 'w-full bg-[#7cb2ff]' : 'w-0 bg-[#7cb2ff] group-hover:w-full'}`}
-                  />
                 </button>
 
                 <AnimatePresence>
@@ -169,19 +369,42 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
                       transition={{ duration: 0.18 }}
-                      className="absolute left-0 top-full mt-3 min-w-[220px] rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_18px_38px_rgba(2,6,23,0.10)]"
+                        className={`absolute top-full mt-4 overflow-hidden rounded-[28px] border backdrop-blur-xl ${item.menu.kind === 'mega' ? 'left-1/2 w-[min(1120px,calc(100vw-2rem))] -translate-x-1/2 border-white/10 bg-[#071225]/96 shadow-[0_28px_80px_rgba(2,8,23,0.56)]' : 'left-0 min-w-[320px] border-white/10 bg-[#071225]/96 shadow-[0_22px_55px_rgba(2,8,23,0.42)]'}`}
                     >
-                      {item.children.map((child) => (
-                        <NavLink
-                          key={`${item.label}-${child.label}`}
-                          to={child.path}
-                          className={({ isActive }) =>
-                            `block rounded-xl px-3 py-2.5 text-sm transition ${isActive ? 'bg-[#eef4ff] text-[#2f6df7]' : 'text-slate-700 hover:bg-slate-50 hover:text-[#2f6df7]'}`
-                          }
-                        >
-                          {child.label}
-                        </NavLink>
-                      ))}
+                        {item.menu.kind === 'mega' ? (
+                          <div className="grid grid-cols-1 gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_320px]">
+                            <div className="col-span-1 grid grid-cols-1 gap-0 xl:col-span-6 xl:grid-cols-6">{item.menu.columns.map((column) => renderMenuCard(column))}</div>
+                            <div className="border-t border-white/10 bg-[#0b1d3f] p-5 xl:border-l xl:border-t-0">
+                              <div className="mb-4 flex h-28 items-center justify-center rounded-[24px] bg-[radial-gradient(circle_at_top,_rgba(58,130,246,0.38),_rgba(7,18,37,0.2)_55%),linear-gradient(135deg,rgba(37,99,235,0.35),rgba(14,22,40,0.92))] ring-1 ring-inset ring-white/10">
+                                <div className="grid h-16 w-16 place-items-center rounded-[20px] border border-white/15 bg-white/8 text-[#5da3ff] shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
+                                  <Sparkles className="h-8 w-8" />
+                                </div>
+                              </div>
+                              <h3 className="text-[1.15rem] font-semibold leading-tight text-white">{item.menu.promo.title}</h3>
+                              <p className="mt-3 text-sm leading-6 text-slate-300">{item.menu.promo.description}</p>
+                              <Link
+                                to={item.menu.promo.buttonPath}
+                                onClick={() => setOpenDropdown(null)}
+                                className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-[#2f6df7] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
+                              >
+                                {item.menu.promo.buttonLabel}
+                                <ChevronRight className="h-4 w-4" />
+                              </Link>
+                              <div className="mt-4 grid grid-cols-3 gap-2">
+                                {item.menu.promo.stats.map((stat) => (
+                                  <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 p-3 text-center">
+                                    <div className="text-lg font-semibold text-white">{stat.value}</div>
+                                    <div className="mt-1 text-[0.7rem] uppercase tracking-[0.16em] text-slate-400">{stat.label}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
+                            {item.menu.columns.map((column) => renderMenuCard(column))}
+                          </div>
+                        )}
                     </motion.div>
                   ) : null}
                 </AnimatePresence>
@@ -219,7 +442,7 @@ export default function Navbar() {
             <div className="section-shell flex flex-col gap-3 py-4">
               {navItems.map((item) => (
                 <div key={item.label} className={`rounded-2xl border ${isDarkHeader ? 'border-white/10 bg-white/5' : 'border-slate-200/70 bg-white'}`}>
-                  {!item.children ? (
+                  {!item.menu ? (
                     <Link
                       to={item.path}
                       onClick={() => setOpen(false)}
@@ -246,8 +469,8 @@ export default function Navbar() {
                             exit={{ opacity: 0, height: 0 }}
                             className="overflow-hidden"
                           >
-                            <div className="px-2 pb-2">
-                              {item.children.map((child) => (
+                            <div className="space-y-2 px-2 pb-2">
+                              {item.menu.columns.flatMap((column) => column.items).map((child) => (
                                 <Link
                                   key={`${item.label}-${child.label}`}
                                   to={child.path}
