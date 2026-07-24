@@ -26,6 +26,32 @@ export function createApiClient({ timeout = 30000 } = {}) {
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    const isFormDataPayload = typeof FormData !== 'undefined' && config.data instanceof FormData;
+
+    if (isFormDataPayload) {
+      // Keep Content-Type unset for FormData so the browser can send multipart boundary.
+      if (typeof config.headers?.setContentType === 'function') {
+        config.headers.setContentType(false);
+      }
+      if (config.headers) {
+        delete config.headers['Content-Type'];
+        delete config.headers['content-type'];
+      }
+    }
+
+    const resolvedContentType =
+      typeof config.headers?.getContentType === 'function'
+        ? config.headers.getContentType()
+        : config.headers?.['Content-Type'] || config.headers?.['content-type'];
+
+    console.log('API request debug:', {
+      method: config.method,
+      url: config.url,
+      isFormDataPayload,
+      contentType: resolvedContentType || null,
+    });
+
     return config;
   });
 
