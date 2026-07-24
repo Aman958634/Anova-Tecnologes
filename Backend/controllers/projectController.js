@@ -250,12 +250,15 @@ const createProject = asyncHandler(async (req, res) => {
 
   if (req.file) {
     try {
+        // Root cause previously hidden here: Cloudinary/Multer errors were being flattened into a generic message.
       asset = await buildAssetFromFile(req.file, { folder: 'projects' });
     } catch (error) {
-      console.error('Cloudinary project image upload failed:', error);
+        console.error(error);
+        console.error(error.stack);
       return res.status(500).json({
         success: false,
-        message: uploadErrorMessage(error),
+          message: error.message,
+          stack: error.stack,
       });
     }
   }
@@ -366,7 +369,7 @@ const updateProject = asyncHandler(async (req, res) => {
         console.error(error.stack);
         return res.status(500).json({
           success: false,
-          message: uploadErrorMessage(error),
+          message: error.message,
           stack: error.stack,
         });
       }
