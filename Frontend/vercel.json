@@ -5,15 +5,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://anova-tecnologes.onrender.com/api/:path*"
-    }
-  ],
-  "routes": [
-    {
-      "handle": "filesystem"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
