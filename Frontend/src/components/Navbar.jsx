@@ -67,7 +67,7 @@ export default function Navbar() {
     <motion.header
       initial={{ y: -24, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className={`sticky top-0 z-50 overflow-visible border-b backdrop-blur-sm transition-colors duration-300 ${
+      className={`fixed left-0 right-0 top-0 z-[70] w-full overflow-visible border-b backdrop-blur-sm transition-colors duration-300 ${
         isDarkHeader
           ? 'border-transparent bg-[#16336F]/98 shadow-[0_12px_30px_rgba(4,12,34,0.16)]'
           : 'border-slate-200 bg-white/95 shadow-[0_1px_0_rgba(15,23,42,0.04)]'
