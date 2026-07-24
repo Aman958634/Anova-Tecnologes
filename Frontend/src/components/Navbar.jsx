@@ -36,13 +36,13 @@ const navItems = [
       kind: 'mega',
       columns: [
         {
-          title: 'Web Development',
+          title: 'Web Development Services',
           icon: Code2,
           items: [
-            { label: 'Custom Website', path: '/services' },
+            { label: 'Custom Website Development', path: '/services' },
             { label: 'E-Commerce', path: '/services' },
             { label: 'CMS Development', path: '/services' },
-            { label: 'Web Application', path: '/services' },
+            { label: 'Web Application Development', path: '/services' },
             { label: 'Progressive Web Apps', path: '/services' },
           ],
         },
@@ -58,7 +58,7 @@ const navItems = [
           ],
         },
         {
-          title: 'UI/UX Design',
+          title: 'UI/UX Design Services',
           icon: Palette,
           items: [
             { label: 'UI Design', path: '/services' },
@@ -122,7 +122,7 @@ const navItems = [
       kind: 'list',
       columns: [
         {
-          title: 'Solutions',
+          title: 'Smart Solutions',
           icon: Sparkles,
           items: [
             { label: 'AI Chatbot', path: '/services' },
@@ -142,7 +142,7 @@ const navItems = [
       kind: 'list',
       columns: [
         {
-          title: 'Industries',
+          title: 'Industries Served',
           icon: BriefcaseBusiness,
           items: [
             { label: 'Healthcare', path: '/projects' },
@@ -161,7 +161,7 @@ const navItems = [
       kind: 'list',
       columns: [
         {
-          title: 'Portfolio',
+          title: 'Featured Work',
           icon: Rocket,
           items: [
             { label: 'Portfolio', path: '/projects' },
@@ -181,7 +181,7 @@ const navItems = [
       kind: 'list',
       columns: [
         {
-          title: 'Resources',
+          title: 'Insights & Media',
           icon: BookOpen,
           items: [
             { label: 'News & Blog', path: '/about' },
@@ -199,7 +199,7 @@ const navItems = [
       kind: 'list',
       columns: [
         {
-          title: 'Company',
+          title: 'Company Overview',
           icon: Building2,
           items: [
             { label: 'Company Profile', path: '/about' },
@@ -218,7 +218,7 @@ const navItems = [
       kind: 'list',
       columns: [
         {
-          title: 'Contact',
+          title: 'Contact Options',
           icon: Headset,
           items: [
             { label: 'Contact Us', path: '/contact' },
@@ -274,24 +274,24 @@ export default function Navbar() {
     const Icon = menuItem.icon || FileText;
 
     return (
-      <div className="border-r border-white/10 px-4 py-5 last:border-r-0 last:pr-0">
+      <div className="border-r border-white/10 px-5 py-5 last:border-r-0 last:pr-5">
         <div className="mb-4 flex items-center gap-3">
-          <span className="grid h-9 w-9 place-items-center rounded-2xl bg-white/8 text-[#5da3ff] ring-1 ring-inset ring-white/10">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-white/8 text-[#5da3ff] ring-1 ring-inset ring-white/10">
             <Icon className="h-4.5 w-4.5" />
           </span>
-          <h3 className="text-[0.98rem] font-semibold tracking-tight text-white">{menuItem.title}</h3>
+          <h3 className="text-[1rem] font-semibold leading-tight tracking-tight text-white">{menuItem.title}</h3>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {menuItem.items.map((child) => (
             <Link
               key={`${menuItem.title}-${child.label}`}
               to={child.path}
               onClick={() => setOpen(false)}
-              className="group flex items-center gap-2 rounded-xl px-1.5 py-1.5 text-[0.92rem] text-slate-300 transition hover:text-white"
+              className="group flex items-start gap-2 rounded-xl px-1.5 py-1.5 text-[0.93rem] leading-5 text-slate-300 transition hover:text-white"
             >
-              <ChevronRight className="h-3.5 w-3.5 text-[#5da3ff] transition group-hover:translate-x-0.5" />
-              <span>{child.label}</span>
+              <ChevronRight className="mt-[0.15rem] h-3.5 w-3.5 shrink-0 text-[#5da3ff] transition group-hover:translate-x-0.5" />
+              <span className="max-w-[190px]">{child.label}</span>
             </Link>
           ))}
         </div>
@@ -380,8 +380,8 @@ export default function Navbar() {
                                   <Sparkles className="h-8 w-8" />
                                 </div>
                               </div>
-                              <h3 className="text-[1.15rem] font-semibold leading-tight text-white">{item.menu.promo.title}</h3>
-                              <p className="mt-3 text-sm leading-6 text-slate-300">{item.menu.promo.description}</p>
+                              <h3 className="text-[1.1rem] font-semibold leading-tight text-white">{item.menu.promo.title}</h3>
+                              <p className="mt-3 text-[0.93rem] leading-6 text-slate-300">{item.menu.promo.description}</p>
                               <Link
                                 to={item.menu.promo.buttonPath}
                                 onClick={() => setOpenDropdown(null)}
@@ -401,7 +401,7 @@ export default function Navbar() {
                             </div>
                           </div>
                         ) : (
-                          <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
                             {item.menu.columns.map((column) => renderMenuCard(column))}
                           </div>
                         )}
