@@ -77,6 +77,14 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 // =========================
 app.use('/api', routes);
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    service: 'backend',
+    docs: '/api/health',
+  });
+});
+
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
