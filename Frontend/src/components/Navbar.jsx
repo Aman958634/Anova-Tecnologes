@@ -274,24 +274,24 @@ export default function Navbar() {
     const Icon = menuItem.icon || FileText;
 
     return (
-      <div className="border-r border-white/10 px-5 py-5 last:border-r-0 last:pr-5">
-        <div className="mb-4 flex items-center gap-3">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-white/8 text-[#5da3ff] ring-1 ring-inset ring-white/10">
-            <Icon className="h-4.5 w-4.5" />
+      <div className="border-r border-white/10 px-4 py-4 last:border-r-0 last:pr-4">
+        <div className="mb-3 flex items-center gap-3">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-white/8 text-[#5da3ff] ring-1 ring-inset ring-white/10">
+            <Icon className="h-4 w-4" />
           </span>
-          <h3 className="text-[1rem] font-semibold leading-tight tracking-tight text-white">{menuItem.title}</h3>
+          <h3 className="text-[0.96rem] font-semibold leading-tight tracking-tight text-white">{menuItem.title}</h3>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           {menuItem.items.map((child) => (
             <Link
               key={`${menuItem.title}-${child.label}`}
               to={child.path}
               onClick={() => setOpen(false)}
-              className="group flex items-start gap-2 rounded-xl px-1.5 py-1.5 text-[0.93rem] leading-5 text-slate-300 transition hover:text-white"
+              className="group flex items-start gap-2 rounded-xl px-1.5 py-1 text-[0.88rem] leading-5 text-slate-300 transition hover:text-white"
             >
               <ChevronRight className="mt-[0.15rem] h-3.5 w-3.5 shrink-0 text-[#5da3ff] transition group-hover:translate-x-0.5" />
-              <span className="max-w-[190px]">{child.label}</span>
+              <span className="max-w-[175px]">{child.label}</span>
             </Link>
           ))}
         </div>
@@ -369,32 +369,32 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
                       transition={{ duration: 0.18 }}
-                        className={`absolute top-full mt-4 overflow-hidden rounded-[28px] border backdrop-blur-xl ${item.menu.kind === 'mega' ? 'left-1/2 w-[min(1120px,calc(100vw-2rem))] -translate-x-1/2 border-white/10 bg-[#071225]/96 shadow-[0_28px_80px_rgba(2,8,23,0.56)]' : 'left-0 min-w-[320px] border-white/10 bg-[#071225]/96 shadow-[0_22px_55px_rgba(2,8,23,0.42)]'}`}
+                        className={`absolute top-full mt-3 overflow-hidden rounded-[28px] border backdrop-blur-xl ${item.menu.kind === 'mega' ? 'left-1/2 w-[min(1260px,calc(100vw-1.25rem))] -translate-x-1/2 border-white/10 bg-[#071225]/96 shadow-[0_28px_80px_rgba(2,8,23,0.56)]' : 'left-0 min-w-[320px] border-white/10 bg-[#071225]/96 shadow-[0_22px_55px_rgba(2,8,23,0.42)]'}`}
                     >
                         {item.menu.kind === 'mega' ? (
                           <div className="grid grid-cols-1 gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_320px]">
                             <div className="col-span-1 grid grid-cols-1 gap-0 xl:col-span-6 xl:grid-cols-6">{item.menu.columns.map((column) => renderMenuCard(column))}</div>
-                            <div className="border-t border-white/10 bg-[#0b1d3f] p-5 xl:border-l xl:border-t-0">
-                              <div className="mb-4 flex h-28 items-center justify-center rounded-[24px] bg-[radial-gradient(circle_at_top,_rgba(58,130,246,0.38),_rgba(7,18,37,0.2)_55%),linear-gradient(135deg,rgba(37,99,235,0.35),rgba(14,22,40,0.92))] ring-1 ring-inset ring-white/10">
+                            <div className="border-t border-white/10 bg-[#0b1d3f] p-4 xl:border-l xl:border-t-0">
+                              <div className="mb-3 flex h-24 items-center justify-center rounded-[24px] bg-[radial-gradient(circle_at_top,_rgba(58,130,246,0.38),_rgba(7,18,37,0.2)_55%),linear-gradient(135deg,rgba(37,99,235,0.35),rgba(14,22,40,0.92))] ring-1 ring-inset ring-white/10">
                                 <div className="grid h-16 w-16 place-items-center rounded-[20px] border border-white/15 bg-white/8 text-[#5da3ff] shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
                                   <Sparkles className="h-8 w-8" />
                                 </div>
                               </div>
-                              <h3 className="text-[1.1rem] font-semibold leading-tight text-white">{item.menu.promo.title}</h3>
-                              <p className="mt-3 text-[0.93rem] leading-6 text-slate-300">{item.menu.promo.description}</p>
+                              <h3 className="text-[1.02rem] font-semibold leading-tight text-white">{item.menu.promo.title}</h3>
+                              <p className="mt-2 text-[0.88rem] leading-5 text-slate-300">{item.menu.promo.description}</p>
                               <Link
                                 to={item.menu.promo.buttonPath}
                                 onClick={() => setOpenDropdown(null)}
-                                className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-[#2f6df7] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
+                                className="mt-3 inline-flex items-center gap-2 rounded-2xl bg-[#2f6df7] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
                               >
                                 {item.menu.promo.buttonLabel}
                                 <ChevronRight className="h-4 w-4" />
                               </Link>
-                              <div className="mt-4 grid grid-cols-3 gap-2">
+                              <div className="mt-3 grid grid-cols-3 gap-2">
                                 {item.menu.promo.stats.map((stat) => (
-                                  <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 p-3 text-center">
-                                    <div className="text-lg font-semibold text-white">{stat.value}</div>
-                                    <div className="mt-1 text-[0.7rem] uppercase tracking-[0.16em] text-slate-400">{stat.label}</div>
+                                    <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 p-2.5 text-center">
+                                      <div className="text-base font-semibold text-white">{stat.value}</div>
+                                      <div className="mt-1 text-[0.65rem] uppercase tracking-[0.15em] text-slate-400">{stat.label}</div>
                                   </div>
                                 ))}
                               </div>
