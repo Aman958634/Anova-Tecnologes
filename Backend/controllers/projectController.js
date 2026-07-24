@@ -1,11 +1,11 @@
 const asyncHandler = require('../utils/asyncHandler');
-const fs = require('fs/promises');
-const os = require('os');
-const path = require('path');
+const crypto = require('crypto');
 const { pool } = require('../config/db');
 const { findById, deleteById } = require('../models/baseModel');
 const { getCache, setCache, invalidateCache } = require('../utils/simpleCache');
 const {
+  generateFilename,
+  uploadToCloudinary,
   deleteFromCloudinary,
   extractPublicIdFromUrl,
 } = require('../utils/cloudStorage');
@@ -170,21 +170,7 @@ const parseTagsForSave = (value, fallbackRawTags) => {
   return JSON.stringify(tagsArray);
 };
 
-const createTempFileFromUpload = async (file) => {
-  const ext = path.extname(file.originalname || '').toLowerCase() || '.bin';
-  const safeExt = /^[.][a-z0-9]{1,10}$/.test(ext) ? ext : '.bin';
-  const tempFileName = `project-${Date.now()}-${Math.random().toString(36).slice(2)}${safeExt}`;
-  const tempFilePath = path.join(os.tmpdir(), tempFileName);
-
-  console.log('[projects:image] Writing temp file for Cloudinary upload:', tempFilePath);
-  await fs.writeFile(tempFilePath, file.buffer);
-  console.log('[projects:image] Temp file write complete');
-
-  return tempFilePath;
-};
-
 const buildAssetFromFile = async (file, { folder = 'projects' } = {}) => {
-  let tempFilePath = null;
   try {
     ensureCloudinaryConfigured();
     console.log('[projects:image] Cloudinary config check passed');
@@ -193,13 +179,8 @@ const buildAssetFromFile = async (file, { folder = 'projects' } = {}) => {
       throw new Error('Upload failed: req.file is undefined.');
     }
 
-    if (!file.path && (!Buffer.isBuffer(file.buffer) || file.buffer.length === 0)) {
-      throw new Error('Upload failed: req.file.path missing and req.file.buffer missing or empty.');
-    }
-
-    if (!file.path) {
-      tempFilePath = await createTempFileFromUpload(file);
-      file.path = tempFilePath;
+    if (!Buffer.isBuffer(file.buffer) || file.buffer.length === 0) {
+      throw new Error('Upload failed: req.file.buffer missing or empty.');
     }
 
     console.log('Uploading image...');
@@ -207,21 +188,22 @@ const buildAssetFromFile = async (file, { folder = 'projects' } = {}) => {
       originalname: file.originalname,
       mimetype: file.mimetype,
       size: file.size,
-      path: file.path,
+      hasBuffer: true,
       folder,
     });
 
-    const result = await cloudinary.uploader.upload(file.path, {
-      folder: 'projects',
-    });
+    const generatedFilename = generateFilename(file.originalname || 'project-image', 'project');
+    const result = await uploadToCloudinary(file.buffer, folder, generatedFilename);
 
     console.log('Cloudinary response:', result);
 
+    const hash = crypto.createHash('sha256').update(file.buffer).digest('hex');
+
     return mapUploadedAsset({
-      url: result.secure_url,
-      fileId: result.public_id,
-      filePath: result.public_id,
-      hash: `${result.format || 'raw'}:${result.bytes || 0}:${result.width || 0}x${result.height || 0}`,
+      url: result.url,
+      fileId: result.publicId,
+      filePath: result.publicId,
+      hash,
       meta: JSON.stringify({
         width: result.width || null,
         height: result.height || null,
@@ -237,15 +219,6 @@ const buildAssetFromFile = async (file, { folder = 'projects' } = {}) => {
     console.error(error.http_code);
     console.error(error.name);
     throw error;
-  } finally {
-    if (tempFilePath) {
-      try {
-        await fs.unlink(tempFilePath);
-        console.log('[projects:image] Temp file removed:', tempFilePath);
-      } catch (cleanupError) {
-        console.error('[projects:image] Temp file cleanup failed:', cleanupError?.message || cleanupError);
-      }
-    }
   }
 };
 
@@ -294,6 +267,7 @@ const getProjectById = asyncHandler(async (req, res) => {
 });
 
 const createProject = asyncHandler(async (req, res) => {
+  let uploadedAsset = null;
   try {
     console.log('========== CREATE PROJECT START ==========' );
     console.log('[projects:create] Step 1: Request received');
@@ -312,10 +286,10 @@ const createProject = asyncHandler(async (req, res) => {
     }
 
     console.log('[projects:create] Step 3: Starting Cloudinary upload');
-    const asset = await buildAssetFromFile(req.file, { folder: 'projects' });
+    uploadedAsset = await buildAssetFromFile(req.file, { folder: 'projects' });
     console.log('[projects:create] Step 4: Cloudinary upload success', {
-      image_url: asset.imageUrl,
-      public_id: asset.imageFileId,
+      image_url: uploadedAsset.imageUrl,
+      public_id: uploadedAsset.imageFileId,
     });
 
     const tags = JSON.stringify(parseTags(req.body.tags));
@@ -327,11 +301,11 @@ const createProject = asyncHandler(async (req, res) => {
     const createValues = [
       req.body.title,
       req.body.description,
-      asset.imageUrl,
-      asset.imageFileId,
-      asset.imageFilePath,
-      asset.imageHash,
-      asset.imageMeta,
+      uploadedAsset.imageUrl,
+      uploadedAsset.imageFileId,
+      uploadedAsset.imageFilePath,
+      uploadedAsset.imageHash,
+      uploadedAsset.imageMeta,
       req.body.live_demo_url || null,
       tags,
       req.body.featured === '1' || req.body.featured === 'true' ? 1 : 0,
@@ -366,6 +340,14 @@ const createProject = asyncHandler(async (req, res) => {
     console.log('[projects:create] Step 9: Response ready');
     return res.status(201).json({ success: true, data: mapped, project: mapped });
   } catch (error) {
+    if (uploadedAsset?.imageFileId) {
+      try {
+        await deleteFromCloudinary(uploadedAsset.imageFileId);
+        console.log('[projects:create] Rolled back uploaded image asset:', uploadedAsset.imageFileId);
+      } catch (cleanupError) {
+        console.error('[projects:create] Image rollback failed:', cleanupError?.message || cleanupError);
+      }
+    }
     console.error(error);
     console.error(error.stack);
     console.error(error.http_code);
@@ -379,6 +361,7 @@ const createProject = asyncHandler(async (req, res) => {
 });
 
 const updateProject = asyncHandler(async (req, res) => {
+  let uploadedAsset = null;
   try {
     console.log('========== UPDATE PROJECT START ==========' );
     console.log('[projects:update] Step 1: Request received');
@@ -435,7 +418,7 @@ const updateProject = asyncHandler(async (req, res) => {
     if (req.file) {
       console.log('[projects:update] Step 7: Starting Cloudinary upload');
       try {
-        const uploadedAsset = await buildAssetFromFile(req.file, { folder: 'projects' });
+        uploadedAsset = await buildAssetFromFile(req.file, { folder: 'projects' });
         nextAsset = {
           imageUrl: uploadedAsset.imageUrl,
           imageFileId: uploadedAsset.imageFileId,
@@ -449,6 +432,14 @@ const updateProject = asyncHandler(async (req, res) => {
           public_id: nextAsset.imageFileId,
         });
       } catch (error) {
+        if (uploadedAsset?.imageFileId) {
+          try {
+            await deleteFromCloudinary(uploadedAsset.imageFileId);
+            console.log('[projects:update] Rolled back uploaded image asset:', uploadedAsset.imageFileId);
+          } catch (cleanupError) {
+            console.error('[projects:update] Image rollback failed:', cleanupError?.message || cleanupError);
+          }
+        }
         console.error(error);
         console.error(error.stack);
         console.error(error.http_code);
