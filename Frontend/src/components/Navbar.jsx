@@ -323,7 +323,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <nav className="hidden flex-1 items-center justify-center gap-4 xl:gap-6 lg:flex">
+        <nav className="hidden flex-1 items-center justify-center gap-3 xl:gap-5 lg:flex">
           {navItems.map((item) => {
             const active = isItemActive(item);
             const hasMenu = Boolean(item.menu);
@@ -334,14 +334,10 @@ export default function Navbar() {
                   key={item.path}
                   to={item.path}
                   className={({ isActive }) =>
-                    `group relative rounded-full px-3 py-2 text-[1.02rem] font-medium transition ${isActive ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`
+                    `group rounded-full px-3 py-2 text-[0.98rem] font-medium transition ${isActive ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`
                   }
                 >
-                  {({ isActive }) => (
-                    <>
-                      <span className="relative z-10">{item.label}</span>
-                    </>
-                  )}
+                  {item.label}
                 </NavLink>
               );
             }
@@ -356,10 +352,10 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setOpenDropdown((current) => (current === item.label ? null : item.label))}
-                  className={`group inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-[1.02rem] font-medium transition ${active ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`}
+                  className={`group inline-flex items-center gap-1 rounded-full px-3 py-2 text-[0.98rem] font-medium transition ${active ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`}
                 >
                   <span>{item.label}</span>
-                  <ChevronDown className={`h-4 w-4 transition ${openDropdown === item.label ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-3.5 w-3.5 transition ${openDropdown === item.label ? 'rotate-180' : ''}`} />
                 </button>
 
                 <AnimatePresence>
@@ -369,42 +365,44 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
                       transition={{ duration: 0.18 }}
-                        className={`absolute top-full mt-3 overflow-hidden rounded-[28px] border backdrop-blur-xl ${item.menu.kind === 'mega' ? 'left-1/2 w-[min(1260px,calc(100vw-1.25rem))] -translate-x-1/2 border-white/10 bg-[#071225]/96 shadow-[0_28px_80px_rgba(2,8,23,0.56)]' : 'left-0 min-w-[320px] border-white/10 bg-[#071225]/96 shadow-[0_22px_55px_rgba(2,8,23,0.42)]'}`}
+                      className={`absolute top-full mt-3 overflow-hidden rounded-[28px] border backdrop-blur-xl ${item.menu.kind === 'mega' ? 'left-1/2 w-[min(1240px,calc(100vw-1.5rem))] -translate-x-1/2 border-white/10 bg-[#071225]/96 shadow-[0_28px_80px_rgba(2,8,23,0.56)]' : 'left-0 min-w-[320px] border-white/10 bg-[#071225]/96 shadow-[0_22px_55px_rgba(2,8,23,0.42)]'}`}
                     >
-                        {item.menu.kind === 'mega' ? (
-                          <div className="grid grid-cols-1 gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_320px]">
-                            <div className="col-span-1 grid grid-cols-1 gap-0 xl:col-span-6 xl:grid-cols-6">{item.menu.columns.map((column) => renderMenuCard(column))}</div>
-                            <div className="border-t border-white/10 bg-[#0b1d3f] p-4 xl:border-l xl:border-t-0">
-                              <div className="mb-3 flex h-24 items-center justify-center rounded-[24px] bg-[radial-gradient(circle_at_top,_rgba(58,130,246,0.38),_rgba(7,18,37,0.2)_55%),linear-gradient(135deg,rgba(37,99,235,0.35),rgba(14,22,40,0.92))] ring-1 ring-inset ring-white/10">
-                                <div className="grid h-16 w-16 place-items-center rounded-[20px] border border-white/15 bg-white/8 text-[#5da3ff] shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
-                                  <Sparkles className="h-8 w-8" />
-                                </div>
-                              </div>
-                              <h3 className="text-[1.02rem] font-semibold leading-tight text-white">{item.menu.promo.title}</h3>
-                              <p className="mt-2 text-[0.88rem] leading-5 text-slate-300">{item.menu.promo.description}</p>
-                              <Link
-                                to={item.menu.promo.buttonPath}
-                                onClick={() => setOpenDropdown(null)}
-                                className="mt-3 inline-flex items-center gap-2 rounded-2xl bg-[#2f6df7] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
-                              >
-                                {item.menu.promo.buttonLabel}
-                                <ChevronRight className="h-4 w-4" />
-                              </Link>
-                              <div className="mt-3 grid grid-cols-3 gap-2">
-                                {item.menu.promo.stats.map((stat) => (
-                                    <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 p-2.5 text-center">
-                                      <div className="text-base font-semibold text-white">{stat.value}</div>
-                                      <div className="mt-1 text-[0.65rem] uppercase tracking-[0.15em] text-slate-400">{stat.label}</div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        ) : (
-                        <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
+                      {item.menu.kind === 'mega' ? (
+                        <div className="grid grid-cols-1 gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_320px]">
+                          <div className="col-span-1 grid grid-cols-1 gap-0 xl:col-span-6 xl:grid-cols-6">
                             {item.menu.columns.map((column) => renderMenuCard(column))}
                           </div>
-                        )}
+                          <div className="border-t border-white/10 bg-[#0b1d3f] p-4 xl:border-l xl:border-t-0">
+                            <div className="mb-3 flex h-24 items-center justify-center rounded-[24px] bg-[radial-gradient(circle_at_top,_rgba(58,130,246,0.38),_rgba(7,18,37,0.2)_55%),linear-gradient(135deg,rgba(37,99,235,0.35),rgba(14,22,40,0.92))] ring-1 ring-inset ring-white/10">
+                              <div className="grid h-16 w-16 place-items-center rounded-[20px] border border-white/15 bg-white/8 text-[#5da3ff] shadow-[0_0_0_1px_rgba(255,255,255,0.05)]">
+                                <Sparkles className="h-8 w-8" />
+                              </div>
+                            </div>
+                            <h3 className="text-[1.02rem] font-semibold leading-tight text-white">{item.menu.promo.title}</h3>
+                            <p className="mt-2 text-[0.88rem] leading-5 text-slate-300">{item.menu.promo.description}</p>
+                            <Link
+                              to={item.menu.promo.buttonPath}
+                              onClick={() => setOpenDropdown(null)}
+                              className="mt-3 inline-flex items-center gap-2 rounded-2xl bg-[#2f6df7] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#2563eb]"
+                            >
+                              {item.menu.promo.buttonLabel}
+                              <ChevronRight className="h-4 w-4" />
+                            </Link>
+                            <div className="mt-3 grid grid-cols-3 gap-2">
+                              {item.menu.promo.stats.map((stat) => (
+                                <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/5 p-2.5 text-center">
+                                  <div className="text-base font-semibold text-white">{stat.value}</div>
+                                  <div className="mt-1 text-[0.65rem] uppercase tracking-[0.15em] text-slate-400">{stat.label}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
+                          {item.menu.columns.map((column) => renderMenuCard(column))}
+                        </div>
+                      )}
                     </motion.div>
                   ) : null}
                 </AnimatePresence>
