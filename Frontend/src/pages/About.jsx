@@ -28,19 +28,34 @@ export default function About() {
   useEffect(() => {
     let active = true;
 
-    api.get('/team', { params: { page: 1, limit: 12 } })
-      .then((response) => {
+    const fetchTeam = async () => {
+      try {
+        const response = await api.get('/team', { params: { page: 1, limit: 12 } });
         if (!active) return;
         const items = response.data.data || [];
         setTeamMembers(items.length > 0 ? items : fallbackTeam);
-      })
-      .catch(() => {
+      } catch {
         if (!active) return;
         setTeamMembers(fallbackTeam);
-      });
+      }
+    };
+
+    fetchTeam();
+
+    const onDataUpdated = () => {
+      fetchTeam();
+    };
+    const onStorage = (event) => {
+      if (event.key === 'anova:data-updated') fetchTeam();
+    };
+
+    window.addEventListener('anova:data-updated', onDataUpdated);
+    window.addEventListener('storage', onStorage);
 
     return () => {
       active = false;
+      window.removeEventListener('anova:data-updated', onDataUpdated);
+      window.removeEventListener('storage', onStorage);
     };
   }, []);
 
@@ -52,34 +67,14 @@ export default function About() {
     const [src, setSrc] = useState(null);
 
     useEffect(() => {
-      let active = true;
       const candidate = member.image_url || member.image;
       if (!candidate) {
         setSrc(imageFallbackByKey());
-        return () => { active = false; };
+        return;
       }
 
-      // Build a usable URL (relative or absolute)
-      const url = buildImageUrl(candidate, imageFallbackByKey());
-
-      // Check resource existence with a HEAD fetch to avoid attaching a failing
-      // <img> src immediately which triggers a visible 404 in the console.
-      (async () => {
-        try {
-          const res = await fetch(url, { method: 'HEAD', mode: 'cors' });
-          if (!active) return;
-          if (res.ok) {
-            setSrc(url);
-          } else {
-            setSrc(imageFallbackByKey());
-          }
-        } catch (err) {
-          if (!active) return;
-          setSrc(imageFallbackByKey());
-        }
-      })();
-
-      return () => { active = false; };
+      // Resolve image URL directly. HEAD probes can fail with strict CORS and cause false fallbacks.
+      setSrc(buildImageUrl(candidate, imageFallbackByKey()));
     }, [member]);
 
     const initials = member.name

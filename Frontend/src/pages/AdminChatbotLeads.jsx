@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import AdminLayout from '../layouts/AdminLayout';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -7,7 +7,8 @@ export default function AdminChatbotLeads() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
+    setLoading(true);
     try {
       const response = await api.get('/chatbot/leads');
       setLeads(response?.data?.data || []);
@@ -16,11 +17,21 @@ export default function AdminChatbotLeads() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchLeads();
-  }, []);
+    const onDataUpdated = () => fetchLeads();
+    const onStorage = (event) => {
+      if (event.key === 'anova:data-updated') fetchLeads();
+    };
+    window.addEventListener('anova:data-updated', onDataUpdated);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('anova:data-updated', onDataUpdated);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, [fetchLeads]);
 
   const deleteLead = async (id) => {
     try {

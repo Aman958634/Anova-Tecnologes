@@ -636,7 +636,7 @@ export default function AdminResourceManager({ resource, title, description }) {
         ) : (
           <>
             {/* Desktop / tablet: regular table */}
-            <div className="hidden sm:block">
+            <div className="hidden overflow-x-auto sm:block">
               <table className="min-w-full text-sm text-[#163c88]">
                 <TableHeader columns={[...columns.map((column) => column.label), 'Actions']} />
                 <tbody>

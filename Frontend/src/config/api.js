@@ -79,7 +79,27 @@ export function createApiClient({ timeout = 30000 } = {}) {
   });
 
   client.interceptors.response.use(
-    (response) => response,
+    (response) => {
+      const method = String(response?.config?.method || '').toLowerCase();
+      if (method === 'post' || method === 'put' || method === 'patch' || method === 'delete') {
+        const stamp = String(Date.now());
+        try {
+          localStorage.setItem('anova:data-updated', stamp);
+        } catch {
+          // Ignore localStorage failures in restricted contexts.
+        }
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('anova:data-updated', {
+            detail: {
+              stamp,
+              method,
+              url: response?.config?.url || null,
+            },
+          }));
+        }
+      }
+      return response;
+    },
     (error) => {
       console.log('API error response:', error.response);
       console.log('API error message:', error.message);

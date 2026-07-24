@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FolderKanban, Mail, Newspaper, Shapes, Star, Users } from 'lucide-react';
 import AdminLayout from '../layouts/AdminLayout';
@@ -17,9 +17,28 @@ const cards = [
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ services: 0, projects: 0, team: 0, blogs: 0, testimonials: 0, contacts: 0 });
 
-  useEffect(() => {
-    api.get('/admin/stats').then((response) => setStats(response.data)).catch(() => null);
+  const fetchStats = useCallback(async () => {
+    try {
+      const response = await api.get('/admin/stats');
+      setStats(response.data);
+    } catch {
+      // Keep last known values on transient failures.
+    }
   }, []);
+
+  useEffect(() => {
+    fetchStats();
+    const onDataUpdated = () => fetchStats();
+    const onStorage = (event) => {
+      if (event.key === 'anova:data-updated') fetchStats();
+    };
+    window.addEventListener('anova:data-updated', onDataUpdated);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('anova:data-updated', onDataUpdated);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, [fetchStats]);
 
   const totals = useMemo(
     () => cards.reduce((acc, card) => acc + (Number(stats[card.key]) || 0), 0),

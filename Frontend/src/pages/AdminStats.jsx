@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import AdminLayout from '../layouts/AdminLayout';
 import SectionHeading from '../components/SectionHeading';
@@ -15,31 +15,39 @@ export default function AdminStats() {
   const [form, setForm] = useState(initialForm);
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
-    api.get('/stats')
-      .then((response) => {
-        setForm({
-          projects_completed: response.data.projects_completed || '156+',
-          happy_clients: response.data.happy_clients || '200+',
-          years_experience: response.data.years_experience || '8+',
-          team_members: response.data.team_members || '14'
-        });
-      })
-      .catch(() => toast.error('Failed to load stats'));
+  const fetchStats = useCallback(async () => {
+    try {
+      const response = await api.get('/stats');
+      setForm({
+        projects_completed: response.data.projects_completed || '156+',
+        happy_clients: response.data.happy_clients || '200+',
+        years_experience: response.data.years_experience || '8+',
+        team_members: response.data.team_members || '14'
+      });
+    } catch {
+      toast.error('Failed to load stats');
+    }
   }, []);
+
+  useEffect(() => {
+    fetchStats();
+    const onDataUpdated = () => fetchStats();
+    const onStorage = (event) => {
+      if (event.key === 'anova:data-updated') fetchStats();
+    };
+    window.addEventListener('anova:data-updated', onDataUpdated);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('anova:data-updated', onDataUpdated);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, [fetchStats]);
 
   const onSubmit = async (event) => {
     event.preventDefault();
     setBusy(true);
     try {
       await api.put('/stats', form);
-      const stamp = String(Date.now());
-      try {
-        localStorage.setItem('anova:data-updated', stamp);
-      } catch {
-        // Ignore localStorage errors
-      }
-      window.dispatchEvent(new CustomEvent('anova:data-updated', { detail: { resource: 'stats', stamp } }));
       toast.success('Stats updated successfully');
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update stats');

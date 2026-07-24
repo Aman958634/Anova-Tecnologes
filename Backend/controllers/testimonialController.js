@@ -5,7 +5,9 @@ const { getCache, setCache, invalidateCache } = require('../utils/simpleCache');
 const { uploadToCloudinary, deleteFromCloudinary, extractPublicIdFromUrl, isCloudinaryUrl, generateFilename } = require('../utils/cloudStorage');
 
 const setShortCacheHeaders = (res) => {
-  res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=30');
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
 };
 
 const isPlaceholderImage = (url) => {
