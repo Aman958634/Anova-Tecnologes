@@ -9,21 +9,52 @@ const navItems = [
     label: 'Services',
     path: '/services',
     children: [
-      { label: 'All Services', path: '/services' },
-      { label: 'Projects Showcase', path: '/projects' },
-      { label: 'Contact for Quote', path: '/contact' },
+      { label: 'Web Development', path: '/services#web-development' },
+      { label: 'Mobile Apps', path: '/services#mobile-apps' },
+      { label: 'UI/UX Design', path: '/services#ui-ux-design' },
+      { label: 'AI Solutions', path: '/services#ai-solutions' },
+      { label: 'Cloud & DevOps', path: '/services#cloud-devops' },
+      { label: 'Digital Marketing', path: '/services#digital-marketing' },
+      { label: 'View All Services', path: '/services' },
     ],
   },
   {
     label: 'About',
     path: '/about',
     children: [
-      { label: 'About Company', path: '/about' },
-      { label: 'Contact', path: '/contact' },
+      { label: 'Company Profile', path: '/about#company-profile' },
+      { label: 'Our Team', path: '/about#our-team' },
+      { label: 'Mission & Vision', path: '/about#mission-vision' },
+      { label: 'Why Choose Us', path: '/about#why-choose-us' },
+      { label: 'Certifications', path: '/about#certifications' },
+      { label: 'Careers', path: '/about#careers' },
+      { label: 'News & Blog', path: '/about#news-blog' },
     ],
   },
-  { label: 'Projects', path: '/projects' },
-  { label: 'Contact', path: '/contact' },
+  {
+    label: 'Project',
+    path: '/projects',
+    children: [
+      { label: 'Portfolio', path: '/projects#portfolio' },
+      { label: 'Case Studies', path: '/projects#case-studies' },
+      { label: 'Client Success Stories', path: '/projects#client-success-stories' },
+      { label: 'Healthcare Projects', path: '/projects#healthcare-projects' },
+      { label: 'E-Commerce Projects', path: '/projects#ecommerce-projects' },
+      { label: 'Mobile Apps', path: '/projects#mobile-apps' },
+      { label: 'Web Applications', path: '/projects#web-applications' },
+    ],
+  },
+  {
+    label: 'Contact',
+    path: '/contact',
+    children: [
+      { label: 'Contact Us', path: '/contact#contact-us' },
+      { label: 'Request a Quote', path: '/contact#request-quote' },
+      { label: 'Book Free Consultation', path: '/contact#book-free-consultation' },
+      { label: 'Customer Support', path: '/contact#customer-support' },
+      { label: 'Office Location', path: '/contact#office-location' },
+    ],
+  },
 ];
 
 export default function Navbar() {
@@ -142,7 +173,7 @@ export default function Navbar() {
                     >
                       {item.children.map((child) => (
                         <NavLink
-                          key={child.path}
+                          key={`${item.label}-${child.label}`}
                           to={child.path}
                           className={({ isActive }) =>
                             `block rounded-xl px-3 py-2.5 text-sm transition ${isActive ? 'bg-[#eef4ff] text-[#2f6df7]' : 'text-slate-700 hover:bg-slate-50 hover:text-[#2f6df7]'}`
@@ -218,7 +249,7 @@ export default function Navbar() {
                             <div className="px-2 pb-2">
                               {item.children.map((child) => (
                                 <Link
-                                  key={child.path}
+                                  key={`${item.label}-${child.label}`}
                                   to={child.path}
                                   onClick={() => setOpen(false)}
                                   className={`block rounded-xl px-3 py-2 text-sm transition ${isDarkHeader ? 'text-slate-100 hover:bg-white/10 hover:text-white' : 'text-slate-600 hover:bg-slate-50 hover:text-[#2f6df7]'}`}
