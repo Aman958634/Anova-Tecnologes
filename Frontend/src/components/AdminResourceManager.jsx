@@ -82,11 +82,13 @@ export default function AdminResourceManager({ resource, title, description }) {
     window.dispatchEvent(new CustomEvent('anova:data-updated', { detail: { resource, stamp } }));
   };
 
-  const fetchRows = async () => {
+  const fetchRows = async ({ searchOverride, pageOverride } = {}) => {
     try {
+      const effectiveSearch = searchOverride ?? query;
+      const effectivePage = pageOverride ?? meta.page;
       const params = {
-        search: query || undefined,
-        page: supportsPagination ? meta.page : undefined,
+        search: effectiveSearch || undefined,
+        page: supportsPagination ? effectivePage : undefined,
         limit: supportsPagination ? meta.limit : undefined
       };
       const response = await api.get(endpoint, { params });
@@ -95,6 +97,7 @@ export default function AdminResourceManager({ resource, title, description }) {
       if (supportsPagination) {
         setMeta((current) => ({
           ...current,
+          page: effectivePage,
           total: response.data?.meta?.total || 0
         }));
       } else {
@@ -270,18 +273,29 @@ export default function AdminResourceManager({ resource, title, description }) {
       // Let the browser set `Content-Type` with proper boundary for FormData.
       const response = await api[method](url, buildPayload());
       toast.success(`${title} saved successfully`);
+      const createdOrUpdated = response?.data?.data || response?.data?.project || null;
+      const createdId = createdOrUpdated?.id || response?.data?.id || null;
 
       // Preserve old preview blob so we can revoke after closing form
       const oldPreview = previewUrl;
       // Close form and refresh rows. For new items, prefer page 1 so the created
       // record is visible immediately.
       closeForm();
-      if (!form.id) setMeta((c) => ({ ...c, page: 1 }));
-      await fetchRows();
+      if (!form.id) {
+        setQuery('');
+        await fetchRows({ searchOverride: '', pageOverride: 1 });
+        if (createdId && createdOrUpdated) {
+          setRows((current) => {
+            const withoutCreated = current.filter((item) => item.id !== createdId);
+            return [createdOrUpdated, ...withoutCreated];
+          });
+        }
+      } else {
+        await fetchRows();
+      }
       notifyDataUpdated();
 
       // Try to find created resource id to highlight it briefly
-      const createdId = response?.data?.data?.id || response?.data?.id || response?.data?.project?.id || null;
       if (createdId) {
         setHighlightedId(createdId);
         window.setTimeout(() => setHighlightedId(null), 3500);
