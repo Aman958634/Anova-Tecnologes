@@ -16,17 +16,33 @@ function generateFilename(originalname, prefix = 'file') {
 
 function uploadToCloudinary(buffer, folder, filename) {
   ensureCloudinaryConfigured();
+
+  if (!Buffer.isBuffer(buffer) || buffer.length === 0) {
+    return Promise.reject(new Error('Buffer missing or empty for Cloudinary upload_stream.'));
+  }
+
+  const publicId = filename.replace(/\.[^.]+$/, '');
+
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: `anova/${folder}`,
-        public_id: filename.replace(/\.[^.]+$/, ''),
+        public_id: publicId,
         resource_type: 'auto',
         quality: 'auto',
         fetch_format: 'auto',
       },
       (error, result) => {
-        if (error) return reject(error);
+        if (error) {
+          const wrapped = new Error(`Cloudinary upload_stream failed: ${error.message}`);
+          wrapped.cause = error;
+          return reject(wrapped);
+        }
+
+        if (!result || !result.secure_url || !result.public_id) {
+          return reject(new Error('Cloudinary upload_stream failed: empty upload result.'));
+        }
+
         resolve({
           url: result.secure_url,
           publicId: result.public_id,
@@ -37,6 +53,13 @@ function uploadToCloudinary(buffer, folder, filename) {
         });
       }
     );
+
+    stream.on('error', (error) => {
+      const wrapped = new Error(`Cloudinary stream error: ${error.message}`);
+      wrapped.cause = error;
+      reject(wrapped);
+    });
+
     stream.end(buffer);
   });
 }

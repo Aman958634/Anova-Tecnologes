@@ -172,8 +172,24 @@ const parseTagsForSave = (value, fallbackRawTags) => {
 const buildAssetFromFile = async (file, { folder = 'projects' } = {}) => {
   try {
     ensureCloudinaryConfigured();
+
+    if (!file) {
+      throw new Error('Upload failed: req.file is undefined.');
+    }
+
+    if (!Buffer.isBuffer(file.buffer) || file.buffer.length === 0) {
+      throw new Error('Upload failed: req.file.buffer missing or empty.');
+    }
+
     const filename = generateFilename(file.originalname, 'project');
     console.log('Cloudinary Upload Starting');
+    console.log('Cloudinary Upload Input:', {
+      originalname: file.originalname,
+      mimetype: file.mimetype,
+      size: file.size,
+      filename,
+      folder,
+    });
     const uploaded = await uploadToCloudinary(file.buffer, folder, filename);
     console.log('Cloudinary Upload Result:', uploaded);
     return mapUploadedAsset({
@@ -197,24 +213,6 @@ const buildAssetFromFile = async (file, { folder = 'projects' } = {}) => {
 
 const setShortCacheHeaders = (res) => {
   res.set('Cache-Control', 'public, max-age=120, stale-while-revalidate=30');
-};
-
-const uploadErrorMessage = (error) => {
-  const message = String(error?.message || '');
-
-  if (message.includes('Cloudinary is not configured')) {
-    return 'Image storage is not configured on server. Please set Cloudinary environment variables.';
-  }
-
-  if (/credentials are invalid|Invalid Signature|unknown api key|authorization required|unauthorized/i.test(message)) {
-    return 'Cloudinary credentials are invalid. Please verify CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.';
-  }
-
-  if (/timeout|ETIMEDOUT|ENOTFOUND|ECONNRESET|socket hang up/i.test(message)) {
-    return 'Cloud image upload failed due to network issue. Please retry.';
-  }
-
-  return 'Failed to upload image to cloud storage. Please try again.';
 };
 
 const listProjects = asyncHandler(async (req, res) => {
@@ -311,6 +309,7 @@ const createProject = asyncHandler(async (req, res) => {
 
 const updateProject = asyncHandler(async (req, res) => {
   try {
+    console.log('Entering updateProject()');
     console.log('[projects:update] Request received', {
       projectId: req.params.id,
       method: req.method,
@@ -452,8 +451,10 @@ const updateProject = asyncHandler(async (req, res) => {
       existingAsset.imageFileId !== nextAsset.imageFileId;
 
     if (shouldDeleteOldCloudinary) {
+      console.log('Deleting Old Image:', existingAsset.imageFileId);
       try {
         await deleteCloudinaryIfUnreferenced(existingAsset.imageFileId);
+        console.log('Old Image Delete Completed');
       } catch (error) {
         console.error(error);
         console.error(error.stack);
@@ -474,7 +475,7 @@ const updateProject = asyncHandler(async (req, res) => {
     console.error(error.stack);
     return res.status(500).json({
       success: false,
-      message: error.message || 'Failed to update project.',
+      message: error.message || 'Unknown error',
       stack: error.stack,
     });
   }
