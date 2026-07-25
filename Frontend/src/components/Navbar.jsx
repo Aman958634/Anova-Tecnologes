@@ -6,10 +6,8 @@ import {
   BriefcaseBusiness,
   Building2,
   ChevronDown,
-  ChevronRight,
   Cloud,
   Code2,
-  FileText,
   Headset,
   Menu,
   Megaphone,
@@ -20,6 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import MegaMenu from './MegaMenu';
 
 const navItems = [
   { label: 'Home', path: '/' },
@@ -266,78 +265,17 @@ export default function Navbar() {
     }));
   };
 
-  const activeMegaItem = navItems.find((item) => item.label === openDropdown && item.menu?.kind === 'mega');
+  const activeMegaItem = navItems.find((item) => item.label === openDropdown && item.menu);
 
-  const renderMenuCard = (menuItem) => {
-    const Icon = menuItem.icon || FileText;
+  const handleMegaMenuState = (shouldClose) => {
+    if (shouldClose) {
+      setOpenDropdown(null);
+      return;
+    }
 
-    return (
-      <div className="mega-menu-col">
-        <div className="mega-menu-col-head">
-          <span className="mega-menu-col-icon">
-            <Icon className="h-4 w-4" />
-          </span>
-          <h3 className="mega-menu-col-title">{menuItem.title}</h3>
-        </div>
-
-        <div className="mega-menu-col-links">
-          {menuItem.items.map((child) => (
-            <Link
-              key={`${menuItem.title}-${child.label}`}
-              to={child.path}
-              onClick={() => setOpen(false)}
-              className="mega-menu-link"
-            >
-              <ChevronRight className="mega-menu-link-caret" />
-              <span className="mega-menu-link-text">{child.label}</span>
-            </Link>
-          ))}
-
-          {menuItem.footerLinkLabel && menuItem.footerLinkPath ? (
-            <Link to={menuItem.footerLinkPath} onClick={() => setOpen(false)} className="mega-menu-col-footer-link">
-              {menuItem.footerLinkLabel}
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
-          ) : null}
-        </div>
-      </div>
-    );
-  };
-
-  const renderServiceMegaColumn = (menuItem, index) => {
-    const Icon = menuItem.icon || FileText;
-
-    return (
-      <div className={`service-mega-col ${index < 5 ? 'service-mega-col-divider' : ''}`}>
-        <div className="service-mega-head">
-          <span className="service-mega-icon">
-            <Icon className="h-4 w-4" />
-          </span>
-          <h3 className="service-mega-title">{menuItem.title}</h3>
-        </div>
-
-        <div className="service-mega-links">
-          {menuItem.items.map((child) => (
-            <Link
-              key={`${menuItem.title}-${child.label}`}
-              to={child.path}
-              onClick={() => setOpen(false)}
-              className="service-mega-link"
-            >
-              <ChevronRight className="service-mega-link-caret" />
-              <span className="service-mega-link-text">{child.label}</span>
-            </Link>
-          ))}
-
-          {menuItem.footerLinkLabel && menuItem.footerLinkPath ? (
-            <Link to={menuItem.footerLinkPath} onClick={() => setOpen(false)} className="service-mega-footer-link">
-              {menuItem.footerLinkLabel}
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
-          ) : null}
-        </div>
-      </div>
-    );
+    if (activeMegaItem) {
+      setOpenDropdown(activeMegaItem.label);
+    }
   };
 
   return (
@@ -364,7 +302,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <div className="navbar-nav-wrap hidden lg:flex">
+        <div className="navbar-nav-wrap hidden lg:flex" onMouseLeave={() => setOpenDropdown(null)}>
           <nav className="relative flex min-w-0 flex-1 items-center justify-center gap-2 overflow-visible xl:gap-3 2xl:gap-4">
             {navItems.map((item) => {
               const active = isItemActive(item);
@@ -376,7 +314,7 @@ export default function Navbar() {
                     key={item.path}
                     to={item.path}
                     className={({ isActive }) =>
-                      `group rounded-full px-2.5 py-2 text-[0.92rem] xl:text-[0.94rem] 2xl:text-[0.98rem] font-medium transition ${isActive ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`
+                      `group nav-pill rounded-full px-2.5 py-2 text-[0.92rem] xl:text-[0.94rem] 2xl:text-[0.98rem] font-medium transition ${isActive ? 'nav-pill-active text-white' : linkBaseClass}`
                     }
                   >
                     {item.label}
@@ -389,31 +327,15 @@ export default function Navbar() {
                   key={item.label}
                   className="relative"
                   onMouseEnter={() => setOpenDropdown(item.label)}
-                  onMouseLeave={() => setOpenDropdown(null)}
                 >
                   <button
                     type="button"
                     onClick={() => setOpenDropdown((current) => (current === item.label ? null : item.label))}
-                    className={`group inline-flex items-center gap-1 rounded-full px-2.5 py-2 text-[0.92rem] xl:text-[0.94rem] 2xl:text-[0.98rem] font-medium transition ${active ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`}
+                    className={`group nav-pill inline-flex items-center gap-1 rounded-full px-2.5 py-2 text-[0.92rem] xl:text-[0.94rem] 2xl:text-[0.98rem] font-medium transition ${openDropdown === item.label || active ? 'nav-pill-active text-white' : linkBaseClass}`}
                   >
                     <span>{item.label}</span>
                     <ChevronDown className={`h-3.5 w-3.5 transition ${openDropdown === item.label ? 'rotate-180' : ''}`} />
                   </button>
-
-                  <AnimatePresence>
-                    {openDropdown === item.label && item.menu.kind !== 'mega' ? (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        transition={{ duration: 0.18 }}
-                        className="absolute left-0 top-full mt-3 min-w-[320px] overflow-hidden rounded-[20px] border border-white/10 bg-[#071225]/96 shadow-[0_22px_55px_rgba(2,8,23,0.42)] backdrop-blur-xl"
-                      >
-                        <div className="grid grid-cols-1 gap-0 md:grid-cols-2">{item.menu.columns.map((column) => renderMenuCard(column))}</div>
-                      </motion.div>
-                    ) : null}
-
-                  </AnimatePresence>
                 </div>
               );
             })}
@@ -427,59 +349,7 @@ export default function Navbar() {
             </motion.div>
           </div>
 
-          <AnimatePresence>
-            {activeMegaItem ? (
-              <motion.div
-                key={activeMegaItem.label}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-                className="services-mega-panel"
-                onMouseEnter={() => setOpenDropdown(activeMegaItem.label)}
-                onMouseLeave={() => setOpenDropdown(null)}
-              >
-                <div className="services-mega-grid">
-                  {activeMegaItem.menu.columns.map((column, index) => renderServiceMegaColumn(column, index))}
-
-                  <aside className="service-mega-cta">
-                    <div className="service-mega-cta-visual" aria-hidden="true">
-                      <div className="service-mega-cta-chip service-mega-cta-chip-a" />
-                      <div className="service-mega-cta-chip service-mega-cta-chip-b" />
-                      <div className="service-mega-cta-chip service-mega-cta-chip-c" />
-                      <div className="service-mega-cta-node service-mega-cta-node-a" />
-                      <div className="service-mega-cta-node service-mega-cta-node-b" />
-                      <div className="service-mega-cta-node service-mega-cta-node-c" />
-                      <div className="service-mega-cta-node service-mega-cta-node-d" />
-                      <div className="service-mega-cta-screen" />
-                      <div className="service-mega-cta-glow">
-                        <Sparkles className="h-7 w-7" />
-                      </div>
-                    </div>
-                    <h3 className="service-mega-cta-title">{activeMegaItem.menu.promo.title}</h3>
-                    <p className="service-mega-cta-copy">{activeMegaItem.menu.promo.description}</p>
-                    <Link
-                      to={activeMegaItem.menu.promo.buttonPath}
-                      onClick={() => setOpenDropdown(null)}
-                      className="service-mega-cta-button"
-                    >
-                      {activeMegaItem.menu.promo.buttonLabel}
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
-
-                    <div className="service-mega-cta-stats">
-                      {activeMegaItem.menu.promo.stats.map((stat) => (
-                        <div key={stat.label} className="service-mega-cta-stat">
-                          <div className="service-mega-cta-stat-value">{stat.value}</div>
-                          <div className="service-mega-cta-stat-label">{stat.label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </aside>
-                </div>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
+          <MegaMenu item={activeMegaItem} onClose={handleMegaMenuState} />
 
         </div>
 
