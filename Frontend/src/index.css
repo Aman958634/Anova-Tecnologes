@@ -154,12 +154,12 @@ section[id] {
     top: calc(100% + 6px);
     left: 0;
     right: 0;
-    width: 100%;
-    max-width: 1320px;
+    width: min(1280px, 95vw);
+    max-width: 95vw;
     margin: 0 auto;
     border-radius: 24px;
     border: 1px solid rgba(148, 163, 184, 0.22);
-    background: linear-gradient(160deg, rgba(9, 20, 43, 0.96) 0%, rgba(6, 16, 34, 0.95) 100%);
+    background: linear-gradient(160deg, rgba(8, 18, 38, 0.985) 0%, rgba(5, 14, 30, 0.982) 100%);
     backdrop-filter: blur(20px);
     box-shadow: 0 32px 86px rgba(2, 8, 23, 0.58);
     z-index: 120;
@@ -168,9 +168,9 @@ section[id] {
 
   .mega-menu-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr) 280px;
-    gap: 32px;
-    padding: 32px 40px;
+    grid-template-columns: 220px 220px 220px 220px 220px 220px 300px;
+    gap: 24px;
+    padding: 36px;
     align-items: start;
   }
 
@@ -178,6 +178,10 @@ section[id] {
     min-width: 0;
     border-right: 1px solid rgba(148, 163, 184, 0.14);
     padding-right: 12px;
+  }
+
+  .mega-menu-grid > .mega-menu-col {
+    min-width: 220px;
   }
 
   .mega-menu-col:nth-child(6) {
@@ -208,7 +212,7 @@ section[id] {
     margin: 0;
     font-size: 0.98rem;
     font-weight: 600;
-    line-height: 1.25;
+    line-height: 1.4;
     letter-spacing: -0.01em;
     color: #f8fafc;
     text-wrap: balance;
@@ -222,7 +226,7 @@ section[id] {
 
   .mega-menu-link {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 8px;
     min-width: 0;
     border-radius: 10px;
@@ -241,7 +245,6 @@ section[id] {
     height: 14px;
     width: 14px;
     flex-shrink: 0;
-    margin-top: 4px;
     color: #60a5fa;
     transition: transform 0.2s ease;
   }
@@ -253,13 +256,16 @@ section[id] {
   .mega-menu-link-text {
     min-width: 0;
     font-size: 0.9rem;
-    line-height: 1.4;
-    overflow-wrap: anywhere;
-    word-break: normal;
+    line-height: 1.7;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    hyphens: none;
   }
 
   .mega-menu-cta {
-    min-width: 0;
+    width: 300px;
+    min-width: 300px;
     border-radius: 20px;
     border: 1px solid rgba(96, 165, 250, 0.22);
     background: linear-gradient(160deg, rgba(22, 48, 96, 0.58), rgba(14, 30, 59, 0.88));
