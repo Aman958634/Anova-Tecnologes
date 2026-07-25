@@ -8,8 +8,8 @@ import { NAV_ITEMS } from './NavigationData';
 import './Navbar.css';
 import './MegaMenu.css';
 
-const DESKTOP_BREAKPOINT = 1200;
 const TABLET_BREAKPOINT = 768;
+const MEGA_MENU_BREAKPOINT = 1024;
 
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -31,8 +31,8 @@ export default function Navbar() {
   }, [pathname]);
 
   const isDesktopOrLaptop = viewportWidth >= TABLET_BREAKPOINT;
-  const isDesktop = viewportWidth >= DESKTOP_BREAKPOINT;
-  const isTablet = viewportWidth >= TABLET_BREAKPOINT && viewportWidth < DESKTOP_BREAKPOINT;
+  const isTablet = viewportWidth >= TABLET_BREAKPOINT && viewportWidth < MEGA_MENU_BREAKPOINT;
+  const canUseMegaMenu = viewportWidth >= MEGA_MENU_BREAKPOINT;
 
   const servicesItem = useMemo(() => NAV_ITEMS.find((item) => item.key === 'services'), []);
 
@@ -59,7 +59,10 @@ export default function Navbar() {
 
   return (
     <header className="ent-nav">
-      <div className="ent-nav__container">
+      <div
+        className="ent-nav__container"
+        onMouseLeave={isDesktopOrLaptop ? closeMenu : undefined}
+      >
         <Link to="/" className="ent-nav__logo-link" aria-label="Anova Technologies home">
           <img src="/logoanova-white.png" alt="Anova Technologies" className="ent-nav__logo" />
         </Link>
@@ -84,7 +87,7 @@ export default function Navbar() {
                   );
                 }
 
-                const shouldUseMega = item.menu.type === 'mega' && !isTablet;
+                const shouldUseMega = item.menu.type === 'mega' && canUseMegaMenu;
 
                 return (
                   <div
@@ -114,15 +117,6 @@ export default function Navbar() {
                 );
               })}
             </nav>
-
-            <AnimatePresence>
-              {openMenuKey === 'services' && isDesktop && servicesItem ? (
-                <MegaMenu
-                  item={servicesItem}
-                  onClose={handleMegaMenuState}
-                />
-              ) : null}
-            </AnimatePresence>
           </div>
         ) : null}
 
@@ -142,6 +136,17 @@ export default function Navbar() {
             </button>
           ) : null}
         </div>
+
+        <AnimatePresence>
+          {openMenuKey === 'services' && canUseMegaMenu && servicesItem ? (
+            <div className="ent-nav__mega-slot">
+              <MegaMenu
+                item={servicesItem}
+                onClose={handleMegaMenuState}
+              />
+            </div>
+          ) : null}
+        </AnimatePresence>
       </div>
 
       <AnimatePresence>

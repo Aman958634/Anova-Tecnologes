@@ -11,10 +11,10 @@ export default function MegaMenu({ item, onClose }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -10 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.22, ease: 'easeOut' }}
+      exit={{ opacity: 0, y: 15 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
       className="ent-mega"
       onMouseEnter={() => onClose(false)}
       onMouseLeave={() => onClose(true)}
