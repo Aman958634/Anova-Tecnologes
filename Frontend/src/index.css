@@ -149,19 +149,70 @@ section[id] {
     align-items: center;
   }
 
+  .menu-list-card {
+    padding: 16px;
+  }
+
+  .menu-list-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .menu-list-icon {
+    display: grid;
+    height: 30px;
+    width: 30px;
+    place-items: center;
+    border-radius: 12px;
+    color: #60a5fa;
+    background: rgba(37, 99, 235, 0.12);
+    border: 1px solid rgba(96, 165, 250, 0.24);
+  }
+
+  .menu-list-title {
+    margin: 0;
+    color: #f8fafc;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .menu-list-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .menu-list-link {
+    color: #cbd5e1;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    text-decoration: none;
+    padding: 4px 2px;
+    border-radius: 8px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
+
+  .menu-list-link:hover {
+    color: #ffffff;
+    background: rgba(37, 99, 235, 0.12);
+  }
+
   .mega-menu-panel {
     position: absolute;
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    width: calc(100% - 48px);
+    width: min(1320px, calc(100vw - 40px));
     max-width: 1320px;
     margin: 0 auto;
     border-radius: 24px;
-    border: 1px solid rgba(148, 163, 184, 0.22);
-    background: rgba(8, 27, 59, 0.98);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: linear-gradient(158deg, rgba(7, 22, 49, 0.98) 0%, rgba(8, 27, 59, 0.97) 45%, rgba(6, 18, 40, 0.98) 100%);
     backdrop-filter: blur(20px);
-    box-shadow: 0 32px 86px rgba(2, 8, 23, 0.58);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
     z-index: 140;
     overflow: hidden;
   }
@@ -170,104 +221,105 @@ section[id] {
     display: grid;
     gap: 28px;
     padding: 32px;
+    align-items: start;
   }
 
   .mega-menu-top-row {
     display: grid;
-    grid-template-columns: repeat(4, minmax(220px, 1fr));
+    grid-template-columns: repeat(4, minmax(240px, 1fr));
     gap: 28px;
     align-items: start;
   }
 
   .mega-menu-bottom-row {
     display: grid;
-    grid-template-columns: repeat(2, minmax(220px, 1fr)) 320px;
+    grid-template-columns: repeat(2, minmax(240px, 1fr)) 320px;
     gap: 28px;
     align-items: start;
   }
 
-  .mega-menu-top-row > .mega-menu-col,
-  .mega-menu-bottom-row > .mega-menu-col {
+  .mega-service-card {
     min-width: 220px;
-    min-height: 100%;
-    padding-right: 14px;
-    border-right: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 24px;
+    transition: background-color 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+    overflow: hidden;
   }
 
-  .mega-menu-top-row > .mega-menu-col:last-child,
-  .mega-menu-bottom-row > .mega-menu-col:last-child {
-    border-right: none;
-    padding-right: 0;
+  .mega-service-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(148, 163, 184, 0.24);
+    transform: translateY(-4px);
   }
 
-  .mega-menu-col-head {
+  .mega-service-head {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 12px;
   }
 
-  .mega-menu-col-icon {
+  .mega-service-icon {
     display: grid;
     height: 34px;
     width: 34px;
     flex-shrink: 0;
     place-items: center;
-    border-radius: 14px;
+    border-radius: 12px;
     color: #60a5fa;
     background: rgba(37, 99, 235, 0.12);
     border: 1px solid rgba(96, 165, 250, 0.24);
   }
 
-  .mega-menu-col-title {
+  .mega-service-title {
     margin: 0;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
     line-height: 1.4;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
     color: #f8fafc;
     text-wrap: balance;
   }
 
-  .mega-menu-col-links {
+  .mega-service-links {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
 
-  .mega-menu-link {
+  .mega-service-link {
     display: flex;
     align-items: center;
     gap: 8px;
     min-width: 0;
-    border-radius: 10px;
-    padding: 4px 2px;
-    color: #cbd5e1;
     text-decoration: none;
-    transition: color 0.2s ease, background-color 0.2s ease;
+    color: #cbd5e1;
+    font-size: 16px;
+    line-height: 1.9;
+    border-radius: 10px;
+    padding: 3px 4px;
+    transition: color 0.25s ease, background-color 0.25s ease, transform 0.25s ease;
   }
 
-  .mega-menu-link:hover {
+  .mega-service-link:hover {
     color: #ffffff;
-    background: rgba(37, 99, 235, 0.1);
+    background: rgba(37, 99, 235, 0.14);
+    transform: translateX(2px);
   }
 
-  .mega-menu-link-caret {
-    height: 14px;
+  .mega-service-link-caret {
     width: 14px;
+    height: 14px;
     flex-shrink: 0;
     color: #60a5fa;
-    transition: transform 0.2s ease;
   }
 
-  .mega-menu-link:hover .mega-menu-link-caret {
-    transform: translateX(1px);
-  }
-
-  .mega-menu-link-text {
+  .mega-service-link-text {
     min-width: 0;
     font-size: 16px;
-    line-height: 1.7;
+    line-height: 1.9;
     white-space: normal;
     overflow-wrap: normal;
     word-break: keep-all;
@@ -277,10 +329,10 @@ section[id] {
   .mega-menu-cta {
     width: 320px;
     min-width: 320px;
-    border-radius: 20px;
+    border-radius: 18px;
     border: 1px solid rgba(96, 165, 250, 0.22);
     background: linear-gradient(160deg, rgba(22, 48, 96, 0.58), rgba(14, 30, 59, 0.88));
-    padding: 14px;
+    padding: 24px;
     overflow: hidden;
   }
 
@@ -390,13 +442,8 @@ section[id] {
     padding-right: 1.25rem;
   }
 
-  .navbar-shell {
-    max-width: 100%;
-  }
-
   .mega-menu-panel {
-    width: calc(100% - 24px);
-    max-width: calc(100vw - 24px);
+    width: min(1320px, calc(100vw - 24px));
   }
 
   .mega-menu-layout {
@@ -410,17 +457,35 @@ section[id] {
     gap: 20px;
   }
 
-  .mega-menu-top-row > .mega-menu-col,
-  .mega-menu-bottom-row > .mega-menu-col {
+  .mega-service-card {
     min-width: 0;
-    border-right: none;
-    padding-right: 0;
+  }
+
+  .mega-service-title {
+    font-size: 22px;
   }
 
   .mega-menu-cta {
     width: auto;
     min-width: 0;
     grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .mega-menu-top-row,
+  .mega-menu-bottom-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .mega-menu-cta {
+    width: auto;
+    min-width: 0;
+    grid-column: 1 / -1;
+  }
+
+  .mega-service-title {
+    font-size: 24px;
   }
 }
 
