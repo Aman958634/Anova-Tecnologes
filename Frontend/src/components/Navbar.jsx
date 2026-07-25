@@ -265,6 +265,8 @@ export default function Navbar() {
   };
 
   const activeMegaItem = navItems.find((item) => item.label === openDropdown && item.menu?.kind === 'mega');
+  const megaTopColumns = activeMegaItem?.menu?.columns?.slice(0, 4) ?? [];
+  const megaBottomColumns = activeMegaItem?.menu?.columns?.slice(4, 6) ?? [];
 
   const renderMenuCard = (menuItem) => {
     const Icon = menuItem.icon || FileText;
@@ -393,35 +395,41 @@ export default function Navbar() {
                 onMouseEnter={() => setOpenDropdown(activeMegaItem.label)}
                 onMouseLeave={() => setOpenDropdown(null)}
               >
-                <div className="mega-menu-grid">
-                  {activeMegaItem.menu.columns.map((column) => renderMenuCard(column))}
+                <div className="mega-menu-layout">
+                  <div className="mega-menu-top-row">
+                    {megaTopColumns.map((column) => renderMenuCard(column))}
+                  </div>
 
-                  <aside className="mega-menu-cta">
-                    <div className="mega-menu-cta-visual">
-                      <div className="mega-menu-cta-icon-wrap">
-                        <Sparkles className="h-8 w-8" />
-                      </div>
-                    </div>
-                    <h3 className="mega-menu-cta-title">{activeMegaItem.menu.promo.title}</h3>
-                    <p className="mega-menu-cta-copy">{activeMegaItem.menu.promo.description}</p>
-                    <Link
-                      to={activeMegaItem.menu.promo.buttonPath}
-                      onClick={() => setOpenDropdown(null)}
-                      className="mega-menu-cta-button"
-                    >
-                      {activeMegaItem.menu.promo.buttonLabel}
-                      <ChevronRight className="h-4 w-4" />
-                    </Link>
+                  <div className="mega-menu-bottom-row">
+                    {megaBottomColumns.map((column) => renderMenuCard(column))}
 
-                    <div className="mega-menu-cta-stats">
-                      {activeMegaItem.menu.promo.stats.map((stat) => (
-                        <div key={stat.label} className="mega-menu-cta-stat">
-                          <div className="mega-menu-cta-stat-value">{stat.value}</div>
-                          <div className="mega-menu-cta-stat-label">{stat.label}</div>
+                    <aside className="mega-menu-cta">
+                      <div className="mega-menu-cta-visual">
+                        <div className="mega-menu-cta-icon-wrap">
+                          <Sparkles className="h-8 w-8" />
                         </div>
-                      ))}
-                    </div>
-                  </aside>
+                      </div>
+                      <h3 className="mega-menu-cta-title">{activeMegaItem.menu.promo.title}</h3>
+                      <p className="mega-menu-cta-copy">{activeMegaItem.menu.promo.description}</p>
+                      <Link
+                        to={activeMegaItem.menu.promo.buttonPath}
+                        onClick={() => setOpenDropdown(null)}
+                        className="mega-menu-cta-button"
+                      >
+                        {activeMegaItem.menu.promo.buttonLabel}
+                        <ChevronRight className="h-4 w-4" />
+                      </Link>
+
+                      <div className="mega-menu-cta-stats">
+                        {activeMegaItem.menu.promo.stats.map((stat) => (
+                          <div key={stat.label} className="mega-menu-cta-stat">
+                            <div className="mega-menu-cta-stat-value">{stat.value}</div>
+                            <div className="mega-menu-cta-stat-label">{stat.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </aside>
+                  </div>
                 </div>
               </motion.div>
             ) : null}
