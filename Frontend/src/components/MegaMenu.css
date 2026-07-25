@@ -1,26 +1,26 @@
 .ent-mega {
-  width: min(1280px, calc(100% - 64px));
-  max-width: 1280px;
+  width: 100%;
+  max-width: 1400px;
+  min-width: 0;
   margin: 12px auto 0;
-  background: #081729;
-  background: linear-gradient(180deg, #081322, #09182c);
+  background: #081426;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(20px);
-  padding: 32px;
+  padding: 40px;
   overflow: visible;
   z-index: 9999;
   visibility: hidden;
   opacity: 0;
   pointer-events: none;
+  transform: translateY(10px);
   transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
 }
 
 .ent-mega.is-visible {
   visibility: visible;
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
   pointer-events: auto;
   transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0s;
 }
@@ -28,7 +28,7 @@
 .ent-mega__grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(180px, 1fr));
-  gap: 32px;
+  gap: 40px;
   align-items: start;
   overflow: visible;
 }
@@ -116,8 +116,8 @@
 
 @media (max-width: 1399px) {
   .ent-mega {
-    width: min(1280px, calc(100% - 64px));
-    max-width: 1280px;
+    width: 100%;
+    max-width: 100%;
     padding: 30px;
   }
 

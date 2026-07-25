@@ -70,7 +70,7 @@ export default function MainLayout({ children }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.32, ease: 'easeOut' }}
-          className="pt-0"
+          className="relative z-[1] pt-[80px]"
         >
           {children}
         </motion.main>

@@ -19,6 +19,7 @@
 
 html {
   min-height: 100%;
+  overflow-x: hidden;
   background: radial-gradient(circle at top, rgba(59, 130, 246, 0.16), transparent 35%), linear-gradient(180deg, #0b2f74 0%, #081b44 45%, #050f2d 100%);
 }
 
@@ -30,11 +31,11 @@ body {
 }
 
 main {
-  min-height: calc(100vh - 90px);
+  min-height: calc(100vh - 80px);
 }
 
 section[id] {
-  scroll-margin-top: 96px;
+  scroll-margin-top: 80px;
 }
 
 * {
