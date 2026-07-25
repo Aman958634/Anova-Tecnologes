@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -16,6 +16,7 @@ export default function Navbar() {
   const [openMenuKey, setOpenMenuKey] = useState(null);
   const [mobileOpenMap, setMobileOpenMap] = useState({});
   const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
+  const closeTimerRef = useRef(null);
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -30,6 +31,12 @@ export default function Navbar() {
     setMobileOpenMap({});
   }, [pathname]);
 
+  useEffect(() => () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+    }
+  }, []);
+
   const isDesktopOrLaptop = viewportWidth >= TABLET_BREAKPOINT;
   const isTablet = viewportWidth >= TABLET_BREAKPOINT && viewportWidth < MEGA_MENU_BREAKPOINT;
   const canUseMegaMenu = viewportWidth >= MEGA_MENU_BREAKPOINT;
@@ -42,12 +49,29 @@ export default function Navbar() {
     return item.menu.items.some((entry) => entry.path === pathname);
   };
 
-  const closeMenu = () => setOpenMenuKey(null);
-
-  const handleMegaMenuState = (shouldClose) => {
-    if (shouldClose) {
-      setOpenMenuKey(null);
+  const clearCloseTimer = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
     }
+  };
+
+  const closeMenu = () => {
+    clearCloseTimer();
+    setOpenMenuKey(null);
+  };
+
+  const openMenuInstant = (key) => {
+    clearCloseTimer();
+    setOpenMenuKey(key);
+  };
+
+  const startCloseTimer = () => {
+    clearCloseTimer();
+    closeTimerRef.current = setTimeout(() => {
+      setOpenMenuKey(null);
+      closeTimerRef.current = null;
+    }, 250);
   };
 
   const toggleMobileGroup = (key) => {
@@ -59,16 +83,13 @@ export default function Navbar() {
 
   return (
     <header className="ent-nav">
-      <div
-        className="ent-nav__container"
-        onMouseLeave={isDesktopOrLaptop ? closeMenu : undefined}
-      >
+      <div className="ent-nav__container">
         <Link to="/" className="ent-nav__logo-link" aria-label="Anova Technologies home">
           <img src="/logoanova-white.png" alt="Anova Technologies" className="ent-nav__logo" />
         </Link>
 
         {isDesktopOrLaptop ? (
-          <div className="ent-nav__center" onMouseLeave={isTablet ? undefined : closeMenu}>
+          <div className="ent-nav__center">
             <nav className="ent-nav__links" aria-label="Primary">
               {NAV_ITEMS.map((item) => {
                 const active = isItemActive(item);
@@ -88,12 +109,14 @@ export default function Navbar() {
                 }
 
                 const shouldUseMega = item.menu.type === 'mega' && canUseMegaMenu;
+                const isServicesMega = item.key === 'services' && shouldUseMega;
 
                 return (
                   <div
                     key={item.key}
                     className="ent-nav__menu-item"
-                    onMouseEnter={!isTablet ? () => setOpenMenuKey(item.key) : undefined}
+                    onMouseEnter={!isTablet ? () => openMenuInstant(item.key) : undefined}
+                    onMouseLeave={isServicesMega ? startCloseTimer : undefined}
                   >
                     <button
                       type="button"
@@ -137,16 +160,19 @@ export default function Navbar() {
           ) : null}
         </div>
 
-        <AnimatePresence>
-          {openMenuKey === 'services' && canUseMegaMenu && servicesItem ? (
-            <div className="ent-nav__mega-slot">
-              <MegaMenu
-                item={servicesItem}
-                onClose={handleMegaMenuState}
-              />
-            </div>
-          ) : null}
-        </AnimatePresence>
+        {canUseMegaMenu && servicesItem ? (
+          <div
+            className={`ent-nav__mega-slot ${openMenuKey === 'services' ? 'is-visible' : ''}`}
+            onMouseEnter={clearCloseTimer}
+            onMouseLeave={startCloseTimer}
+          >
+            <MegaMenu
+              item={servicesItem}
+              isVisible={openMenuKey === 'services'}
+              onClose={closeMenu}
+            />
+          </div>
+        ) : null}
       </div>
 
       <AnimatePresence>

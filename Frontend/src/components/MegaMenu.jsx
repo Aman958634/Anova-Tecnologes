@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { ChevronRight } from 'lucide-react';
 
-export default function MegaMenu({ item, onClose }) {
+export default function MegaMenu({ item, isVisible, onClose }) {
   if (!item?.menu?.columns?.length) {
     return null;
   }
@@ -10,15 +9,7 @@ export default function MegaMenu({ item, onClose }) {
   const columns = item.menu.columns;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 15 }}
-      transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="ent-mega"
-      onMouseEnter={() => onClose(false)}
-      onMouseLeave={() => onClose(true)}
-    >
+    <div className={`ent-mega ${isVisible ? 'is-visible' : ''}`}>
       <div className="ent-mega__grid">
         {columns.map((column, index) => {
           const Icon = column.icon;
@@ -39,7 +30,7 @@ export default function MegaMenu({ item, onClose }) {
                     key={`${column.title}-${entry.label}`}
                     to={entry.path}
                     className="ent-mega__link"
-                    onClick={() => onClose(true)}
+                    onClick={onClose}
                   >
                     <span>{entry.label}</span>
                     <ChevronRight className="ent-mega__arrow" size={14} />
@@ -50,6 +41,6 @@ export default function MegaMenu({ item, onClose }) {
           );
         })}
       </div>
-    </motion.div>
+    </div>
   );
 }

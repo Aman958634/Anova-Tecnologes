@@ -1,12 +1,25 @@
 .ent-mega {
   width: min(1400px, calc(100vw - 80px));
   max-width: 100%;
-  margin: 16px auto 0;
+  margin: 0 auto;
   background: #071528;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45);
   padding: 36px 42px;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+}
+
+.ent-mega.is-visible {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0s;
 }
 
 .ent-mega__grid {
