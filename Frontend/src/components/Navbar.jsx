@@ -97,17 +97,6 @@ const navItems = [
           ],
         },
       ],
-      promo: {
-        title: 'Need a Custom IT Solution?',
-        description: 'We build scalable, secure, future-ready solutions tailored for your business.',
-        buttonLabel: 'Talk to Our Experts',
-        buttonPath: '/contact',
-        stats: [
-          { value: '150+', label: 'Happy Clients' },
-          { value: '250+', label: 'Projects' },
-          { value: '24/7', label: 'Support' },
-        ],
-      },
     },
   },
   {
@@ -307,14 +296,14 @@ export default function Navbar() {
             {navItems.map((item) => {
               const active = isItemActive(item);
               const hasMenu = Boolean(item.menu);
-              const linkBaseClass = isDarkHeader ? 'text-white/85 hover:text-white' : 'text-slate-700 hover:text-[#2f80ff]';
+              const linkBaseClass = 'text-white';
               if (!hasMenu) {
                 return (
                   <NavLink
                     key={item.path}
                     to={item.path}
                     className={({ isActive }) =>
-                      `group nav-pill rounded-full px-2.5 py-2 text-[0.92rem] xl:text-[0.94rem] 2xl:text-[0.98rem] font-medium transition ${isActive ? 'nav-pill-active text-white' : linkBaseClass}`
+                      `group nav-text-link ${isActive ? 'nav-text-link-active' : ''} ${linkBaseClass}`
                     }
                   >
                     {item.label}
@@ -331,10 +320,10 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={() => setOpenDropdown((current) => (current === item.label ? null : item.label))}
-                    className={`group nav-pill inline-flex items-center gap-1 rounded-full px-2.5 py-2 text-[0.92rem] xl:text-[0.94rem] 2xl:text-[0.98rem] font-medium transition ${openDropdown === item.label || active ? 'nav-pill-active text-white' : linkBaseClass}`}
+                    className={`group nav-text-link inline-flex items-center gap-1 ${openDropdown === item.label || active ? 'nav-text-link-active' : ''} ${linkBaseClass}`}
                   >
                     <span>{item.label}</span>
-                    <ChevronDown className={`h-3.5 w-3.5 transition ${openDropdown === item.label ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`h-3.5 w-3.5 transition ${openDropdown === item.label ? 'rotate-180 text-[#3b82f6]' : ''}`} />
                   </button>
                 </div>
               );
