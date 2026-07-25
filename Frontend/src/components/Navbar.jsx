@@ -5,24 +5,18 @@ import {
   Bot,
   BriefcaseBusiness,
   Building2,
-  Calendar,
   ChevronDown,
   ChevronRight,
   Cloud,
   Code2,
   FileText,
-  Globe2,
   Headset,
-  MapPin,
   Menu,
   Megaphone,
-  MonitorSmartphone,
   Palette,
   Rocket,
-  ShieldCheck,
   Smartphone,
   Sparkles,
-  Users,
   X,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -314,7 +308,7 @@ export default function Navbar() {
           <img
             src={isDarkHeader ? '/logoanova-white.png' : '/logoanova.png'}
             alt="Anova Technologies"
-            className={`h-auto w-[138px] max-w-none object-contain transition duration-300 group-hover:scale-[1.01] sm:w-[116px] md:w-[110px] lg:w-[190px] ${
+            className={`h-auto w-[132px] max-w-none object-contain transition duration-300 group-hover:scale-[1.01] sm:w-[118px] md:w-[122px] lg:w-[165px] xl:w-[182px] ${
               isDarkHeader ? 'brightness-110 contrast-[1.2] drop-shadow-[0_3px_8px_rgba(2,6,23,0.55)]' : 'contrast-[1.14] saturate-110'
             }`}
             loading="eager"
@@ -323,7 +317,7 @@ export default function Navbar() {
           />
         </Link>
 
-        <nav className="hidden flex-1 items-center justify-center gap-3 xl:gap-5 lg:flex">
+        <nav className="hidden flex-1 items-center justify-center gap-2 xl:gap-3 2xl:gap-4 lg:flex">
           {navItems.map((item) => {
             const active = isItemActive(item);
             const hasMenu = Boolean(item.menu);
@@ -334,7 +328,7 @@ export default function Navbar() {
                   key={item.path}
                   to={item.path}
                   className={({ isActive }) =>
-                    `group rounded-full px-3 py-2 text-[0.98rem] font-medium transition ${isActive ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`
+                    `group rounded-full px-2.5 py-2 text-[0.92rem] xl:text-[0.94rem] 2xl:text-[0.98rem] font-medium transition ${isActive ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`
                   }
                 >
                   {item.label}
@@ -352,7 +346,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setOpenDropdown((current) => (current === item.label ? null : item.label))}
-                  className={`group inline-flex items-center gap-1 rounded-full px-3 py-2 text-[0.98rem] font-medium transition ${active ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`}
+                  className={`group inline-flex items-center gap-1 rounded-full px-2.5 py-2 text-[0.92rem] xl:text-[0.94rem] 2xl:text-[0.98rem] font-medium transition ${active ? 'bg-white/10 text-[#5da3ff]' : linkBaseClass}`}
                 >
                   <span>{item.label}</span>
                   <ChevronDown className={`h-3.5 w-3.5 transition ${openDropdown === item.label ? 'rotate-180' : ''}`} />
@@ -413,7 +407,7 @@ export default function Navbar() {
 
         <div className="ml-auto flex shrink-0 items-center gap-3">
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }}>
-            <Link to="/contact" className={`hidden items-center rounded-full px-4 py-2.5 text-sm font-semibold transition sm:inline-flex sm:px-5 sm:py-3 ${isDarkHeader ? 'border border-white/15 bg-white text-[#16336F] hover:bg-white/95' : 'bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.24)] hover:bg-[#2563eb]'}`}>
+            <Link to="/contact" className={`hidden items-center rounded-full px-4 py-2.5 text-sm font-semibold transition 2xl:inline-flex 2xl:px-5 2xl:py-3 ${isDarkHeader ? 'border border-white/15 bg-white text-[#16336F] hover:bg-white/95' : 'bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.24)] hover:bg-[#2563eb]'}`}>
               Get in Touch
             </Link>
           </motion.div>
