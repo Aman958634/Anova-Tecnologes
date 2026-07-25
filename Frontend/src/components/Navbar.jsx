@@ -18,6 +18,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
   const closeTimerRef = useRef(null);
+  const openTimerRef = useRef(null);
   const desktopNavRef = useRef(null);
   const { pathname } = useLocation();
 
@@ -44,6 +45,9 @@ export default function Navbar() {
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
     }
+    if (openTimerRef.current) {
+      clearTimeout(openTimerRef.current);
+    }
   }, []);
 
   const isDesktopOrLaptop = viewportWidth >= TABLET_BREAKPOINT;
@@ -59,23 +63,51 @@ export default function Navbar() {
     }
   }, []);
 
+  const clearOpenTimer = useCallback(() => {
+    if (openTimerRef.current) {
+      clearTimeout(openTimerRef.current);
+      openTimerRef.current = null;
+    }
+  }, []);
+
   const closeMenu = useCallback(() => {
+    clearOpenTimer();
     clearCloseTimer();
     setOpenMenuKey((current) => (current === null ? current : null));
-  }, [clearCloseTimer]);
+  }, [clearCloseTimer, clearOpenTimer]);
 
   const openMenuInstant = useCallback((key) => {
+    clearOpenTimer();
     clearCloseTimer();
     setOpenMenuKey((current) => (current === key ? current : key));
-  }, [clearCloseTimer]);
+  }, [clearCloseTimer, clearOpenTimer]);
+
+  const startOpenTimer = useCallback((key) => {
+    clearOpenTimer();
+    clearCloseTimer();
+    openTimerRef.current = setTimeout(() => {
+      setOpenMenuKey((current) => (current === key ? current : key));
+      openTimerRef.current = null;
+    }, 200);
+  }, [clearCloseTimer, clearOpenTimer]);
 
   const startCloseTimer = useCallback(() => {
     clearCloseTimer();
+    clearOpenTimer();
     closeTimerRef.current = setTimeout(() => {
       setOpenMenuKey((current) => (current === null ? current : null));
       closeTimerRef.current = null;
     }, 200);
-  }, [clearCloseTimer]);
+  }, [clearCloseTimer, clearOpenTimer]);
+
+  const startDropdownCloseTimer = useCallback(() => {
+    clearCloseTimer();
+    clearOpenTimer();
+    closeTimerRef.current = setTimeout(() => {
+      setOpenMenuKey((current) => (current === null ? current : null));
+      closeTimerRef.current = null;
+    }, 150);
+  }, [clearCloseTimer, clearOpenTimer]);
 
   const handleGlobalKeyDown = useCallback(
     (event) => {
@@ -181,13 +213,14 @@ export default function Navbar() {
 
                 const shouldUseMega = item.menu.type === 'mega' && canUseMegaMenu;
                 const isServicesMega = item.key === 'services' && shouldUseMega;
+                const isSmallDropdown = !shouldUseMega;
 
                 return (
                   <div
                     key={item.key}
-                    className="ent-nav__menu-item"
-                    onMouseEnter={!isTablet ? () => openMenuInstant(item.key) : undefined}
-                    onMouseLeave={isServicesMega ? startCloseTimer : undefined}
+                    className={`ent-nav__menu-item ${isSmallDropdown ? 'ent-nav__menu-item--dropdown' : ''}`}
+                    onMouseEnter={!isTablet ? () => (isSmallDropdown ? startOpenTimer(item.key) : openMenuInstant(item.key)) : undefined}
+                    onMouseLeave={isServicesMega ? startCloseTimer : isSmallDropdown ? startDropdownCloseTimer : undefined}
                   >
                     <button
                       type="button"
@@ -210,6 +243,11 @@ export default function Navbar() {
                           title={item.label}
                           items={item.menu.items}
                           onClose={closeMenu}
+                          onEnter={() => {
+                            clearOpenTimer();
+                            clearCloseTimer();
+                          }}
+                          onLeave={startDropdownCloseTimer}
                           menuId={`menu-${item.key}`}
                         />
                       ) : null}
