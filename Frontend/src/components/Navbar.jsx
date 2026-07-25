@@ -407,7 +407,7 @@ export default function Navbar() {
 
         <div className="ml-auto flex shrink-0 items-center gap-3">
           <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.2 }}>
-            <Link to="/contact" className={`hidden items-center rounded-full px-4 py-2.5 text-sm font-semibold transition 2xl:inline-flex 2xl:px-5 2xl:py-3 ${isDarkHeader ? 'border border-white/15 bg-white text-[#16336F] hover:bg-white/95' : 'bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.24)] hover:bg-[#2563eb]'}`}>
+            <Link to="/contact" className={`hidden whitespace-nowrap items-center rounded-full px-4 py-2.5 text-sm font-semibold transition xl:inline-flex ${isDarkHeader ? 'border border-white/15 bg-white text-[#16336F] hover:bg-white/95' : 'bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.24)] hover:bg-[#2563eb]'}`}>
               Get in Touch
             </Link>
           </motion.div>
