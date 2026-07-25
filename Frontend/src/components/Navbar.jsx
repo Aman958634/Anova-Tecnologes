@@ -266,6 +266,8 @@ export default function Navbar() {
     }));
   };
 
+  const activeMegaItem = navItems.find((item) => item.label === openDropdown && item.menu?.kind === 'mega');
+
   const renderMenuCard = (menuItem) => {
     const Icon = menuItem.icon || FileText;
 
@@ -385,7 +387,7 @@ export default function Navbar() {
               return (
                 <div
                   key={item.label}
-                  className={item.menu.kind === 'mega' ? 'static' : 'relative'}
+                  className="relative"
                   onMouseEnter={() => setOpenDropdown(item.label)}
                   onMouseLeave={() => setOpenDropdown(null)}
                 >
@@ -411,51 +413,6 @@ export default function Navbar() {
                       </motion.div>
                     ) : null}
 
-                    {openDropdown === item.label && item.menu.kind === 'mega' ? (
-                      <motion.div
-                        key={`${item.label}-mega`}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 12 }}
-                        transition={{ duration: 0.25, ease: 'easeOut' }}
-                        className="services-mega-panel"
-                      >
-                        <div className="services-mega-grid">
-                          {item.menu.columns.map((column, index) => renderServiceMegaColumn(column, index))}
-
-                          <aside className="service-mega-cta">
-                            <div className="service-mega-cta-visual" aria-hidden="true">
-                              <div className="service-mega-cta-chip service-mega-cta-chip-a" />
-                              <div className="service-mega-cta-chip service-mega-cta-chip-b" />
-                              <div className="service-mega-cta-chip service-mega-cta-chip-c" />
-                              <div className="service-mega-cta-node service-mega-cta-node-a" />
-                              <div className="service-mega-cta-node service-mega-cta-node-b" />
-                              <div className="service-mega-cta-node service-mega-cta-node-c" />
-                              <div className="service-mega-cta-node service-mega-cta-node-d" />
-                              <div className="service-mega-cta-screen" />
-                              <div className="service-mega-cta-glow">
-                                <Sparkles className="h-7 w-7" />
-                              </div>
-                            </div>
-                            <h3 className="service-mega-cta-title">{item.menu.promo.title}</h3>
-                            <p className="service-mega-cta-copy">{item.menu.promo.description}</p>
-                            <Link to={item.menu.promo.buttonPath} onClick={() => setOpenDropdown(null)} className="service-mega-cta-button">
-                              {item.menu.promo.buttonLabel}
-                              <ChevronRight className="h-4 w-4" />
-                            </Link>
-
-                            <div className="service-mega-cta-stats">
-                              {item.menu.promo.stats.map((stat) => (
-                                <div key={stat.label} className="service-mega-cta-stat">
-                                  <div className="service-mega-cta-stat-value">{stat.value}</div>
-                                  <div className="service-mega-cta-stat-label">{stat.label}</div>
-                                </div>
-                              ))}
-                            </div>
-                          </aside>
-                        </div>
-                      </motion.div>
-                    ) : null}
                   </AnimatePresence>
                 </div>
               );
@@ -469,6 +426,60 @@ export default function Navbar() {
               </Link>
             </motion.div>
           </div>
+
+          <AnimatePresence>
+            {activeMegaItem ? (
+              <motion.div
+                key={activeMegaItem.label}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="services-mega-panel"
+                onMouseEnter={() => setOpenDropdown(activeMegaItem.label)}
+                onMouseLeave={() => setOpenDropdown(null)}
+              >
+                <div className="services-mega-grid">
+                  {activeMegaItem.menu.columns.map((column, index) => renderServiceMegaColumn(column, index))}
+
+                  <aside className="service-mega-cta">
+                    <div className="service-mega-cta-visual" aria-hidden="true">
+                      <div className="service-mega-cta-chip service-mega-cta-chip-a" />
+                      <div className="service-mega-cta-chip service-mega-cta-chip-b" />
+                      <div className="service-mega-cta-chip service-mega-cta-chip-c" />
+                      <div className="service-mega-cta-node service-mega-cta-node-a" />
+                      <div className="service-mega-cta-node service-mega-cta-node-b" />
+                      <div className="service-mega-cta-node service-mega-cta-node-c" />
+                      <div className="service-mega-cta-node service-mega-cta-node-d" />
+                      <div className="service-mega-cta-screen" />
+                      <div className="service-mega-cta-glow">
+                        <Sparkles className="h-7 w-7" />
+                      </div>
+                    </div>
+                    <h3 className="service-mega-cta-title">{activeMegaItem.menu.promo.title}</h3>
+                    <p className="service-mega-cta-copy">{activeMegaItem.menu.promo.description}</p>
+                    <Link
+                      to={activeMegaItem.menu.promo.buttonPath}
+                      onClick={() => setOpenDropdown(null)}
+                      className="service-mega-cta-button"
+                    >
+                      {activeMegaItem.menu.promo.buttonLabel}
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
+
+                    <div className="service-mega-cta-stats">
+                      {activeMegaItem.menu.promo.stats.map((stat) => (
+                        <div key={stat.label} className="service-mega-cta-stat">
+                          <div className="service-mega-cta-stat-value">{stat.value}</div>
+                          <div className="service-mega-cta-stat-label">{stat.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </aside>
+                </div>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
 
         </div>
 
