@@ -15,6 +15,7 @@ export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [openMenuKey, setOpenMenuKey] = useState(null);
   const [mobileOpenMap, setMobileOpenMap] = useState({});
+  const [isScrolled, setIsScrolled] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
   const closeTimerRef = useRef(null);
   const { pathname } = useLocation();
@@ -23,6 +24,13 @@ export default function Navbar() {
     const onResize = () => setViewportWidth(window.innerWidth);
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   useEffect(() => {
@@ -42,12 +50,6 @@ export default function Navbar() {
   const canUseMegaMenu = viewportWidth >= MEGA_MENU_BREAKPOINT;
 
   const servicesItem = useMemo(() => NAV_ITEMS.find((item) => item.key === 'services'), []);
-
-  const isItemActive = (item) => {
-    if (pathname === item.path) return true;
-    if (!item.menu) return false;
-    return item.menu.items.some((entry) => entry.path === pathname);
-  };
 
   const clearCloseTimer = () => {
     if (closeTimerRef.current) {
@@ -82,17 +84,16 @@ export default function Navbar() {
   };
 
   return (
-    <header className="ent-nav">
+    <header className={`ent-nav ${isScrolled ? 'is-scrolled' : ''}`}>
       <div className="ent-nav__container">
         <Link to="/" className="ent-nav__logo-link" aria-label="Anova Technologies home">
-          <img src="/logoanova-white.png" alt="Anova Technologies" className="ent-nav__logo" />
+          <img src={isScrolled ? '/logoanova.png' : '/logoanova-white.png'} alt="Anova Technologies" className="ent-nav__logo" />
         </Link>
 
         {isDesktopOrLaptop ? (
           <div className="ent-nav__center">
             <nav className="ent-nav__links" aria-label="Primary">
               {NAV_ITEMS.map((item) => {
-                const active = isItemActive(item);
                 const isOpen = openMenuKey === item.key;
                 const hasMenu = Boolean(item.menu);
 
@@ -101,7 +102,7 @@ export default function Navbar() {
                     <NavLink
                       key={item.key}
                       to={item.path}
-                      className={`ent-nav__link ${active ? 'is-active' : ''}`}
+                      className="ent-nav__link"
                     >
                       {item.label}
                     </NavLink>
@@ -120,7 +121,7 @@ export default function Navbar() {
                   >
                     <button
                       type="button"
-                      className={`ent-nav__link ent-nav__trigger ${active || isOpen ? 'is-active' : ''}`}
+                      className="ent-nav__link ent-nav__trigger"
                       onClick={() => setOpenMenuKey((current) => (current === item.key ? null : item.key))}
                     >
                       <span>{item.label}</span>

@@ -1,16 +1,14 @@
 .ent-mega {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(10px);
-  width: min(1380px, 96vw);
-  max-width: min(1380px, 96vw);
-  margin: 0 auto;
+  width: min(1280px, calc(100% - 64px));
+  max-width: 1280px;
+  margin: 12px auto 0;
   background: #081729;
-  border-radius: 18px;
+  background: linear-gradient(180deg, #081322, #09182c);
+  border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
-  padding: 36px 40px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20px);
+  padding: 32px;
   overflow: visible;
   z-index: 9999;
   visibility: hidden;
@@ -30,7 +28,7 @@
 .ent-mega__grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(180px, 1fr));
-  gap: 36px;
+  gap: 32px;
   align-items: start;
   overflow: visible;
 }
@@ -40,7 +38,13 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding-right: 20px;
+  padding: 10px 16px 10px 0;
+  transition: background-color 0.25s ease;
+}
+
+.ent-mega__column:hover {
+  background: rgba(37, 99, 235, 0.05);
+  border-radius: 12px;
 }
 
 .ent-mega__column.is-divider {
@@ -112,8 +116,8 @@
 
 @media (max-width: 1399px) {
   .ent-mega {
-    width: min(1380px, 96vw);
-    max-width: min(1380px, 96vw);
+    width: min(1280px, calc(100% - 64px));
+    max-width: 1280px;
     padding: 30px;
   }
 
