@@ -268,7 +268,7 @@ export default function Navbar() {
     const Icon = menuItem.icon || FileText;
 
     return (
-      <div className="border-r border-white/10 px-4 py-4 last:border-r-0 last:pr-4">
+      <div className="min-w-0 border-r border-white/10 px-4 py-4 last:border-r-0 last:pr-4">
         <div className="mb-3 flex items-center gap-3">
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-white/8 text-[#5da3ff] ring-1 ring-inset ring-white/10">
             <Icon className="h-4 w-4" />
@@ -285,7 +285,7 @@ export default function Navbar() {
               className="group flex items-start gap-2 rounded-xl px-1.5 py-1 text-[0.88rem] leading-5 text-slate-300 transition hover:text-white"
             >
               <ChevronRight className="mt-[0.15rem] h-3.5 w-3.5 shrink-0 text-[#5da3ff] transition group-hover:translate-x-0.5" />
-              <span className="max-w-[175px]">{child.label}</span>
+              <span className="max-w-[210px]">{child.label}</span>
             </Link>
           ))}
         </div>
@@ -359,10 +359,10 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
                       transition={{ duration: 0.18 }}
-                      className={`absolute top-full mt-3 overflow-hidden rounded-[28px] border backdrop-blur-xl ${item.menu.kind === 'mega' ? 'left-1/2 w-[min(1240px,calc(100vw-1.5rem))] -translate-x-1/2 border-white/10 bg-[#071225]/96 shadow-[0_28px_80px_rgba(2,8,23,0.56)]' : 'left-0 min-w-[320px] border-white/10 bg-[#071225]/96 shadow-[0_22px_55px_rgba(2,8,23,0.42)]'}`}
+                      className={`absolute top-full mt-3 overflow-hidden rounded-[28px] border backdrop-blur-xl ${item.menu.kind === 'mega' ? 'left-1/2 w-[min(1320px,calc(100vw-2rem))] -translate-x-1/2 border-white/10 bg-[#071225]/96 shadow-[0_28px_80px_rgba(2,8,23,0.56)]' : 'left-0 min-w-[320px] border-white/10 bg-[#071225]/96 shadow-[0_22px_55px_rgba(2,8,23,0.42)]'}`}
                     >
                       {item.menu.kind === 'mega' ? (
-                        <div className="grid grid-cols-1 gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_320px]">
+                        <div className="grid grid-cols-1 gap-0 xl:grid-cols-[repeat(6,minmax(0,1fr))_300px]">
                           <div className="col-span-1 grid grid-cols-1 gap-0 xl:col-span-6 xl:grid-cols-6">
                             {item.menu.columns.map((column) => renderMenuCard(column))}
                           </div>
