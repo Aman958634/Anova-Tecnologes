@@ -264,28 +264,30 @@ export default function Navbar() {
     }));
   };
 
+  const activeMegaItem = navItems.find((item) => item.label === openDropdown && item.menu?.kind === 'mega');
+
   const renderMenuCard = (menuItem) => {
     const Icon = menuItem.icon || FileText;
 
     return (
-      <div className="min-w-0 border-r border-white/10 px-4 py-4 last:border-r-0 last:pr-4">
-        <div className="mb-3 flex items-center gap-3">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-white/8 text-[#5da3ff] ring-1 ring-inset ring-white/10">
+      <div className="mega-menu-col">
+        <div className="mega-menu-col-head">
+          <span className="mega-menu-col-icon">
             <Icon className="h-4 w-4" />
           </span>
-          <h3 className="text-[0.96rem] font-semibold leading-tight tracking-tight text-white">{menuItem.title}</h3>
+          <h3 className="mega-menu-col-title">{menuItem.title}</h3>
         </div>
 
-        <div className="space-y-1">
+        <div className="mega-menu-col-links">
           {menuItem.items.map((child) => (
             <Link
               key={`${menuItem.title}-${child.label}`}
               to={child.path}
               onClick={() => setOpen(false)}
-              className="group flex items-start gap-2 rounded-xl px-1.5 py-1 text-[0.88rem] leading-5 text-slate-300 transition hover:text-white"
+              className="mega-menu-link"
             >
-              <ChevronRight className="mt-[0.15rem] h-3.5 w-3.5 shrink-0 text-[#5da3ff] transition group-hover:translate-x-0.5" />
-              <span className="max-w-[210px]">{child.label}</span>
+              <ChevronRight className="mega-menu-link-caret" />
+              <span className="mega-menu-link-text">{child.label}</span>
             </Link>
           ))}
         </div>
@@ -303,7 +305,7 @@ export default function Navbar() {
           : 'border-slate-200 bg-white/95 shadow-[0_1px_0_rgba(15,23,42,0.04)]'
       }`}
     >
-      <div className="section-shell flex h-[90px] items-center justify-between gap-4 lg:h-[96px] lg:gap-8">
+      <div className="section-shell relative flex h-[90px] items-center justify-between gap-4 lg:h-[96px] lg:gap-8">
         <Link to="/" className="group flex shrink-0 items-center">
           <img
             src={isDarkHeader ? '/logoanova-white.png' : '/logoanova.png'}
@@ -353,7 +355,7 @@ export default function Navbar() {
                 </button>
 
                 <AnimatePresence>
-                  {openDropdown === item.label ? (
+                  {openDropdown === item.label && item.menu.kind !== 'mega' ? (
                     <motion.div
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -403,6 +405,52 @@ export default function Navbar() {
               </div>
             );
           })}
+
+          <AnimatePresence>
+            {activeMegaItem ? (
+              <motion.div
+                key={activeMegaItem.label}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.2 }}
+                className="mega-menu-panel"
+                onMouseEnter={() => setOpenDropdown(activeMegaItem.label)}
+                onMouseLeave={() => setOpenDropdown(null)}
+              >
+                <div className="mega-menu-grid">
+                  {activeMegaItem.menu.columns.map((column) => renderMenuCard(column))}
+
+                  <aside className="mega-menu-cta">
+                    <div className="mega-menu-cta-visual">
+                      <div className="mega-menu-cta-icon-wrap">
+                        <Sparkles className="h-8 w-8" />
+                      </div>
+                    </div>
+                    <h3 className="mega-menu-cta-title">{activeMegaItem.menu.promo.title}</h3>
+                    <p className="mega-menu-cta-copy">{activeMegaItem.menu.promo.description}</p>
+                    <Link
+                      to={activeMegaItem.menu.promo.buttonPath}
+                      onClick={() => setOpenDropdown(null)}
+                      className="mega-menu-cta-button"
+                    >
+                      {activeMegaItem.menu.promo.buttonLabel}
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
+
+                    <div className="mega-menu-cta-stats">
+                      {activeMegaItem.menu.promo.stats.map((stat) => (
+                        <div key={stat.label} className="mega-menu-cta-stat">
+                          <div className="mega-menu-cta-stat-value">{stat.value}</div>
+                          <div className="mega-menu-cta-stat-label">{stat.label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </aside>
+                </div>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
         </nav>
 
         <div className="ml-auto flex shrink-0 items-center gap-3">
