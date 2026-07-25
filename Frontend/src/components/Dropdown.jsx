@@ -1,7 +1,8 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-export default function Dropdown({ title, items, onClose }) {
+function Dropdown({ title, items, onClose, menuId }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -9,6 +10,7 @@ export default function Dropdown({ title, items, onClose }) {
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.22, ease: 'easeOut' }}
       className="ent-dropdown"
+      id={menuId}
       role="menu"
       aria-label={title}
       onMouseLeave={onClose}
@@ -27,3 +29,5 @@ export default function Dropdown({ title, items, onClose }) {
     </motion.div>
   );
 }
+
+export default memo(Dropdown);

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ChevronDown, Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -18,6 +18,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
   const closeTimerRef = useRef(null);
+  const desktopNavRef = useRef(null);
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -51,37 +52,98 @@ export default function Navbar() {
 
   const servicesItem = useMemo(() => NAV_ITEMS.find((item) => item.key === 'services'), []);
 
-  const clearCloseTimer = () => {
+  const clearCloseTimer = useCallback(() => {
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
     }
-  };
+  }, []);
 
-  const closeMenu = () => {
+  const closeMenu = useCallback(() => {
     clearCloseTimer();
-    setOpenMenuKey(null);
-  };
+    setOpenMenuKey((current) => (current === null ? current : null));
+  }, [clearCloseTimer]);
 
-  const openMenuInstant = (key) => {
+  const openMenuInstant = useCallback((key) => {
     clearCloseTimer();
-    setOpenMenuKey(key);
-  };
+    setOpenMenuKey((current) => (current === key ? current : key));
+  }, [clearCloseTimer]);
 
-  const startCloseTimer = () => {
+  const startCloseTimer = useCallback(() => {
     clearCloseTimer();
     closeTimerRef.current = setTimeout(() => {
-      setOpenMenuKey(null);
+      setOpenMenuKey((current) => (current === null ? current : null));
       closeTimerRef.current = null;
-    }, 250);
-  };
+    }, 200);
+  }, [clearCloseTimer]);
 
-  const toggleMobileGroup = (key) => {
+  const handleGlobalKeyDown = useCallback(
+    (event) => {
+      if (event.key === 'Escape') {
+        closeMenu();
+      }
+    },
+    [closeMenu]
+  );
+
+  const handleDesktopNavKeyDown = useCallback(
+    (event) => {
+      if (!desktopNavRef.current) return;
+
+      const focusables = Array.from(
+        desktopNavRef.current.querySelectorAll('[data-nav-focusable="true"]')
+      );
+      if (focusables.length === 0) return;
+
+      const currentIndex = focusables.indexOf(document.activeElement);
+      if (currentIndex === -1) return;
+
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        const nextIndex = (currentIndex + 1) % focusables.length;
+        focusables[nextIndex].focus();
+      }
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        const prevIndex = (currentIndex - 1 + focusables.length) % focusables.length;
+        focusables[prevIndex].focus();
+      }
+    },
+    []
+  );
+
+  const handleTriggerKeyDown = useCallback(
+    (event, key) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        setOpenMenuKey((current) => (current === key ? null : key));
+      }
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        openMenuInstant(key);
+      }
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeMenu();
+      }
+    },
+    [closeMenu, openMenuInstant]
+  );
+
+  const toggleMobileGroup = useCallback((key) => {
     setMobileOpenMap((current) => ({
       ...current,
       [key]: !current[key],
     }));
-  };
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [handleGlobalKeyDown]);
 
   return (
     <header className={`ent-nav ${isScrolled ? 'is-scrolled' : ''}`}>
@@ -92,7 +154,13 @@ export default function Navbar() {
 
         {isDesktopOrLaptop ? (
           <div className="ent-nav__center">
-            <nav className="ent-nav__links" aria-label="Primary">
+            <nav
+              className="ent-nav__links"
+              aria-label="Primary"
+              role="menubar"
+              ref={desktopNavRef}
+              onKeyDown={handleDesktopNavKeyDown}
+            >
               {NAV_ITEMS.map((item) => {
                 const isOpen = openMenuKey === item.key;
                 const hasMenu = Boolean(item.menu);
@@ -103,6 +171,8 @@ export default function Navbar() {
                       key={item.key}
                       to={item.path}
                       className="ent-nav__link"
+                      data-nav-focusable="true"
+                      role="menuitem"
                     >
                       {item.label}
                     </NavLink>
@@ -122,7 +192,13 @@ export default function Navbar() {
                     <button
                       type="button"
                       className="ent-nav__link ent-nav__trigger"
+                      data-nav-focusable="true"
+                      role="menuitem"
+                      aria-haspopup="true"
+                      aria-expanded={isOpen}
+                      aria-controls={`menu-${item.key}`}
                       onClick={() => setOpenMenuKey((current) => (current === item.key ? null : item.key))}
+                      onKeyDown={(event) => handleTriggerKeyDown(event, item.key)}
                     >
                       <span>{item.label}</span>
                       <ChevronDown className={`ent-nav__chevron ${isOpen ? 'is-open' : ''}`} />
@@ -134,6 +210,7 @@ export default function Navbar() {
                           title={item.label}
                           items={item.menu.items}
                           onClose={closeMenu}
+                          menuId={`menu-${item.key}`}
                         />
                       ) : null}
                     </AnimatePresence>
@@ -171,6 +248,7 @@ export default function Navbar() {
               item={servicesItem}
               isVisible={openMenuKey === 'services'}
               onClose={closeMenu}
+              menuId="menu-services"
             />
           </div>
         ) : null}

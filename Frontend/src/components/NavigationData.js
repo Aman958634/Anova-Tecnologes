@@ -1,12 +1,3 @@
-import {
-  Bot,
-  Cloud,
-  Code2,
-  Megaphone,
-  Palette,
-  Smartphone,
-} from 'lucide-react';
-
 export const NAV_ITEMS = [
   { key: 'home', label: 'Home', path: '/' },
   {
@@ -18,7 +9,7 @@ export const NAV_ITEMS = [
       columns: [
         {
           title: 'Web Development',
-          icon: Code2,
+          icon: 'Code2',
           items: [
             { label: 'Custom Website Development', path: '/services' },
             { label: 'E-Commerce Development', path: '/services' },
@@ -29,7 +20,7 @@ export const NAV_ITEMS = [
         },
         {
           title: 'Mobile Apps',
-          icon: Smartphone,
+          icon: 'Smartphone',
           items: [
             { label: 'Android App Development', path: '/services' },
             { label: 'iOS App Development', path: '/services' },
@@ -40,7 +31,7 @@ export const NAV_ITEMS = [
         },
         {
           title: 'UI/UX',
-          icon: Palette,
+          icon: 'Palette',
           items: [
             { label: 'UI Design', path: '/services' },
             { label: 'UX Research', path: '/services' },
@@ -51,7 +42,7 @@ export const NAV_ITEMS = [
         },
         {
           title: 'AI Solutions',
-          icon: Bot,
+          icon: 'Bot',
           items: [
             { label: 'Conversational AI', path: '/services' },
             { label: 'Intelligent Automation', path: '/services' },
@@ -62,7 +53,7 @@ export const NAV_ITEMS = [
         },
         {
           title: 'Cloud',
-          icon: Cloud,
+          icon: 'Cloud',
           items: [
             { label: 'Cloud Architecture', path: '/services' },
             { label: 'Cloud Migration', path: '/services' },
@@ -73,7 +64,7 @@ export const NAV_ITEMS = [
         },
         {
           title: 'Digital Marketing',
-          icon: Megaphone,
+          icon: 'Megaphone',
           items: [
             { label: 'Search Engine Optimization', path: '/services' },
             { label: 'Performance Marketing', path: '/services' },
