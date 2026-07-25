@@ -446,6 +446,11 @@ export default function Navbar() {
                       <div className="service-mega-cta-chip service-mega-cta-chip-a" />
                       <div className="service-mega-cta-chip service-mega-cta-chip-b" />
                       <div className="service-mega-cta-chip service-mega-cta-chip-c" />
+                      <div className="service-mega-cta-node service-mega-cta-node-a" />
+                      <div className="service-mega-cta-node service-mega-cta-node-b" />
+                      <div className="service-mega-cta-node service-mega-cta-node-c" />
+                      <div className="service-mega-cta-node service-mega-cta-node-d" />
+                      <div className="service-mega-cta-screen" />
                       <div className="service-mega-cta-glow">
                         <Sparkles className="h-7 w-7" />
                       </div>
