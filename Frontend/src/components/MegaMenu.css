@@ -1,0 +1,118 @@
+.ent-mega {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 14px;
+  width: 1240px;
+  max-width: 95vw;
+  background: #081426;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  padding: 34px;
+  z-index: 120;
+}
+
+.ent-mega__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(180px, 1fr));
+  gap: 30px;
+}
+
+.ent-mega__column {
+  min-width: 0;
+  padding-right: 15px;
+}
+
+.ent-mega__column.is-divider {
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ent-mega__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ent-mega__icon-wrap {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.28);
+  flex-shrink: 0;
+}
+
+.ent-mega__title {
+  margin: 0;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.ent-mega__links {
+  display: grid;
+  gap: 0;
+}
+
+.ent-mega__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 32px;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 32px;
+  transition: color 0.22s ease;
+}
+
+.ent-mega__arrow {
+  color: #8cb6ff;
+  transition: transform 0.22s ease;
+  flex-shrink: 0;
+}
+
+.ent-mega__link:hover {
+  color: #3b82f6;
+}
+
+.ent-mega__link:hover .ent-mega__arrow {
+  transform: translateX(4px);
+}
+
+@media (max-width: 1360px) {
+  .ent-mega {
+    width: min(1240px, calc(100vw - 28px));
+    padding: 26px;
+  }
+
+  .ent-mega__grid {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+    gap: 22px;
+  }
+
+  .ent-mega__column.is-divider {
+    border-right: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .ent-mega {
+    width: min(95vw, 900px);
+    padding: 22px;
+  }
+
+  .ent-mega__grid {
+    grid-template-columns: repeat(2, minmax(170px, 1fr));
+    gap: 18px;
+  }
+}
