@@ -356,6 +356,14 @@ export default function Navbar() {
                   </div>
                 );
               })}
+
+              <Link
+                to="/contact"
+                className="ent-nav__mobile-cta"
+                onClick={() => setIsMobileOpen(false)}
+              >
+                Get In Touch
+              </Link>
             </nav>
           </motion.div>
         ) : null}
