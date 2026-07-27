@@ -3,7 +3,7 @@ services:
     name: anova-backend
     runtime: node
     rootDir: Backend
-    buildCommand: npm ci
+    buildCommand: npm install
     startCommand: npm start
     autoDeploy: true
     healthCheckPath: /api/health

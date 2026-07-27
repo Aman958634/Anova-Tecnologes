@@ -1,4 +1,4 @@
-require('dotenv').config({ quiet: true });
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -426,9 +426,6 @@ async function bootstrap() {
 
   } catch (err) {
     console.error('❌ Server startup failed:', err.message);
-    if (err?.code) console.error('❌ Error code:', err.code);
-    if (err?.errno) console.error('❌ Error number:', err.errno);
-    if (err?.sqlState) console.error('❌ SQL state:', err.sqlState);
 
     // DO NOT silently continue in production
     process.exit(1);

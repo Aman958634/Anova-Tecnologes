@@ -1,4 +1,4 @@
-require('dotenv').config({ quiet: true });
+require('dotenv').config();
 const mysql = require('mysql2/promise');
 
 const databaseUrl = process.env.DATABASE_URL || process.env.MYSQL_URL || process.env.CLEARDB_DATABASE_URL;
@@ -31,23 +31,8 @@ const dbConfig = {
   database: process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE
 };
 
-const isRailwayInternalHost = typeof dbConfig.host === 'string' && dbConfig.host.endsWith('.railway.internal');
-if (isRailwayInternalHost) {
-  const fallbackPublicHost = process.env.MYSQL_PUBLIC_HOST || process.env.RAILWAY_PUBLIC_HOST || process.env.DATABASE_PUBLIC_HOST;
-  const fallbackPublicPort = Number(process.env.MYSQL_PUBLIC_PORT || process.env.RAILWAY_PUBLIC_PORT || process.env.DATABASE_PUBLIC_PORT || dbConfig.port);
-  if (fallbackPublicHost) {
-    dbConfig.host = fallbackPublicHost;
-    dbConfig.port = fallbackPublicPort;
-    console.log('ℹ️  Using public MySQL host fallback for non-Railway network runtime.');
-  }
-}
-
-const managedMysqlHostPattern = /(proxy\.rlwy\.net|railway)/i;
-const inferredManagedMysql = managedMysqlHostPattern.test(String(dbConfig.host || '')) || Number(dbConfig.port) !== 3306;
-
-// For managed MySQL providers (Railway/Render proxied endpoints), SSL is often required.
-const useSsl = toBoolean(process.env.MYSQL_SSL, inferredManagedMysql);
-const rejectUnauthorized = toBoolean(process.env.MYSQL_SSL_REJECT_UNAUTHORIZED, !inferredManagedMysql);
+const useSsl = toBoolean(process.env.MYSQL_SSL, false);
+const rejectUnauthorized = toBoolean(process.env.MYSQL_SSL_REJECT_UNAUTHORIZED, true);
 const sslConfig = useSsl
   ? {
       rejectUnauthorized,
@@ -101,59 +86,22 @@ const pool = mysql.createPool({
   ...baseConfig,
   database: dbConfig.database,
   ssl: sslConfig,
-  connectTimeout: Number(process.env.MYSQL_CONNECT_TIMEOUT_MS || 20000),
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
   dateStrings: true
 });
 
-function isTransientConnectionError(error) {
-  const code = String(error?.code || '').toUpperCase();
-  const message = String(error?.message || '').toLowerCase();
-  return (
-    code === 'PROTOCOL_CONNECTION_LOST' ||
-    code === 'ECONNRESET' ||
-    code === 'ETIMEDOUT' ||
-    code === 'EPIPE' ||
-    code === 'PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR' ||
-    message.includes('connection lost') ||
-    message.includes('server closed the connection')
-  );
-}
-
-function wait(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 /**
  * Test DB connection
  */
-async function testConnection({ retries = 5, baseDelayMs = 800 } = {}) {
-  let lastError = null;
-
-  for (let attempt = 1; attempt <= retries; attempt += 1) {
-    let conn;
-    try {
-      conn = await pool.getConnection();
-      await conn.ping();
-      return;
-    } catch (error) {
-      lastError = error;
-      const shouldRetry = isTransientConnectionError(error) && attempt < retries;
-      if (!shouldRetry) throw error;
-
-      const delay = baseDelayMs * attempt;
-      console.warn(`[db] Connection attempt ${attempt}/${retries} failed (${error?.code || 'UNKNOWN'}). Retrying in ${delay}ms...`);
-      await wait(delay);
-    } finally {
-      if (conn) conn.release();
-    }
+async function testConnection() {
+  const conn = await pool.getConnection();
+  try {
+    await conn.ping();
+  } finally {
+    conn.release();
   }
-
-  throw lastError || new Error('Database connection failed after retries.');
 }
 
 /**

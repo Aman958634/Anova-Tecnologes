@@ -230,17 +230,14 @@ const setShortCacheHeaders = (res) => {
 
 const listProjects = asyncHandler(async (req, res) => {
   const search = req.query.search ? `%${req.query.search}%` : '%';
-  const forceFresh = req.query.fresh === '1' || req.query.fresh === 'true';
   const page = Math.max(Number(req.query.page) || 1, 1);
   const limit = Math.min(Math.max(Number(req.query.limit) || 12, 1), 100);
   const offset = (page - 1) * limit;
   const cacheKey = `projects:${search}:${page}:${limit}`;
-  if (!forceFresh) {
-    const cached = getCache(cacheKey);
-    if (cached) {
-      setShortCacheHeaders(res);
-      return res.json(cached);
-    }
+  const cached = getCache(cacheKey);
+  if (cached) {
+    setShortCacheHeaders(res);
+    return res.json(cached);
   }
 
   const [rows] = await pool.query(
@@ -258,8 +255,7 @@ const listProjects = asyncHandler(async (req, res) => {
     projects: formatted,
     meta: { page, limit, total: countRows[0].total },
   };
-  // Keep cache short to balance speed with near real-time admin updates.
-  setCache(cacheKey, result, 30000);
+  setCache(cacheKey, result, 120000);
   setShortCacheHeaders(res);
   res.json(result);
 });
@@ -393,6 +389,15 @@ const updateProject = asyncHandler(async (req, res) => {
         success: false,
         message: 'Invalid request body.',
         stack: null,
+      });
+    }
+
+    if (!req.file) {
+      console.log('req.file is undefined');
+      console.log('[projects:update] Step 4: req.file undefined, returning 400');
+      return res.status(400).json({
+        success:false,
+        message:'Image file not received.'
       });
     }
 
