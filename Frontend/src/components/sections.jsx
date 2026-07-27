@@ -566,20 +566,26 @@ export function AboutSection() {
 export function ProjectsSection() {
   const [projects, setProjects] = useState([]);
   const [liked, setLiked] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
-  const fetchProjects = useCallback(async () => {
+  const fetchProjects = useCallback(async ({ fresh = false } = {}) => {
     try {
-      const response = await api.get('/projects', { params: { page: 1, limit: 9 } });
+      setIsLoading(true);
+      const response = await api.get('/projects', { params: { page: 1, limit: 9, fresh: fresh ? 1 : undefined } });
       setProjects(response.data.data || []);
     } catch {
       setProjects([]);
+    } finally {
+      setIsLoading(false);
+      setHasLoaded(true);
     }
   }, []);
 
   useEffect(() => {
-    fetchProjects();
-    const onDataUpdated = () => fetchProjects();
-    const onStorage = (event) => { if (event.key === 'anova:data-updated') fetchProjects(); };
+    fetchProjects({ fresh: true });
+    const onDataUpdated = () => fetchProjects({ fresh: true });
+    const onStorage = (event) => { if (event.key === 'anova:data-updated') fetchProjects({ fresh: true }); };
     window.addEventListener('anova:data-updated', onDataUpdated);
     window.addEventListener('storage', onStorage);
     return () => {
@@ -668,7 +674,19 @@ export function ProjectsSection() {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project, index) => (
+          {isLoading && !hasLoaded ? Array.from({ length: 6 }).map((_, index) => (
+            <div
+              key={`project-skeleton-${index}`}
+              className="overflow-hidden rounded-[18px] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.08)]"
+            >
+              <div className="h-[210px] animate-pulse bg-slate-200 sm:h-[250px] md:h-[260px] lg:h-[220px]" />
+              <div className="space-y-3 p-5">
+                <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200" />
+                <div className="h-3 w-full animate-pulse rounded bg-slate-100" />
+                <div className="h-3 w-4/5 animate-pulse rounded bg-slate-100" />
+              </div>
+            </div>
+          )) : projects.map((project, index) => (
             <motion.div
               key={project.id || project.title}
               initial={{ opacity: 0, y: 20 }}
@@ -742,6 +760,13 @@ export function ProjectsSection() {
             </motion.div>
           ))}
         </div>
+
+        {!isLoading && projects.length === 0 ? (
+          <div className="rounded-2xl border border-[#dbe6ff] bg-white px-6 py-10 text-center text-[#355189] shadow-[0_8px_20px_rgba(15,23,42,0.05)]">
+            <p className="text-lg font-semibold text-[#15387c]">Projects are being updated.</p>
+            <p className="mt-2 text-sm">Please check back in a moment, or add projects from the admin panel.</p>
+          </div>
+        ) : null}
 
       </div>
     </motion.section>

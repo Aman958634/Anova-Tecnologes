@@ -31,6 +31,17 @@ const dbConfig = {
   database: process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE
 };
 
+const isRailwayInternalHost = typeof dbConfig.host === 'string' && dbConfig.host.endsWith('.railway.internal');
+if (isRailwayInternalHost) {
+  const fallbackPublicHost = process.env.MYSQL_PUBLIC_HOST || process.env.RAILWAY_PUBLIC_HOST || process.env.DATABASE_PUBLIC_HOST;
+  const fallbackPublicPort = Number(process.env.MYSQL_PUBLIC_PORT || process.env.RAILWAY_PUBLIC_PORT || process.env.DATABASE_PUBLIC_PORT || dbConfig.port);
+  if (fallbackPublicHost) {
+    dbConfig.host = fallbackPublicHost;
+    dbConfig.port = fallbackPublicPort;
+    console.log('ℹ️  Using public MySQL host fallback for non-Railway network runtime.');
+  }
+}
+
 const useSsl = toBoolean(process.env.MYSQL_SSL, false);
 const rejectUnauthorized = toBoolean(process.env.MYSQL_SSL_REJECT_UNAUTHORIZED, true);
 const sslConfig = useSsl

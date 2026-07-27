@@ -2,6 +2,9 @@
   "name": "anova-tech-company-backend",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=20 <25"
+  },
   "description": "Production-ready Express API for the Anova tech company website",
   "main": "server.js",
   "scripts": {
