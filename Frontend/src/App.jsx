@@ -1,8 +1,9 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Suspense, lazy, useEffect } from 'react';
 import WhatsAppButton from './components/WhatsAppButton';
+import { trackPageView } from './utils/analytics';
 
 const Home = lazy(() => import('./pages/Home'));
 const About = lazy(() => import('./pages/About'));
@@ -25,9 +26,15 @@ function PublicRoute({ element }) {
 }
 
 export default function App() {
+  const location = useLocation();
+
   useEffect(() => {
     document.title = 'ANOVA TECHNOLOGIES';
   }, []);
+
+  useEffect(() => {
+    trackPageView(location.pathname, location.search);
+  }, [location.pathname, location.search]);
 
   return (
     <Suspense fallback={<div className="min-h-screen grid place-items-center bg-[#071c46] text-white">Loading page…</div>}>
