@@ -201,6 +201,17 @@ export function HomeServicesSection() {
     return ['Attractive & Responsive Design', 'User-Friendly Experience', 'Best for Services & Businesses'];
   };
 
+  const iconMotionVariant = (service) => {
+    const source = `${service.icon || ''} ${service.title || ''} ${service.description || ''}`.toLowerCase();
+    if (source.includes('mobile') || source.includes('app')) return 'mobile';
+    if (source.includes('web') || source.includes('website')) return 'web';
+    if (source.includes('market') || source.includes('seo')) return 'marketing';
+    if (source.includes('cloud')) return 'cloud';
+    if (source.includes('ui') || source.includes('ux') || source.includes('design')) return 'uiux';
+    if (source.includes('ai') || source.includes('ml')) return 'ai';
+    return 'default';
+  };
+
   const fetchServices = useCallback(async () => {
     try {
       const response = await api.get('/services', { params: { page: 1, limit: 100 } });
@@ -250,14 +261,14 @@ export function HomeServicesSection() {
               variants={cardVariants}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -6 }}
-              className="relative"
+              className="service-card-fx relative"
             >
             <SectionCard className="h-full rounded-[14px] border border-[#d7dce6] bg-[#f7f9fc] shadow-[0_6px_16px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_30px_rgba(15,23,42,0.12)]">
               <div className="space-y-5 p-8">
-              <div className={`grid h-[64px] w-[64px] place-items-center rounded-[16px] ${iconTheme(index)}`}>
+              <div className={`service-icon-fx service-icon--${iconMotionVariant(service)} grid h-[64px] w-[64px] place-items-center rounded-[16px] ${iconTheme(index)}`}>
                 {(() => {
                   const Icon = resolveServiceIcon(service);
-                  return <Icon className="h-7 w-7" />;
+                  return <Icon className="service-icon-glyph h-7 w-7" />;
                 })()}
               </div>
                 <h3 className="text-[16px] font-semibold leading-[1.35] text-[#162f63]">{service.title}</h3>

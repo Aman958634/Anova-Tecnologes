@@ -1052,6 +1052,131 @@ section[id] {
   }
 }
 
+/* Services icon motion: subtle, premium, and GPU-friendly. */
+@keyframes serviceIconFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -3px, 0);
+  }
+}
+
+@keyframes serviceIconMobileBob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -2px, 0) rotate(-1deg);
+  }
+}
+
+@keyframes serviceIconWebPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.045);
+  }
+}
+
+@keyframes serviceIconMarketingLift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@keyframes serviceIconCloudFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+@keyframes serviceIconUiPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+.service-icon-fx {
+  position: relative;
+  transform: translateZ(0);
+  will-change: transform, box-shadow, filter;
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease, filter 300ms ease;
+  animation: serviceIconFloat 6.2s ease-in-out infinite;
+}
+
+.service-icon-glyph {
+  transform: translateZ(0);
+  transform-origin: center;
+  will-change: transform;
+  transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms ease;
+}
+
+.service-card-fx:hover .service-icon-fx,
+.service-card-fx:focus-within .service-icon-fx {
+  transform: translate3d(0, -1px, 0) scale(1.055);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.24), 0 10px 22px rgba(47, 109, 247, 0.22);
+  filter: saturate(1.03);
+}
+
+.service-card-fx:hover .service-icon-glyph,
+.service-card-fx:focus-within .service-icon-glyph {
+  transform: scale(1.06);
+}
+
+.service-icon--mobile {
+  animation: serviceIconMobileBob 6.8s ease-in-out infinite;
+}
+
+.service-icon--mobile .service-icon-glyph {
+  animation: serviceIconMobileBob 7.2s ease-in-out infinite;
+}
+
+.service-icon--web .service-icon-glyph {
+  animation: serviceIconWebPulse 7.6s ease-in-out infinite;
+}
+
+.service-icon--marketing .service-icon-glyph {
+  animation: serviceIconMarketingLift 6.4s ease-in-out infinite;
+}
+
+.service-icon--cloud {
+  animation: serviceIconCloudFloat 7.2s ease-in-out infinite;
+}
+
+.service-icon--uiux .service-icon-glyph {
+  animation: serviceIconUiPulse 6.8s ease-in-out infinite;
+}
+
+.service-icon--ai .service-icon-glyph {
+  animation: serviceIconUiPulse 7s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-icon-fx,
+  .service-icon-glyph {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
 @keyframes floatIn {
   from {
     opacity: 0;
