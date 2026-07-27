@@ -21,20 +21,22 @@ function parseDatabaseUrl(url) {
 }
 
 /**
- * Railway / Production MySQL config
+ * Primary DB config for TiDB Cloud / MySQL-compatible providers.
+ * Keeps backward-compatible fallbacks for existing deployments.
  */
 const dbConfig = {
-  host: process.env.MYSQL_HOST || process.env.DATABASE_HOST || process.env.MYSQLHOST,
-  port: Number(process.env.MYSQL_PORT || process.env.DATABASE_PORT || process.env.MYSQLPORT || 3306),
-  user: process.env.MYSQL_USER || process.env.MYSQLUSER,
-  password: process.env.MYSQL_PASSWORD || process.env.MYSQLPASSWORD,
-  database: process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE
+  host: process.env.DB_HOST || process.env.MYSQL_HOST || process.env.DATABASE_HOST || process.env.MYSQLHOST,
+  port: Number(process.env.DB_PORT || process.env.MYSQL_PORT || process.env.DATABASE_PORT || process.env.MYSQLPORT || 3306),
+  user: process.env.DB_USER || process.env.MYSQL_USER || process.env.MYSQLUSER,
+  password: process.env.DB_PASSWORD || process.env.MYSQL_PASSWORD || process.env.MYSQLPASSWORD,
+  database: process.env.DB_NAME || process.env.MYSQL_DATABASE || process.env.MYSQLDATABASE
 };
 
-const useSsl = toBoolean(process.env.MYSQL_SSL, false);
-const rejectUnauthorized = toBoolean(process.env.MYSQL_SSL_REJECT_UNAUTHORIZED, true);
+const useSsl = toBoolean(process.env.DB_SSL ?? process.env.MYSQL_SSL, true);
+const rejectUnauthorized = toBoolean(process.env.DB_SSL_REJECT_UNAUTHORIZED ?? process.env.MYSQL_SSL_REJECT_UNAUTHORIZED, false);
 const sslConfig = useSsl
   ? {
+      minVersion: 'TLSv1.2',
       rejectUnauthorized,
     }
   : undefined;
@@ -51,11 +53,11 @@ if (databaseUrl && !hasExplicitMysqlConfig) {
  * Validate required env vars early
  */
 const requiredVars = [
-  'MYSQLHOST or MYSQL_HOST or DATABASE_HOST or DATABASE_URL',
-  'MYSQLPORT or MYSQL_PORT or DATABASE_PORT or DATABASE_URL',
-  'MYSQLUSER or MYSQL_USER or DATABASE_URL',
-  'MYSQLPASSWORD or MYSQL_PASSWORD or DATABASE_URL',
-  'MYSQLDATABASE or MYSQL_DATABASE or DATABASE_URL'
+  'DB_HOST (or MYSQLHOST / MYSQL_HOST / DATABASE_HOST / DATABASE_URL)',
+  'DB_PORT (or MYSQLPORT / MYSQL_PORT / DATABASE_PORT / DATABASE_URL)',
+  'DB_USER (or MYSQLUSER / MYSQL_USER / DATABASE_URL)',
+  'DB_PASSWORD (or MYSQLPASSWORD / MYSQL_PASSWORD / DATABASE_URL)',
+  'DB_NAME (or MYSQLDATABASE / MYSQL_DATABASE / DATABASE_URL)'
 ];
 
 if (!dbConfig.host || !dbConfig.user || !dbConfig.password || !dbConfig.database) {
@@ -66,7 +68,8 @@ console.log('🛠️  MySQL config loaded:', {
   host: dbConfig.host,
   port: dbConfig.port,
   user: dbConfig.user,
-  database: dbConfig.database
+  database: dbConfig.database,
+  ssl: useSsl ? { minVersion: 'TLSv1.2', rejectUnauthorized } : false,
 });
 
 /**
@@ -109,7 +112,10 @@ async function testConnection() {
  * (use only in setup scripts, not production runtime)
  */
 async function ensureDatabaseExists() {
-  const connection = await mysql.createConnection(baseConfig);
+  const connection = await mysql.createConnection({
+    ...baseConfig,
+    ssl: sslConfig,
+  });
   try {
     await connection.query(
       `CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\``
