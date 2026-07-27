@@ -101,11 +101,11 @@ export function HeroSection() {
             </span>
 
             <h1 className="mt-8 text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Building Digital Products That Drive Growth & Create Impact
+              Transforming Ideas into Powerful Digital Solutions
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-8 text-white/80 sm:text-lg">
-              We build scalable web applications, mobile apps, AI solutions, and cloud platforms that help businesses automate, innovate, and grow faster.
+              We build modern websites, mobile apps, and digital marketing strategies that help businesses grow faster.
             </p>
 
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
