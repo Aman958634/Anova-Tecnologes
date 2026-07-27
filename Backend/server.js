@@ -5,6 +5,8 @@ const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
+const fs = require('fs/promises');
+const path = require('path');
 
 const { pool, testConnection } = require('./config/db');
 const routes = require('./routes');
@@ -381,6 +383,65 @@ async function ensureProjectImageStorageColumns() {
   }
 }
 
+async function executeSqlBatch(sql, { source = 'inline' } = {}) {
+  const statements = sql
+    .split(';')
+    .map((statement) => statement.trim())
+    .filter(Boolean);
+
+  for (const statement of statements) {
+    try {
+      await pool.query(statement);
+    } catch (error) {
+      const snippet = statement.replace(/\s+/g, ' ').slice(0, 140);
+      throw new Error(`Schema execution failed in ${source}: ${snippet} :: ${error.message}`);
+    }
+  }
+}
+
+async function ensureBaseSchema() {
+  const schemaPath = path.join(__dirname, 'config', 'schema.sql');
+  const schemaSql = await fs.readFile(schemaPath, 'utf8');
+  await executeSqlBatch(schemaSql, { source: 'config/schema.sql' });
+  console.log('✅ Base schema ensured from config/schema.sql');
+}
+
+async function runMigrationsIfPresent() {
+  const migrationDirs = [
+    path.join(__dirname, 'migrations'),
+    path.join(__dirname, 'config', 'migrations'),
+  ];
+
+  let ranAnyMigration = false;
+
+  for (const dir of migrationDirs) {
+    try {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+      const sqlFiles = entries
+        .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.sql'))
+        .map((entry) => entry.name)
+        .sort();
+
+      for (const fileName of sqlFiles) {
+        const fullPath = path.join(dir, fileName);
+        const sql = await fs.readFile(fullPath, 'utf8');
+        await executeSqlBatch(sql, { source: fullPath });
+        console.log(`✅ Migration executed: ${fileName}`);
+        ranAnyMigration = true;
+      }
+    } catch (error) {
+      if (error && error.code === 'ENOENT') {
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  if (!ranAnyMigration) {
+    console.log('ℹ️  No migration files found, skipping migration step');
+  }
+}
+
 
 // =========================
 // BOOTSTRAP SERVER
@@ -389,6 +450,14 @@ async function bootstrap() {
   try {
     await testConnection();
     console.log('✅ Database connected');
+
+    // Ensure all core tables exist before any seed/auth query executes.
+    await ensureBaseSchema();
+    await runMigrationsIfPresent();
+
+    // Chatbot tables are created in controller helper and must exist before runtime usage.
+    await ensureChatbotTables();
+    console.log('✅ Chatbot tables ready');
 
     ensureCloudinaryConfigured();
     console.log('✅ Cloudinary configuration ready');
@@ -416,9 +485,6 @@ async function bootstrap() {
 
     await seedDefaultBlogs();
     console.log('✅ Default blogs ready');
-
-    await ensureChatbotTables();
-    console.log('✅ Chatbot tables ready');
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
