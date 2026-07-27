@@ -12,6 +12,16 @@
     <meta name="theme-color" content="#2563EB" />
     <link rel="canonical" href="https://anova-tecnologes.vercel.app/" />
 
+    <!-- Google Analytics 4 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WFLRB2DR31"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      // Disable auto pageview for SPA; route-change tracking is handled in React Router.
+      gtag('config', 'G-WFLRB2DR31', { send_page_view: false });
+    </script>
+
     <meta property="og:type" content="website" />
     <meta property="og:title" content="ANOVA Technology | Software Development Company" />
     <meta property="og:description" content="ANOVA Technology builds modern websites, custom web applications, CRM, ERP systems, dashboards, business automation software, and scalable digital solutions." />
