@@ -1,67 +1,55 @@
-import { memo, Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
-const ChevronRight = lazy(() => import('lucide-react').then((mod) => ({ default: mod.ChevronRight })));
-const Code2 = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Code2 })));
-const Smartphone = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Smartphone })));
-const Palette = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Palette })));
-const Bot = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Bot })));
-const Cloud = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Cloud })));
-const Megaphone = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Megaphone })));
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
 
-const ICON_MAP = {
-  Code2,
-  Smartphone,
-  Palette,
-  Bot,
-  Cloud,
-  Megaphone,
-};
+export default function MegaMenu({ item, onClose }) {
+  const menu = item?.menu;
+  const isOpen = Boolean(item && menu);
 
-function MegaMenu({ item, isVisible, onClose, menuId }) {
-  if (!item?.menu?.columns?.length) {
+  if (!isOpen) {
     return null;
   }
 
-  const columns = item.menu.columns;
+  const columns = menu.columns ?? [];
 
   return (
-    <div className={`ent-mega ${isVisible ? 'is-visible' : ''}`} id={menuId} role="menu" aria-label={item.label}>
-      <div className="ent-mega__grid">
-        {columns.map((column, index) => {
-          const IconComponent = ICON_MAP[column.icon] ?? Code2;
-          const withDivider = index < columns.length - 1;
+    <AnimatePresence>
+      <motion.div
+        key={item.label}
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{ duration: 0.22, ease: 'easeOut' }}
+        className="enterprise-mega"
+        onMouseEnter={() => onClose(false)}
+        onMouseLeave={() => onClose(true)}
+      >
+        <div className="enterprise-mega-columns">
+          {columns.map((column, index) => {
+            const showDivider = index < columns.length - 1;
 
-          return (
-            <article key={column.title} className={`ent-mega__column ${withDivider ? 'is-divider' : ''}`}>
-              <header className="ent-mega__head">
-                <span className="ent-mega__icon-wrap">
-                  <IconComponent size={18} />
-                </span>
-                <h3 className="ent-mega__title">{column.title}</h3>
-              </header>
+            return (
+              <article key={column.title} className={`enterprise-mega-column ${showDivider ? 'enterprise-mega-column-divider' : ''}`}>
+                <h3 className="enterprise-mega-title">{column.title}</h3>
 
-              <div className="ent-mega__links">
-                {column.items.map((entry) => (
-                  <Link
-                    key={`${column.title}-${entry.label}`}
-                    to={entry.path}
-                    className="ent-mega__link"
-                    role="menuitem"
-                    onClick={onClose}
-                  >
-                    <span>{entry.label}</span>
-                    <Suspense fallback={null}>
-                      <ChevronRight className="ent-mega__arrow" size={14} />
-                    </Suspense>
-                  </Link>
-                ))}
-              </div>
-            </article>
-          );
-        })}
-      </div>
-    </div>
+                <div className="enterprise-mega-links">
+                  {column.items.map((child) => (
+                    <Link
+                      key={`${column.title}-${child.label}`}
+                      to={child.path}
+                      className="enterprise-mega-link"
+                      onClick={() => onClose(true)}
+                    >
+                      <span className="enterprise-mega-link-text">{child.label}</span>
+                      <ChevronRight className="enterprise-mega-link-caret" />
+                    </Link>
+                  ))}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
-
-export default memo(MegaMenu);

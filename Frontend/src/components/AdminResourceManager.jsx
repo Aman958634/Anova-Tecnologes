@@ -468,41 +468,114 @@ export default function AdminResourceManager({ resource, title, description }) {
       </div>
 
       {supportsForm && isFormOpen ? (
-        <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded-2xl border border-[#d9e7ff] bg-white p-5 shadow-[0_12px_28px_rgba(47,109,247,0.08)] md:grid-cols-2">
+        <form onSubmit={onSubmit} className={`grid grid-cols-1 gap-3 rounded-2xl border border-[#d9e7ff] bg-white p-5 shadow-[0_12px_28px_rgba(47,109,247,0.08)] md:grid-cols-2 ${resource === 'services' ? 'admin-services-form' : ''}`}>
           {resource === 'services' ? (
             <>
-              <input className="input-field" value={form.title || ''} onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))} placeholder="Service title" required />
-              <input className="input-field" value={form.icon || ''} onChange={(event) => setForm((current) => ({ ...current, icon: event.target.value }))} placeholder="Icon name" />
-              <textarea className="input-field md:col-span-2" rows="4" value={form.description || ''} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} placeholder="Description" required />
-              <input className="input-field md:col-span-2" value={form.key_features || ''} onChange={(event) => setForm((current) => ({ ...current, key_features: event.target.value }))} placeholder="Key features (comma separated)" />
-              <input type="url" className="input-field" value={form.image_url || ''} onChange={(event) => setForm((current) => ({ ...current, image_url: event.target.value }))} placeholder="Image URL (https://...)" />
-              <button type="button" className="ml-2 text-sm text-[#1e4db8] underline" onClick={() => {
-                if (form.image_url) setPreviewUrl(buildImageUrl(form.image_url));
-              }}>Preview URL</button>
-              <input type="file" accept="image/*" onChange={(event) => {
-                const file = event.target.files?.[0] || null;
-                const validationError = validateImageFile(file);
-                if (validationError) {
-                  toast.error(validationError);
-                  event.target.value = '';
-                  return;
-                }
-                setForm((current) => ({ ...current, image: file, remove_image: false }));
-                if (file) {
-                  const url = URL.createObjectURL(file);
-                  setPreviewUrl((old) => {
-                    if (old && old.startsWith('blob:')) URL.revokeObjectURL(old);
-                    return url;
-                  });
-                }
-              }} className="input-field" />
+              <div className="admin-services-field md:col-span-2">
+                <label className="admin-services-label" htmlFor="service-title">Service Title</label>
+                <input
+                  id="service-title"
+                  className="admin-services-input"
+                  value={form.title || ''}
+                  onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
+                  placeholder="Service title"
+                  required
+                />
+              </div>
+              <div className="admin-services-field md:col-span-2">
+                <label className="admin-services-label" htmlFor="service-description">Description</label>
+                <textarea
+                  id="service-description"
+                  className="admin-services-textarea"
+                  rows="4"
+                  value={form.description || ''}
+                  onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
+                  placeholder="Description"
+                  required
+                />
+              </div>
+              <div className="admin-services-field">
+                <label className="admin-services-label" htmlFor="service-icon">Icon</label>
+                <input
+                  id="service-icon"
+                  className="admin-services-input"
+                  value={form.icon || ''}
+                  onChange={(event) => setForm((current) => ({ ...current, icon: event.target.value }))}
+                  placeholder="Icon name"
+                />
+              </div>
+              <div className="admin-services-field">
+                <label className="admin-services-label" htmlFor="service-features">Features</label>
+                <input
+                  id="service-features"
+                  className="admin-services-input"
+                  value={form.key_features || ''}
+                  onChange={(event) => setForm((current) => ({ ...current, key_features: event.target.value }))}
+                  placeholder="Key features (comma separated)"
+                />
+              </div>
+              <div className="admin-services-field md:col-span-2">
+                <label className="admin-services-label" htmlFor="service-image-url">Image URL</label>
+                <div className="admin-services-url-row">
+                  <input
+                    id="service-image-url"
+                    type="url"
+                    className="admin-services-input"
+                    value={form.image_url || ''}
+                    onChange={(event) => setForm((current) => ({ ...current, image_url: event.target.value }))}
+                    placeholder="Image URL (https://...)"
+                  />
+                  <button
+                    type="button"
+                    className="admin-services-link-btn"
+                    onClick={() => {
+                      if (form.image_url) setPreviewUrl(buildImageUrl(form.image_url));
+                    }}
+                  >
+                    Preview URL
+                  </button>
+                </div>
+              </div>
+              <div className="admin-services-field md:col-span-2">
+                <label className="admin-services-label" htmlFor="service-image-upload">Image Upload</label>
+                <input
+                  id="service-image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] || null;
+                    const validationError = validateImageFile(file);
+                    if (validationError) {
+                      toast.error(validationError);
+                      event.target.value = '';
+                      return;
+                    }
+                    setForm((current) => ({ ...current, image: file, remove_image: false }));
+                    if (file) {
+                      const url = URL.createObjectURL(file);
+                      setPreviewUrl((old) => {
+                        if (old && old.startsWith('blob:')) URL.revokeObjectURL(old);
+                        return url;
+                      });
+                    }
+                  }}
+                  className="admin-services-file"
+                />
+              </div>
               {previewUrl ? (
                 <div className="md:col-span-2 mt-2 relative">
                   <button type="button" onClick={handleRemoveImage} className="absolute right-2 top-2 z-10 inline-flex items-center gap-2 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100">Delete image</button>
                   <img src={previewUrl} alt="preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-40 sm:h-32 w-full rounded-md object-cover bg-white" />
                 </div>
               ) : null}
-              <label className="flex items-center gap-2 text-sm text-[#163c88]"><input type="checkbox" checked={Boolean(form.featured)} onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))} /> Featured</label>
+              <label className="admin-services-checkbox md:col-span-2">
+                <input
+                  type="checkbox"
+                  checked={Boolean(form.featured)}
+                  onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))}
+                />
+                Featured
+              </label>
             </>
           ) : null}
 
