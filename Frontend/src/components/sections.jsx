@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowRight, BarChart3, CheckCircle2, Clock3, Code2, Cloud, Cpu, Database, Globe, LayoutPanelTop, Link2, Mail, MapPin, Megaphone, Palette, Phone, PlayCircle, Smartphone, Star, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BarChart3, CheckCircle2, Clock3, Code2, Cloud, Cpu, Database, Globe, LayoutPanelTop, Link2, Mail, MapPin, Megaphone, Palette, Phone, PlayCircle, Smartphone, ShieldCheck } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { buildImageUrl, imageFallbackByKey, starsFromRating } from '../utils/helpers';
-import { fallbackServices, fallbackTeam, fallbackTestimonials } from '../utils/siteData';
+import { buildImageUrl, imageFallbackByKey } from '../utils/helpers';
+import { fallbackServices, fallbackTeam } from '../utils/siteData';
 import SectionHeading from './SectionHeading';
 import ProjectGrid from './projects/ProjectGrid';
 import { sectionEnter } from './projects/animationUtils';
+import TestimonialSection from './testimonials/TestimonialSection';
 import api from '../services/api';
 
 function SectionCard({ children, className = '' }) {
@@ -880,65 +881,7 @@ export function ProjectsSection() {
 }
 
 export function TestimonialsSection() {
-  const [testimonials, setTestimonials] = useState(fallbackTestimonials);
-
-  const fetchTestimonials = useCallback(async () => {
-    try {
-      const response = await api.get('/testimonials');
-      const items = response.data.data || [];
-      setTestimonials(items.length > 0 ? items : fallbackTestimonials);
-    } catch {
-      setTestimonials(fallbackTestimonials);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchTestimonials();
-
-    const onDataUpdated = () => fetchTestimonials();
-    const onStorage = (event) => {
-      if (event.key === 'anova:data-updated') fetchTestimonials();
-    };
-
-    window.addEventListener('anova:data-updated', onDataUpdated);
-    window.addEventListener('storage', onStorage);
-
-    return () => {
-      window.removeEventListener('anova:data-updated', onDataUpdated);
-      window.removeEventListener('storage', onStorage);
-    };
-  }, [fetchTestimonials]);
-
-  return (
-    <motion.section
-      variants={sectionReveal}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, amount: 0.2 }}
-      className="bg-white py-24 text-slate-900"
-    >
-      <div className="section-shell space-y-10">
-        <SectionHeading center eyebrow="Client Success Stories" title="Client Success Stories" description="Trusted results that speak for themselves." />
-        <div className="grid gap-6 lg:grid-cols-3">
-          {testimonials.map((item) => (
-            <SectionCard key={item.id || item.name} className="h-full p-6">
-              <div className="flex items-center gap-2 text-amber-400">
-                {starsFromRating(item.rating).map((filled, index) => <Star key={index} className={`h-4 w-4 ${filled ? 'fill-current' : 'opacity-30'}`} />)}
-              </div>
-              <p className="mt-5 text-[0.92rem] italic leading-7 text-slate-600">“{item.review}”</p>
-              <div className="mt-6 flex items-center gap-3">
-                <img src={buildImageUrl(item.photo_url)} alt={item.name} loading="lazy" decoding="async" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-10 w-10 rounded-full object-cover bg-white" />
-                <div>
-                  <h3 className="text-sm font-semibold text-[#163c88]">{item.name}</h3>
-                  <p className="text-[0.76rem] text-slate-500">{item.designation}</p>
-                </div>
-              </div>
-            </SectionCard>
-          ))}
-        </div>
-      </div>
-    </motion.section>
-  );
+  return <TestimonialSection />;
 }
 
 export function TeamSection() {
