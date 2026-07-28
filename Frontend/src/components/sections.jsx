@@ -59,28 +59,171 @@ function AnimatedCounter({ value, duration = 1200, delay = 80, className = '' })
   return <span className={className}>{count}{suffix}</span>;
 }
 
-const SERVICE_ICON_MAP = [
-  ['database', Database],
-  ['db', Database],
-  ['api', Link2],
-  ['integration', Link2],
-  ['web', Globe],
-  ['website', Globe],
-  ['app', Smartphone],
-  ['mobile', Smartphone],
-  ['ui', Palette],
-  ['ux', Palette],
-  ['design', LayoutPanelTop],
-  ['cloud', Cloud],
-  ['ai', Cpu],
-  ['ml', Cpu],
-  ['market', Megaphone],
-  ['seo', BarChart3],
-  ['security', ShieldCheck],
-  ['devops', Cloud],
-  ['software', Code2],
-  ['development', Code2]
-];
+const SERVICE_KIND_CONFIG = {
+  mobile: {
+    icon: Smartphone,
+    shellClass: 'from-[#d8ebff] via-[#bfe0ff] to-[#a4d2ff] text-[#145dc8]',
+  },
+  web: {
+    icon: Globe,
+    shellClass: 'from-[#d8f1ff] via-[#c2e9ff] to-[#9fdbff] text-[#0f6f9b]',
+  },
+  cloud: {
+    icon: Cloud,
+    shellClass: 'from-[#d8e7ff] via-[#c8dcff] to-[#adc9ff] text-[#2450c0]',
+  },
+  ai: {
+    icon: Cpu,
+    shellClass: 'from-[#e8ddff] via-[#d8cbff] to-[#c1afff] text-[#5e33b3]',
+  },
+  uiux: {
+    icon: Palette,
+    shellClass: 'from-[#ffe5f4] via-[#ffd6eb] to-[#ffc4e1] text-[#ba2f75]',
+  },
+  marketing: {
+    icon: Megaphone,
+    shellClass: 'from-[#ffe9d8] via-[#ffdbc2] to-[#ffccaa] text-[#b85b16]',
+  },
+  default: {
+    icon: Code2,
+    shellClass: 'from-[#e7efff] via-[#d9e7ff] to-[#c6dcff] text-[#275fcf]',
+  },
+};
+
+const getServiceKind = (service) => {
+  const source = `${service.icon || ''} ${service.title || ''} ${service.description || ''}`.toLowerCase();
+  if (source.includes('mobile') || source.includes('app')) return 'mobile';
+  if (source.includes('web') || source.includes('website') || source.includes('software')) return 'web';
+  if (source.includes('cloud') || source.includes('devops')) return 'cloud';
+  if (source.includes('ai') || source.includes('ml') || source.includes('intelligent')) return 'ai';
+  if (source.includes('ui') || source.includes('ux') || source.includes('design')) return 'uiux';
+  if (source.includes('market') || source.includes('seo') || source.includes('ads')) return 'marketing';
+  return 'default';
+};
+
+function ServiceIconVisual({ service }) {
+  const kind = getServiceKind(service);
+  const config = SERVICE_KIND_CONFIG[kind] || SERVICE_KIND_CONFIG.default;
+  const Icon = config.icon;
+
+  return (
+    <motion.div
+      className="relative transition-all duration-500 ease-out group-hover:scale-[1.2] group-hover:rotate-6"
+    >
+      <motion.div
+        animate={{
+          y: kind === 'mobile' || kind === 'cloud' || kind === 'uiux' ? [0, -8, 0] : 0,
+          rotate: kind === 'mobile' ? [0, 5, -3, 0] : kind === 'web' ? [0, 360] : 0,
+          scale: kind === 'ai' ? [1, 1.06, 1] : 1,
+        }}
+        transition={{
+          duration: kind === 'web' ? 10 : 4,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+        className={`relative grid h-[72px] w-[72px] place-items-center rounded-[20px] bg-gradient-to-br ${config.shellClass} shadow-[0_10px_30px_rgba(37,99,235,0.25)]`}
+      >
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-3 -top-3 h-8 w-8 rounded-full bg-[#7cb4ff]/35 blur-xl"
+          animate={{ scale: [1, 1.35, 1], opacity: [0.45, 0.75, 0.45] }}
+          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-3 -right-3 h-7 w-7 rounded-full bg-[#9fc7ff]/40 blur-lg"
+          animate={{ scale: [1.2, 0.8, 1.2], opacity: [0.35, 0.7, 0.35] }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        {kind === 'cloud' ? (
+          <>
+            <motion.span
+              aria-hidden="true"
+              className="pointer-events-none absolute left-[8px] top-[10px] h-[5px] w-[5px] rounded-full bg-white/85"
+              animate={{ y: [0, -7, 0], x: [0, 2, 0], opacity: [0.25, 1, 0.25] }}
+              transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.span
+              aria-hidden="true"
+              className="pointer-events-none absolute right-[10px] bottom-[11px] h-[4px] w-[4px] rounded-full bg-white/80"
+              animate={{ y: [0, -8, 0], x: [0, -3, 0], opacity: [0.2, 1, 0.2] }}
+              transition={{ duration: 2.3, repeat: Infinity, ease: 'easeInOut', delay: 0.45 }}
+            />
+            <motion.span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 rounded-[20px] border border-[#72a8ff]/45"
+              animate={{ scale: [1, 1.14, 1], opacity: [0.5, 0.1, 0.5] }}
+              transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </>
+        ) : null}
+
+        {kind === 'ai' ? (
+          <>
+            <motion.span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-[5px] rounded-[16px] border border-[#8f64f0]/55"
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
+            />
+            <motion.span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-[11px] rounded-[12px] border border-[#6a42d6]/55"
+              animate={{ rotate: [360, 0] }}
+              transition={{ duration: 5.5, repeat: Infinity, ease: 'linear' }}
+            />
+          </>
+        ) : null}
+
+        {kind === 'marketing' ? (
+          <>
+            <motion.span
+              aria-hidden="true"
+              className="pointer-events-none absolute right-[-9px] top-[21px] h-3 w-3 rounded-full border border-[#ffb37d]/75"
+              animate={{ scale: [1, 1.8, 2.3], opacity: [0.6, 0.35, 0] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+            />
+            <motion.span
+              aria-hidden="true"
+              className="pointer-events-none absolute right-[-14px] top-[17px] h-5 w-5 rounded-full border border-[#ffb37d]/55"
+              animate={{ scale: [1, 1.7, 2.15], opacity: [0.45, 0.25, 0] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut', delay: 0.5 }}
+            />
+          </>
+        ) : null}
+
+        {kind === 'uiux' ? (
+          <motion.span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 rounded-[20px]"
+            animate={{
+              boxShadow: [
+                '0 0 0px rgba(246,86,173,0.25)',
+                '0 0 24px rgba(246,86,173,0.45)',
+                '0 0 0px rgba(86,160,246,0.25)',
+              ]
+            }}
+            transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
+          />
+        ) : null}
+
+        <motion.div
+          animate={{
+            filter: kind === 'cloud' || kind === 'ai' ? [
+              'drop-shadow(0 0 0px rgba(59,130,246,0.2))',
+              'drop-shadow(0 0 10px rgba(59,130,246,0.55))',
+              'drop-shadow(0 0 0px rgba(59,130,246,0.2))'
+            ] : undefined,
+          }}
+          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <Icon className="h-8 w-8" />
+        </motion.div>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 export function HeroSection() {
   const heroVideo = '/hero-video.mp4';
@@ -150,14 +293,6 @@ export function HeroSection() {
 export function HomeServicesSection() {
   const [services, setServices] = useState(fallbackServices);
 
-  const resolveServiceIcon = (service) => {
-    const source = `${service.icon || ''} ${service.title || ''} ${service.description || ''}`.toLowerCase();
-    for (const [keyword, Icon] of SERVICE_ICON_MAP) {
-      if (source.includes(keyword)) return Icon;
-    }
-    return Code2;
-  };
-
   const cardVariants = {
     hidden: { opacity: 0, y: 22, scale: 0.985 },
     show: { opacity: 1, y: 0, scale: 1 }
@@ -174,17 +309,6 @@ export function HomeServicesSection() {
     }
   };
 
-  const iconTheme = (index) => {
-    const themes = [
-      'bg-[#eaf1ff] text-[#2f6df7]',
-      'bg-[#e9f8f0] text-[#168f57]',
-      'bg-[#fff1e8] text-[#ea6b1f]',
-      'bg-[#f3ecff] text-[#7e3af2]',
-      'bg-[#e8f8ff] text-[#0c7ca6]',
-      'bg-[#ffeef3] text-[#d6336c]'
-    ];
-    return themes[index % themes.length];
-  };
 
   const normalizedFeatures = (service) => {
     if (Array.isArray(service.key_features)) return service.key_features.filter(Boolean);
@@ -199,17 +323,6 @@ export function HomeServicesSection() {
       return ['Social Media Marketing', 'SEO & Website Optimization', 'Google Ads & PPC Campaigns'];
     }
     return ['Attractive & Responsive Design', 'User-Friendly Experience', 'Best for Services & Businesses'];
-  };
-
-  const iconMotionVariant = (service) => {
-    const source = `${service.icon || ''} ${service.title || ''} ${service.description || ''}`.toLowerCase();
-    if (source.includes('mobile') || source.includes('app')) return 'mobile';
-    if (source.includes('web') || source.includes('website')) return 'web';
-    if (source.includes('market') || source.includes('seo')) return 'marketing';
-    if (source.includes('cloud')) return 'cloud';
-    if (source.includes('ui') || source.includes('ux') || source.includes('design')) return 'uiux';
-    if (source.includes('ai') || source.includes('ml')) return 'ai';
-    return 'default';
   };
 
   const fetchServices = useCallback(async () => {
@@ -255,40 +368,63 @@ export function HomeServicesSection() {
           variants={gridVariants}
           className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
         >
-          {services.map((service, index) => (
+          {services.map((service) => (
             <motion.div
               key={service.id || service.title}
               variants={cardVariants}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -6 }}
-              className="service-card-fx relative"
+              whileHover={{ y: -12, scale: 1.03 }}
+              className="group relative"
             >
-            <SectionCard className="h-full rounded-[14px] border border-[#d7dce6] bg-[#f7f9fc] shadow-[0_6px_16px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_30px_rgba(15,23,42,0.12)]">
-              <div className="space-y-5 p-8">
-              <div className={`service-icon-fx service-icon--${iconMotionVariant(service)} grid h-[64px] w-[64px] place-items-center rounded-[16px] ${iconTheme(index)}`}>
-                {(() => {
-                  const Icon = resolveServiceIcon(service);
-                  return <Icon className="service-icon-glyph h-7 w-7" />;
-                })()}
-              </div>
-                <h3 className="text-[16px] font-semibold leading-[1.35] text-[#162f63]">{service.title}</h3>
-                <p className="line-clamp-3 min-h-[84px] text-[13px] leading-[1.55] text-[#4d5f84]">{service.description}</p>
+              <motion.div
+                className="relative h-full overflow-hidden rounded-3xl border border-white/45 bg-white/55 p-[1px] shadow-[0_14px_38px_rgba(14,30,84,0.14)] backdrop-blur-xl transition-all duration-500 ease-out"
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                variants={{
+                  rest: {
+                    boxShadow: '0 14px 38px rgba(14,30,84,0.14)',
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.6), rgba(248,251,255,0.52))',
+                  },
+                  hover: {
+                    boxShadow: '0 24px 55px rgba(24,67,168,0.22)',
+                    background: 'linear-gradient(135deg, rgba(109,169,255,0.35), rgba(255,255,255,0.7))',
+                  }
+                }}
+              >
+                <motion.span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-[#82b3ff]/35 blur-2xl"
+                  animate={{ scale: [1, 1.15, 1], opacity: [0.45, 0.75, 0.45] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <motion.span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -bottom-14 -left-8 h-28 w-28 rounded-full bg-[#b7d2ff]/35 blur-2xl"
+                  animate={{ scale: [1.1, 0.95, 1.1], opacity: [0.35, 0.65, 0.35] }}
+                  transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+                />
 
-              <ul className="mt-2 space-y-1.5">
-                {normalizedFeatures(service).slice(0, 3).map((feature) => (
-                  <li key={feature} className="flex items-start gap-2 text-[13px] font-medium leading-[1.5] text-[#203760]">
-                    <CheckCircle2 className="mt-0.5 h-[16px] w-[16px] shrink-0 text-[#2974ff]" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
+                <div className="relative h-full rounded-[22px] border border-[#d9e7ff]/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(243,248,255,0.88)_100%)] p-8 transition-all duration-500 ease-out group-hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(231,242,255,0.96)_100%)]">
+                  <div className="space-y-5">
+                    <ServiceIconVisual service={service} />
+                    <h3 className="text-[16px] font-semibold leading-[1.35] text-[#162f63]">{service.title}</h3>
+                    <p className="line-clamp-3 min-h-[84px] text-[13px] leading-[1.55] text-[#4d5f84]">{service.description}</p>
 
-              <a href="#projects" className="mt-5 inline-flex items-center gap-2 text-[14px] font-semibold text-[#1f67ff]">
-                  Learn more
-                <ArrowRight className="h-4 w-4" />
-                </a>
-              </div>
-            </SectionCard>
+                    <ul className="mt-2 space-y-1.5">
+                      {normalizedFeatures(service).slice(0, 3).map((feature) => (
+                        <li key={feature} className="flex items-start gap-2 text-[13px] font-medium leading-[1.5] text-[#203760]">
+                          <CheckCircle2 className="mt-0.5 h-[16px] w-[16px] shrink-0 text-[#2974ff]" />
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <a href="#projects" className="mt-5 inline-flex items-center gap-2 text-[14px] font-semibold text-[#1f67ff] transition-all duration-500 ease-out group-hover:text-[#0d4fcf]">
+                      Learn more
+                      <ArrowRight className="h-4 w-4 transition-all duration-500 ease-out group-hover:translate-x-1" />
+                    </a>
+                  </div>
+                </div>
+              </motion.div>
             </motion.div>
           ))}
         </motion.div>
