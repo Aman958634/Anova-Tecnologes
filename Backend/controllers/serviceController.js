@@ -110,9 +110,19 @@ const createService = asyncHandler(async (req, res) => {
 
   logServiceImageDebug('createService: resolved imageUrl', { title, imageUrl });
 
+  const createValues = [
+    title,
+    description,
+    icon || null,
+    serializeKeyFeatures(key_features),
+    imageUrl,
+    featured === '1' || featured === 'true' ? 1 : 0,
+  ];
+  logServiceImageDebug('createService: SQL values', createValues);
+
   const [result] = await pool.query(
     'INSERT INTO services (title, description, icon, key_features, image_url, featured) VALUES (?, ?, ?, ?, ?, ?)',
-    [title, description, icon || null, serializeKeyFeatures(key_features), imageUrl, featured === '1' || featured === 'true' ? 1 : 0]
+    createValues
   );
   invalidateCache('services:');
   res.status(201).json(normalizeService(await findById('services', result.insertId)));
@@ -160,17 +170,20 @@ const updateService = asyncHandler(async (req, res) => {
     imageUrl,
   });
 
+  const updateValues = [
+    title,
+    description,
+    icon || null,
+    serializeKeyFeatures(key_features || existing.key_features),
+    imageUrl,
+    featured === '1' || featured === 'true' ? 1 : 0,
+    req.params.id,
+  ];
+  logServiceImageDebug('updateService: SQL values', updateValues);
+
   await pool.query(
     'UPDATE services SET title = ?, description = ?, icon = ?, key_features = ?, image_url = ?, featured = ? WHERE id = ?',
-    [
-      title,
-      description,
-      icon || null,
-      serializeKeyFeatures(key_features || existing.key_features),
-      imageUrl,
-      featured === '1' || featured === 'true' ? 1 : 0,
-      req.params.id,
-    ]
+    updateValues
   );
 
   const updated = await findById('services', req.params.id);
