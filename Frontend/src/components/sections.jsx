@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowRight, BarChart3, CheckCircle2, Clock3, Code2, Cloud, Cpu, Database, Globe, GraduationCap, Heart, HeartHandshake, LayoutPanelTop, Link2, Mail, MapPin, Megaphone, Monitor, Palette, Phone, PlayCircle, ShoppingCart, Smartphone, Star, ShieldCheck, UtensilsCrossed } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { buildImageUrl, imageFallbackByKey, starsFromRating } from '../utils/helpers';
 import { fallbackServices, fallbackTeam, fallbackTestimonials } from '../utils/siteData';
 import SectionHeading from './SectionHeading';
@@ -105,14 +105,68 @@ function ServiceIconVisual({ service }) {
   const kind = getServiceKind(service);
   const config = SERVICE_KIND_CONFIG[kind] || SERVICE_KIND_CONFIG.default;
   const Icon = config.icon;
+  const magneticX = useMotionValue(0);
+  const magneticY = useMotionValue(0);
+  const smoothX = useSpring(magneticX, { stiffness: 190, damping: 16, mass: 0.3 });
+  const smoothY = useSpring(magneticY, { stiffness: 190, damping: 16, mass: 0.3 });
+  const tiltX = useTransform(smoothY, [-14, 14], [8, -8]);
+  const tiltY = useTransform(smoothX, [-14, 14], [-8, 8]);
+  const glowShiftX = useTransform(smoothX, [-14, 14], ['35%', '65%']);
+  const glowShiftY = useTransform(smoothY, [-14, 14], ['40%', '60%']);
+
+  const particlePalette =
+    kind === 'ai'
+      ? 'bg-[#b68bff]/70'
+      : kind === 'marketing'
+      ? 'bg-[#ffb37d]/70'
+      : 'bg-[#9cc8ff]/70';
+
+  const particles = [
+    { top: '10%', left: '16%', delay: 0, duration: 3.2, size: 'h-1.5 w-1.5' },
+    { top: '20%', right: '12%', delay: 0.4, duration: 3.8, size: 'h-1 w-1' },
+    { bottom: '19%', left: '14%', delay: 0.8, duration: 4.2, size: 'h-1.5 w-1.5' },
+    { bottom: '14%', right: '15%', delay: 0.2, duration: 3.5, size: 'h-1 w-1' },
+    { top: '45%', left: '7%', delay: 1.1, duration: 4.4, size: 'h-1 w-1' },
+    { top: '56%', right: '8%', delay: 0.6, duration: 3.1, size: 'h-1.5 w-1.5' },
+  ];
+
+  const onMagneticMove = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const offsetX = event.clientX - (rect.left + rect.width / 2);
+    const offsetY = event.clientY - (rect.top + rect.height / 2);
+    magneticX.set(Math.max(-14, Math.min(14, offsetX * 0.18)));
+    magneticY.set(Math.max(-14, Math.min(14, offsetY * 0.18)));
+  };
+
+  const resetMagnetic = () => {
+    magneticX.set(0);
+    magneticY.set(0);
+  };
 
   return (
     <motion.div
-      className="relative transition-all duration-500 ease-out group-hover:scale-[1.2] group-hover:rotate-6"
+      className="relative"
+      style={{ perspective: 1000 }}
+      onMouseMove={onMagneticMove}
+      onMouseLeave={resetMagnetic}
+      whileHover={{ scale: 1.04 }}
+      transition={{ duration: 0.45, ease: 'easeOut' }}
     >
+      <motion.span
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-8 rounded-[30px] bg-[radial-gradient(circle_at_center,rgba(76,156,255,0.34),rgba(76,156,255,0)_70%)] blur-2xl"
+        style={{
+          opacity: 0.82,
+          backgroundPositionX: glowShiftX,
+          backgroundPositionY: glowShiftY,
+        }}
+        animate={{ opacity: [0.65, 0.95, 0.65], scale: [1, 1.1, 1] }}
+        transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
+      />
+
       <motion.div
         animate={{
-          y: kind === 'mobile' || kind === 'cloud' || kind === 'uiux' ? [0, -8, 0] : 0,
+          y: [0, -6, 0],
           rotate: kind === 'mobile' ? [0, 5, -3, 0] : kind === 'web' ? [0, 360] : 0,
           scale: kind === 'ai' ? [1, 1.06, 1] : 1,
         }}
@@ -121,20 +175,91 @@ function ServiceIconVisual({ service }) {
           repeat: Infinity,
           ease: 'easeInOut',
         }}
-        className={`relative grid h-[72px] w-[72px] place-items-center rounded-[20px] bg-gradient-to-br ${config.shellClass} shadow-[0_10px_30px_rgba(37,99,235,0.25)]`}
+        style={{
+          x: smoothX,
+          y: smoothY,
+          rotateX: tiltX,
+          rotateY: tiltY,
+          transformStyle: 'preserve-3d',
+        }}
+        className="relative grid h-[78px] w-[78px] place-items-center rounded-[22px] border border-white/45 bg-white/16 backdrop-blur-xl shadow-[0_18px_40px_rgba(16,56,140,0.28),inset_0_1px_0_rgba(255,255,255,0.65)]"
       >
         <motion.span
           aria-hidden="true"
-          className="pointer-events-none absolute -left-3 -top-3 h-8 w-8 rounded-full bg-[#7cb4ff]/35 blur-xl"
-          animate={{ scale: [1, 1.35, 1], opacity: [0.45, 0.75, 0.45] }}
-          transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+          className={`pointer-events-none absolute inset-[2px] rounded-[20px] bg-gradient-to-br ${config.shellClass}`}
+          style={{ backgroundSize: '240% 240%' }}
+          animate={{
+            backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+            filter: [
+              'saturate(1.05) brightness(1.02)',
+              'saturate(1.25) brightness(1.12)',
+              'saturate(1.05) brightness(1.02)'
+            ]
+          }}
+          transition={{ duration: 6.4, repeat: Infinity, ease: 'easeInOut' }}
         />
+
         <motion.span
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-3 -right-3 h-7 w-7 rounded-full bg-[#9fc7ff]/40 blur-lg"
-          animate={{ scale: [1.2, 0.8, 1.2], opacity: [0.35, 0.7, 0.35] }}
+          className="pointer-events-none absolute inset-[1px] rounded-[21px] border border-white/35"
+          animate={{ opacity: [0.45, 0.75, 0.45] }}
           transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
         />
+
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute -inset-[1px] rounded-[22px]"
+          animate={{
+            boxShadow: [
+              '0 0 0 rgba(73,142,255,0.24)',
+              '0 0 26px rgba(73,142,255,0.44)',
+              '0 0 0 rgba(73,142,255,0.24)'
+            ]
+          }}
+          transition={{ duration: 3.1, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        {particles.map((particle, index) => (
+          <motion.span
+            key={`${kind}-particle-${index}`}
+            aria-hidden="true"
+            className={`pointer-events-none absolute ${particle.size} ${particlePalette} rounded-full blur-[1px]`}
+            style={particle}
+            animate={{
+              y: [0, -8, 0],
+              x: [0, index % 2 === 0 ? 3 : -3, 0],
+              opacity: [0.25, 0.85, 0.25],
+              scale: [0.9, 1.35, 0.9],
+            }}
+            transition={{
+              duration: particle.duration,
+              delay: particle.delay,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
+
+        <motion.div
+          className="absolute inset-[10px] rounded-[14px] bg-white/14 blur-md"
+          animate={{ opacity: [0.22, 0.4, 0.22] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        />
+
+        <motion.div
+          className="relative z-10"
+          animate={{
+            scale: [1, 1.08, 1],
+            filter: [
+              'drop-shadow(0 0 0px rgba(255,255,255,0.1))',
+              'drop-shadow(0 0 14px rgba(255,255,255,0.65))',
+              'drop-shadow(0 0 0px rgba(255,255,255,0.1))'
+            ],
+          }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <Icon className="h-8 w-8" />
+        </motion.div>
 
         {kind === 'cloud' ? (
           <>
@@ -207,19 +332,6 @@ function ServiceIconVisual({ service }) {
             transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
           />
         ) : null}
-
-        <motion.div
-          animate={{
-            filter: kind === 'cloud' || kind === 'ai' ? [
-              'drop-shadow(0 0 0px rgba(59,130,246,0.2))',
-              'drop-shadow(0 0 10px rgba(59,130,246,0.55))',
-              'drop-shadow(0 0 0px rgba(59,130,246,0.2))'
-            ] : undefined,
-          }}
-          transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <Icon className="h-8 w-8" />
-        </motion.div>
       </motion.div>
     </motion.div>
   );
