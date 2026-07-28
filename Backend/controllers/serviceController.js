@@ -30,6 +30,7 @@ const serializeKeyFeatures = (value) => JSON.stringify(parseKeyFeatures(value));
 
 const normalizeService = (row) => ({
   ...row,
+  image_url: row?.image_url || row?.imageUrl || row?.image || row?.thumbnail || null,
   key_features: parseKeyFeatures(row.key_features),
 });
 
@@ -76,6 +77,7 @@ const listServices = asyncHandler(async (req, res) => {
   logServiceImageDebug('listServices: fetched rows', rows.map((row) => ({ id: row.id, title: row.title, image_url: row.image_url })));
   const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM services WHERE title LIKE ? OR description LIKE ?', [search, search]);
   const result = { data: rows.map(normalizeService), meta: { page, limit, total: countRows[0].total } };
+  logServiceImageDebug('GET /services response', JSON.stringify(result.data, null, 2));
   setCache(cacheKey, result, 120000);
   setShortCacheHeaders(res);
   res.json(result);
@@ -127,6 +129,7 @@ const createService = asyncHandler(async (req, res) => {
     'INSERT INTO services (title, description, icon, key_features, image_url, featured) VALUES (?, ?, ?, ?, ?, ?)',
     createValues
   );
+  logServiceImageDebug('DB RESULT (create)', result);
   invalidateCache('services:');
   res.status(201).json(normalizeService(await findById('services', result.insertId)));
 });
@@ -187,10 +190,11 @@ const updateService = asyncHandler(async (req, res) => {
   ];
   logServiceImageDebug('updateService: SQL values', updateValues);
 
-  await pool.query(
+  const [result] = await pool.query(
     'UPDATE services SET title = ?, description = ?, icon = ?, key_features = ?, image_url = ?, featured = ? WHERE id = ?',
     updateValues
   );
+  logServiceImageDebug('DB RESULT (update)', result);
 
   const updated = await findById('services', req.params.id);
   logServiceImageDebug('updateService: updatedService', updated);

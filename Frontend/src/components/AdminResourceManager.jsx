@@ -25,6 +25,8 @@ const endpoints = {
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
 
+const normalizeImageUrl = (row) => row?.image_url || row?.imageUrl || row?.image || row?.thumbnail || '';
+
 function TableHeader({ columns }) {
   return (
     <thead className="bg-[#edf4ff] text-left text-xs uppercase tracking-[0.2em] text-[#2f5ea8]">
@@ -103,15 +105,23 @@ export default function AdminResourceManager({ resource, title, description }) {
       };
       const response = await api.get(endpoint, { params });
       const data = response.data?.data || [];
+      const normalizedData = resource === 'services'
+        ? data.map((item) => ({
+          ...item,
+          image_url: normalizeImageUrl(item) || null,
+        }))
+        : data;
       if (isDev && resource === 'services') {
-        console.log('[Admin Services] fetched rows', data.map((item) => ({
+        console.log('[Admin Services] fetched rows', normalizedData.map((item) => ({
           id: item.id,
           title: item.title,
           image_url: item.image_url,
           imageUrl: item.imageUrl,
+          image: item.image,
+          thumbnail: item.thumbnail,
         })));
       }
-      setRows(data);
+      setRows(normalizedData);
       if (supportsPagination) {
         setMeta((current) => ({
           ...current,
@@ -119,7 +129,7 @@ export default function AdminResourceManager({ resource, title, description }) {
           total: response.data?.meta?.total || 0
         }));
       } else {
-        setMeta((current) => ({ ...current, total: data.length }));
+        setMeta((current) => ({ ...current, total: normalizedData.length }));
       }
     } catch {
       toast.error(`Failed to load ${resource}`);
@@ -211,11 +221,6 @@ export default function AdminResourceManager({ resource, title, description }) {
     return null;
   };
 
-  const isPlaceholderImageUrl = (value) => {
-    if (!value) return false;
-    return typeof value === 'string' && value.includes('images.unsplash.com');
-  };
-
   const buildPayload = () => {
     const payload = new FormData();
     Object.entries(form).forEach(([key, value]) => {
@@ -226,9 +231,6 @@ export default function AdminResourceManager({ resource, title, description }) {
       }
       if (key === 'photo' && value) {
         payload.append('photo', value);
-        return;
-      }
-      if ((key === 'image_url' || key === 'photo_url') && isPlaceholderImageUrl(value)) {
         return;
       }
       if (key === 'image_url' && form.image) {
@@ -281,9 +283,6 @@ export default function AdminResourceManager({ resource, title, description }) {
       }
       if (key === 'photo' && value) {
         payload.append('photo', value);
-        return;
-      }
-      if ((key === 'image_url' || key === 'photo_url') && isPlaceholderImageUrl(value)) {
         return;
       }
       if (key === 'image_url' && obj.image) {
@@ -478,16 +477,21 @@ export default function AdminResourceManager({ resource, title, description }) {
       case 'live_demo_url':
         return value ? <a className="text-blue-600 hover:underline" href={String(value)} target="_blank" rel="noreferrer">{String(value)}</a> : '-';
       case 'image_url':
-        return value ? (
-          <a href={buildImageUrl(value)} target="_blank" rel="noreferrer">
+        {
+          const imageValue = normalizeImageUrl(row);
+          return imageValue ? (
+          <a href={buildImageUrl(imageValue)} target="_blank" rel="noreferrer">
             <img
-              src={buildImageUrl(value)}
+              src={buildImageUrl(imageValue)}
               alt={row.title || 'image'}
               onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
-              className="h-16 w-24 rounded-md object-cover bg-[#f3f7ff]"
+              width={70}
+              height={70}
+              style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px', background: '#f3f7ff' }}
             />
           </a>
         ) : '-';
+        }
       case 'email':
         return value ? <a className="text-blue-600 hover:underline" href={`mailto:${String(value)}`}>{String(value)}</a> : '-';
       case 'subject':
