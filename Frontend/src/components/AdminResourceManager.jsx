@@ -456,6 +456,11 @@ export default function AdminResourceManager({ resource, title, description }) {
 
   const columns = tableColumns[resource] || [];
 
+  const logServiceRowRender = (row) => {
+    if (!(isDev && resource === 'services')) return;
+    console.log('[Admin Services] render service row', row);
+  };
+
   const renderCellValue = (column, row) => {
     const value = row[column.key];
 
@@ -791,31 +796,34 @@ export default function AdminResourceManager({ resource, title, description }) {
               <table className="min-w-full text-sm text-[#163c88]">
                 <TableHeader columns={[...columns.map((column) => column.label), 'Actions']} />
                 <tbody>
-                  {rows.map((row) => (
-                    <tr key={row.id} className={`border-t border-[#e6efff] hover:bg-[#f8fbff] ${highlightedId === row.id ? 'ring-4 ring-[#2f80ff]/30' : ''}`}>
-                      {columns.map((column) => (
-                        <td key={column.key} className="px-4 py-3 align-top max-w-[260px] break-words">
-                          {renderCellValue(column, row)}
-                        </td>
-                      ))}
-                      <td className="px-4 py-3">
-                        {supportsForm ? (
-                          <div className="flex items-center gap-2">
-                            <button onClick={() => onEdit(row)} className="inline-flex items-center gap-1 rounded-lg bg-[#edf4ff] px-3 py-2 text-sm text-[#2f6df7] transition hover:bg-[#dceaff]">
-                              <Pencil className="h-4 w-4" /> Edit
-                            </button>
+                  {rows.map((row) => {
+                    logServiceRowRender(row);
+                    return (
+                      <tr key={row.id} className={`border-t border-[#e6efff] hover:bg-[#f8fbff] ${highlightedId === row.id ? 'ring-4 ring-[#2f80ff]/30' : ''}`}>
+                        {columns.map((column) => (
+                          <td key={column.key} className="px-4 py-3 align-top max-w-[260px] break-words">
+                            {renderCellValue(column, row)}
+                          </td>
+                        ))}
+                        <td className="px-4 py-3">
+                          {supportsForm ? (
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => onEdit(row)} className="inline-flex items-center gap-1 rounded-lg bg-[#edf4ff] px-3 py-2 text-sm text-[#2f6df7] transition hover:bg-[#dceaff]">
+                                <Pencil className="h-4 w-4" /> Edit
+                              </button>
+                              <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
+                                <Trash2 className="h-4 w-4" /> Delete
+                              </button>
+                            </div>
+                          ) : (
                             <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
                               <Trash2 className="h-4 w-4" /> Delete
                             </button>
-                          </div>
-                        ) : (
-                          <button onClick={() => onDelete(row.id)} className="inline-flex items-center gap-1 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 transition hover:bg-red-100">
-                            <Trash2 className="h-4 w-4" /> Delete
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

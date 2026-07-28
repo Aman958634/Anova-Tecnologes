@@ -85,6 +85,9 @@ const createService = asyncHandler(async (req, res) => {
   const { title, description, icon, featured, key_features } = req.body;
   let imageUrl = null;
 
+  logServiceImageDebug('createService: req.body', req.body);
+  logServiceImageDebug('createService: req.file', req.file ? { originalname: req.file.originalname, mimetype: req.file.mimetype, size: req.file.size } : null);
+
   logServiceImageDebug('createService: incoming body', {
     title,
     image_url: req.body.image_url,
@@ -134,6 +137,9 @@ const updateService = asyncHandler(async (req, res) => {
 
   const { title, description, icon, featured, key_features } = req.body;
   let imageUrl = existing.image_url;
+
+  logServiceImageDebug('updateService: req.body', req.body);
+  logServiceImageDebug('updateService: req.file', req.file ? { originalname: req.file.originalname, mimetype: req.file.mimetype, size: req.file.size } : null);
 
   logServiceImageDebug('updateService: incoming body', {
     id: req.params.id,
@@ -187,6 +193,7 @@ const updateService = asyncHandler(async (req, res) => {
   );
 
   const updated = await findById('services', req.params.id);
+  logServiceImageDebug('updateService: updatedService', updated);
   logServiceImageDebug('updateService: DB row after SQL', {
     id: updated?.id,
     title: updated?.title,
