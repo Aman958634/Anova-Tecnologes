@@ -48,6 +48,7 @@ export default function AdminResourceManager({ resource, title, description }) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const tableRef = useRef(null);
   const [highlightedId, setHighlightedId] = useState(null);
+  const isDev = import.meta.env.DEV;
 
   const endpoint = endpoints[resource];
   const supportsForm = resource !== 'contacts';
@@ -102,6 +103,14 @@ export default function AdminResourceManager({ resource, title, description }) {
       };
       const response = await api.get(endpoint, { params });
       const data = response.data?.data || [];
+      if (isDev && resource === 'services') {
+        console.log('[Admin Services] fetched rows', data.map((item) => ({
+          id: item.id,
+          title: item.title,
+          image_url: item.image_url,
+          imageUrl: item.imageUrl,
+        })));
+      }
       setRows(data);
       if (supportsPagination) {
         setMeta((current) => ({
@@ -243,6 +252,25 @@ export default function AdminResourceManager({ resource, title, description }) {
     return payload;
   };
 
+  const logServicePayloadDebug = (payload, method, url) => {
+    if (!(isDev && resource === 'services')) return;
+    const entries = {};
+    payload.forEach((value, key) => {
+      if (value instanceof File) {
+        entries[key] = `[File:${value.name}]`;
+      } else {
+        entries[key] = value;
+      }
+    });
+    console.log('[Admin Services] submit payload', {
+      method,
+      url,
+      serviceId: form.id || null,
+      entries,
+      previewUrl,
+    });
+  };
+
   const buildFormDataFrom = (obj) => {
     const payload = new FormData();
     Object.entries(obj).forEach(([key, value]) => {
@@ -287,8 +315,18 @@ export default function AdminResourceManager({ resource, title, description }) {
     try {
       const method = form.id ? 'put' : 'post';
       const url = `${endpoint}${form.id ? `/${form.id}` : ''}`;
+      const payload = buildPayload();
+      logServicePayloadDebug(payload, method, url);
       // Let the browser set `Content-Type` with proper boundary for FormData.
-      const response = await api[method](url, buildPayload());
+      const response = await api[method](url, payload);
+      if (isDev && resource === 'services') {
+        const responseData = response?.data;
+        console.log('[Admin Services] submit response', {
+          id: responseData?.id || responseData?.data?.id,
+          image_url: responseData?.image_url || responseData?.data?.image_url,
+          imageUrl: responseData?.imageUrl || responseData?.data?.imageUrl,
+        });
+      }
       toast.success(`${title} saved successfully`);
       const createdOrUpdated = response?.data?.data || response?.data?.project || null;
       const createdId = createdOrUpdated?.id || response?.data?.id || null;

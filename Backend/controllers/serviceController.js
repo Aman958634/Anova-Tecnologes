@@ -4,6 +4,13 @@ const { findById, deleteById } = require('../models/baseModel');
 const { getCache, setCache, invalidateCache } = require('../utils/simpleCache');
 const { uploadToCloudinary, deleteFromCloudinary, extractPublicIdFromUrl, isCloudinaryUrl, generateFilename } = require('../utils/cloudStorage');
 
+const shouldLogServiceImageDebug = process.env.SERVICE_IMAGE_DEBUG === 'true' || process.env.NODE_ENV !== 'production';
+
+const logServiceImageDebug = (...args) => {
+  if (!shouldLogServiceImageDebug) return;
+  console.log('[services:image-debug]', ...args);
+};
+
 const parseKeyFeatures = (value) => {
   if (!value) return [];
   if (Array.isArray(value)) return value.filter(Boolean);
@@ -30,11 +37,6 @@ const setShortCacheHeaders = (res) => {
   res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
   res.set('Pragma', 'no-cache');
   res.set('Expires', '0');
-};
-
-const isPlaceholderImage = (url) => {
-  if (!url) return false;
-  return typeof url === 'string' && url.includes('images.unsplash.com');
 };
 
 const removeCloudImage = async (imageUrl) => {
@@ -71,6 +73,7 @@ const listServices = asyncHandler(async (req, res) => {
     'SELECT * FROM services WHERE title LIKE ? OR description LIKE ? ORDER BY featured DESC, id DESC LIMIT ? OFFSET ?',
     [search, search, limit, offset]
   );
+  logServiceImageDebug('listServices: fetched rows', rows.map((row) => ({ id: row.id, title: row.title, image_url: row.image_url })));
   const [countRows] = await pool.query('SELECT COUNT(*) AS total FROM services WHERE title LIKE ? OR description LIKE ?', [search, search]);
   const result = { data: rows.map(normalizeService), meta: { page, limit, total: countRows[0].total } };
   setCache(cacheKey, result, 120000);
@@ -82,6 +85,13 @@ const createService = asyncHandler(async (req, res) => {
   const { title, description, icon, featured, key_features } = req.body;
   let imageUrl = null;
 
+  logServiceImageDebug('createService: incoming body', {
+    title,
+    image_url: req.body.image_url,
+    imageUrl: req.body.imageUrl,
+    hasFile: Boolean(req.file),
+  });
+
   if (req.file) {
     try {
       const filename = generateFilename(req.file.originalname, 'service');
@@ -90,12 +100,15 @@ const createService = asyncHandler(async (req, res) => {
     } catch (error) {
       return respondWithError(res, error, 'create');
     }
-  } else if (req.body.image_url) {
-    const value = String(req.body.image_url).trim();
-    if (!isPlaceholderImage(value)) {
+  } else {
+    const rawImageUrl = req.body.image_url ?? req.body.imageUrl ?? req.body.image;
+    const value = rawImageUrl ? String(rawImageUrl).trim() : '';
+    if (value) {
       imageUrl = value;
     }
   }
+
+  logServiceImageDebug('createService: resolved imageUrl', { title, imageUrl });
 
   const [result] = await pool.query(
     'INSERT INTO services (title, description, icon, key_features, image_url, featured) VALUES (?, ?, ?, ?, ?, ?)',
@@ -112,6 +125,16 @@ const updateService = asyncHandler(async (req, res) => {
   const { title, description, icon, featured, key_features } = req.body;
   let imageUrl = existing.image_url;
 
+  logServiceImageDebug('updateService: incoming body', {
+    id: req.params.id,
+    title,
+    existingImageUrl: existing.image_url,
+    image_url: req.body.image_url,
+    imageUrl: req.body.imageUrl,
+    image: req.body.image,
+    hasFile: Boolean(req.file),
+  });
+
   if (req.file) {
     await removeCloudImage(existing.image_url);
     try {
@@ -121,15 +144,21 @@ const updateService = asyncHandler(async (req, res) => {
     } catch (error) {
       return respondWithError(res, error, 'update');
     }
-  } else if (req.body.image_url) {
-    const value = String(req.body.image_url).trim();
-    if (!isPlaceholderImage(value)) {
+  } else {
+    const rawImageUrl = req.body.image_url ?? req.body.imageUrl ?? req.body.image;
+    const value = rawImageUrl ? String(rawImageUrl).trim() : '';
+    if (value) {
       if (existing.image_url && existing.image_url !== value && isCloudinaryUrl(existing.image_url)) {
         await removeCloudImage(existing.image_url);
       }
       imageUrl = value;
     }
   }
+
+  logServiceImageDebug('updateService: resolved imageUrl before SQL', {
+    id: req.params.id,
+    imageUrl,
+  });
 
   await pool.query(
     'UPDATE services SET title = ?, description = ?, icon = ?, key_features = ?, image_url = ?, featured = ? WHERE id = ?',
@@ -143,8 +172,15 @@ const updateService = asyncHandler(async (req, res) => {
       req.params.id,
     ]
   );
+
+  const updated = await findById('services', req.params.id);
+  logServiceImageDebug('updateService: DB row after SQL', {
+    id: updated?.id,
+    title: updated?.title,
+    image_url: updated?.image_url,
+  });
   invalidateCache('services:');
-  res.json(normalizeService(await findById('services', req.params.id)));
+  res.json(normalizeService(updated));
 });
 
 const deleteService = asyncHandler(async (req, res) => {
