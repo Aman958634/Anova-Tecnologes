@@ -41,6 +41,7 @@ export default function AdminResourceManager({ resource, title, description }) {
   const [rows, setRows] = useState([]);
   const [busy, setBusy] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [serviceUrlPreviewError, setServiceUrlPreviewError] = useState(false);
   const [query, setQuery] = useState('');
   const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0 });
   const [form, setForm] = useState(initialForms[resource] || {});
@@ -59,14 +60,22 @@ export default function AdminResourceManager({ resource, title, description }) {
 
   const resetForm = () => setForm(initialForms[resource] || {});
 
+  const serviceImageUrlValue = String(form.image_url || form.imageUrl || '').trim();
+  const serviceUrlPreviewSrc = serviceImageUrlValue && /^https?:\/\//i.test(serviceImageUrlValue)
+    ? serviceImageUrlValue
+    : '';
+  const shouldShowLiveServiceUrlPreview = resource === 'services' && isFormOpen && !form.image && Boolean(serviceUrlPreviewSrc);
+
   const openNewForm = () => {
     resetForm();
+    setServiceUrlPreviewError(false);
     setPreviewUrl(null);
     setIsFormOpen(true);
   };
 
   const closeForm = () => {
     resetForm();
+    setServiceUrlPreviewError(false);
     if (previewUrl && previewUrl.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(null);
     setIsFormOpen(false);
@@ -110,6 +119,7 @@ export default function AdminResourceManager({ resource, title, description }) {
 
   useEffect(() => {
     resetForm();
+    setServiceUrlPreviewError(false);
     setIsFormOpen(false);
     setQuery('');
     setMeta((current) => ({ ...current, page: 1 }));
@@ -162,8 +172,15 @@ export default function AdminResourceManager({ resource, title, description }) {
       return;
     }
     if (resource === 'services') {
-      setForm({ ...row, key_features: Array.isArray(row.key_features) ? row.key_features.join(', ') : row.key_features || '', image: null });
-      setPreviewUrl(row.image_url ? buildImageUrl(row.image_url) : null);
+      const imageUrlValue = row.image_url || row.imageUrl || row.image || '';
+      setForm({
+        ...row,
+        key_features: Array.isArray(row.key_features) ? row.key_features.join(', ') : row.key_features || '',
+        image: null,
+        image_url: imageUrlValue
+      });
+      setServiceUrlPreviewError(false);
+      setPreviewUrl(imageUrlValue ? buildImageUrl(imageUrlValue) : null);
       setIsFormOpen(true);
       return;
     }
@@ -522,19 +539,42 @@ export default function AdminResourceManager({ resource, title, description }) {
                     type="url"
                     className="admin-services-input"
                     value={form.image_url || ''}
-                    onChange={(event) => setForm((current) => ({ ...current, image_url: event.target.value }))}
+                    onChange={(event) => {
+                      setServiceUrlPreviewError(false);
+                      setForm((current) => ({ ...current, image_url: event.target.value }));
+                    }}
                     placeholder="Image URL (https://...)"
                   />
                   <button
                     type="button"
                     className="admin-services-link-btn"
                     onClick={() => {
-                      if (form.image_url) setPreviewUrl(buildImageUrl(form.image_url));
+                      const manualUrl = String(form.image_url || form.imageUrl || '').trim();
+                      if (manualUrl) {
+                        setServiceUrlPreviewError(false);
+                        setPreviewUrl(buildImageUrl(manualUrl));
+                      }
                     }}
                   >
                     Preview URL
                   </button>
                 </div>
+                {shouldShowLiveServiceUrlPreview ? (
+                  <div className="service-image-preview mt-2 rounded-md border border-[#dbe7ff] bg-[#f8fbff] p-2">
+                    <img
+                      src={serviceUrlPreviewSrc}
+                      alt={form.title || 'Service preview'}
+                      onLoad={() => setServiceUrlPreviewError(false)}
+                      onError={() => {
+                        setServiceUrlPreviewError(true);
+                      }}
+                      className="h-32 w-full rounded-md object-cover bg-white"
+                    />
+                  </div>
+                ) : null}
+                {serviceImageUrlValue && serviceUrlPreviewError ? (
+                  <p className="mt-1 text-xs text-red-600">Image could not be loaded. Please use a direct public image URL.</p>
+                ) : null}
               </div>
               <div className="admin-services-field md:col-span-2">
                 <label className="admin-services-label" htmlFor="service-image-upload">Image Upload</label>
@@ -562,7 +602,7 @@ export default function AdminResourceManager({ resource, title, description }) {
                   className="admin-services-file"
                 />
               </div>
-              {previewUrl ? (
+              {previewUrl && (!shouldShowLiveServiceUrlPreview || form.image) ? (
                 <div className="md:col-span-2 mt-2 relative">
                   <button type="button" onClick={handleRemoveImage} className="absolute right-2 top-2 z-10 inline-flex items-center gap-2 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100">Delete image</button>
                   <img src={previewUrl} alt="preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-40 sm:h-32 w-full rounded-md object-cover bg-white" />
