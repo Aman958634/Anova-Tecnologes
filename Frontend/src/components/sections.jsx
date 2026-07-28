@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowRight, BarChart3, CheckCircle2, Clock3, Code2, Cloud, Cpu, Database, Globe, GraduationCap, Heart, HeartHandshake, LayoutPanelTop, Link2, Mail, MapPin, Megaphone, Monitor, Palette, Phone, PlayCircle, ShoppingCart, Smartphone, Star, ShieldCheck, UtensilsCrossed } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { ArrowRight, BarChart3, CheckCircle2, Clock3, Code2, Cloud, Cpu, Database, Globe, LayoutPanelTop, Link2, Mail, MapPin, Megaphone, Palette, Phone, PlayCircle, Smartphone, Star, ShieldCheck } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { buildImageUrl, imageFallbackByKey, starsFromRating } from '../utils/helpers';
 import { fallbackServices, fallbackTeam, fallbackTestimonials } from '../utils/siteData';
 import SectionHeading from './SectionHeading';
+import ProjectGrid from './projects/ProjectGrid';
+import { sectionEnter } from './projects/animationUtils';
 import api from '../services/api';
 
 function SectionCard({ children, className = '' }) {
@@ -824,7 +826,6 @@ export function AboutSection() {
 
 export function ProjectsSection() {
   const [projects, setProjects] = useState([]);
-  const [liked, setLiked] = useState({});
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -847,65 +848,10 @@ export function ProjectsSection() {
     };
   }, [fetchProjects]);
 
-  const allTags = useMemo(() => {
-    const tags = new Set();
-    projects.forEach((p) => {
-      if (Array.isArray(p.tags)) p.tags.forEach((t) => tags.add(t));
-    });
-    return ['All', ...Array.from(tags).slice(0, 4)];
-  }, [projects]);
-
-  const filtered = useMemo(() => projects, [projects]);
-
-  const tagIcon = (tag = '') => {
-    const t = tag.toLowerCase();
-    if (t.includes('health')) return <HeartHandshake className="h-3.5 w-3.5" />;
-    if (t.includes('edu') || t.includes('school')) return <GraduationCap className="h-3.5 w-3.5" />;
-    if (t.includes('food') || t.includes('restaurant')) return <UtensilsCrossed className="h-3.5 w-3.5" />;
-    if (t.includes('web') || t.includes('react')) return <Code2 className="h-3.5 w-3.5" />;
-    if (t.includes('biz') || t.includes('business')) return <ShoppingCart className="h-3.5 w-3.5" />;
-    return <Monitor className="h-3.5 w-3.5" />;
-  };
-
-  const cardIconBg = (index) => {
-    const themes = [
-      'bg-[#e8eeff] text-[#3a5cf4]',
-      'bg-[#fff3e8] text-[#e07b1a]',
-      'bg-[#eef6ff] text-[#2f78ff]',
-      'bg-[#f0faf0] text-[#22a06b]',
-      'bg-[#fdf0ff] text-[#a855f7]',
-      'bg-[#fff0f4] text-[#f43f6e]',
-    ];
-    return themes[index % themes.length];
-  };
-
-  const chipColor = (index) => {
-    const chips = [
-      'bg-[#dcf5e7] text-[#1a7a46]',
-      'bg-[#dff0ff] text-[#1a5bb5]',
-      'bg-[#f2e6ff] text-[#7c3aed]',
-      'bg-[#fff3dc] text-[#a05d00]',
-      'bg-[#fde8ee] text-[#c0234e]',
-      'bg-[#dff8ff] text-[#0369a1]',
-    ];
-    return chips[index % chips.length];
-  };
-
-  const linkColor = (index) => {
-    const colors = ['text-[#2563eb]', 'text-[#16a34a]', 'text-[#7c3aed]', 'text-[#d97706]', 'text-[#db2777]', 'text-[#0891b2]'];
-    return colors[index % colors.length];
-  };
-
-  const CardIcon = (index) => {
-    const icons = [Monitor, UtensilsCrossed, GraduationCap, Code2, ShoppingCart, HeartHandshake];
-    const Icon = icons[index % icons.length];
-    return <Icon className="h-5 w-5" />;
-  };
-
   return (
     <motion.section
       id="projects"
-      variants={sectionReveal}
+      variants={sectionEnter}
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, amount: 0.2 }}
@@ -926,81 +872,7 @@ export function ProjectsSection() {
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project, index) => (
-            <motion.div
-              key={project.id || project.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -4, scale: 1.004 }}
-              whileTap={{ scale: 0.997 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.32, delay: index * 0.05, type: 'spring', stiffness: 240, damping: 24 }}
-              className="card-animate"
-            >
-              <div className="overflow-hidden rounded-[18px] bg-transparent shadow-[0_8px_24px_rgba(15,23,42,0.08)] transition hover:shadow-[0_16px_36px_rgba(15,23,42,0.13)]">
-
-                {/* Image area */}
-                <div className="relative h-[210px] overflow-hidden sm:h-[250px] md:h-[260px] lg:h-[220px]">
-                  {project.imageUrl || project.image || project.image_url ? (
-                    <img
-                      src={buildImageUrl(project.imageUrl || project.image || project.image_url)}
-                      alt={project.title}
-                      loading="lazy"
-                      decoding="async"
-                      onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
-                      className="h-full w-full object-cover bg-[#f0f3fa]"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-slate-100" />
-                  )}
-
-                  {/* Category chip */}
-                  <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] ${chipColor(index)}`}>
-                    {Array.isArray(project.tags) && project.tags[0] ? project.tags[0] : 'Project'}
-                  </span>
-                  {/* Heart button */}
-                  <button
-                    onClick={() => setLiked((prev) => ({ ...prev, [project.id]: !prev[project.id] }))}
-                    className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-white shadow-md transition hover:scale-110"
-                  >
-                    <Heart className={`h-4 w-4 ${liked[project.id] ? 'fill-red-500 text-red-500' : 'text-slate-400'}`} />
-                  </button>
-                </div>
-
-                {/* Card body */}
-                <div className="p-5">
-                  {/* Floating icon */}
-                  <div className={`-mt-9 mb-4 inline-grid h-12 w-12 place-items-center rounded-[14px] shadow-md ${cardIconBg(index)}`}>
-                    {CardIcon(index)}
-                  </div>
-
-                  <h3 className="text-[17px] font-bold text-[#0f1b3f]">{project.title}</h3>
-                  <p className="mt-1.5 text-[13px] leading-[1.6] text-[#4d5f84] line-clamp-3">{project.description}</p>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <a
-                      href={project.live_demo_url || '#contact'}
-                      target={project.live_demo_url ? '_blank' : undefined}
-                      rel="noreferrer"
-                      className={`inline-flex items-center gap-1.5 text-[13px] font-semibold ${linkColor(index)}`}
-                    >
-                      View Case Study <ArrowRight className="h-3.5 w-3.5" />
-                    </a>
-                    <a
-                      href={project.live_demo_url || '#contact'}
-                      target={project.live_demo_url ? '_blank' : undefined}
-                      rel="noreferrer"
-                      className="grid h-8 w-8 place-items-center rounded-full border border-[#d6dfef] bg-[#f4f7ff] text-[#3c4f7a] transition hover:bg-[#2f6df7] hover:text-white"
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        <ProjectGrid projects={projects} />
 
       </div>
     </motion.section>

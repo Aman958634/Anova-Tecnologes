@@ -15,6 +15,20 @@
   --muted: #cbd5e1;
   --accent: #60a5fa;
   --accent-strong: #2563eb;
+  --project-neon-blue: rgba(64, 139, 255, 0.9);
+  --project-neon-purple: rgba(132, 94, 255, 0.88);
+  --project-neon-cyan: rgba(41, 214, 255, 0.86);
+}
+
+@keyframes project-ripple {
+  0% {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) scale(0.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(16);
+  }
 }
 
 html {
