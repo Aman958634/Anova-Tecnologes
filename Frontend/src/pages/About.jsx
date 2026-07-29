@@ -4,6 +4,7 @@ import { Lightbulb, Target, Users } from 'lucide-react';
 import api from '../services/api';
 import { buildImageUrl, imageFallbackByKey } from '../utils/helpers';
 import { fallbackTeam } from '../utils/siteData';
+import SEO from '../components/SEO';
 
 export default function About() {
   const [teamMembers, setTeamMembers] = useState(fallbackTeam);
@@ -115,7 +116,13 @@ export default function About() {
   }
 
   return (
-    <div className="bg-white text-slate-900">
+    <>
+      <SEO
+        title="About Us"
+        description="Learn about ANOVA Technologies — a full-service digital solutions company founded in India, building modern websites, web applications, and mobile apps for businesses worldwide."
+        url="/about"
+      />
+      <div className="bg-white text-slate-900">
       <section className="bg-[#102c66] px-4 py-16 text-center text-white sm:py-20">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -235,5 +242,6 @@ export default function About() {
         </div>
       </section>
     </div>
+    </>
   );
 }

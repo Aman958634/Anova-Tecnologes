@@ -29,10 +29,6 @@ export default function App() {
   const location = useLocation();
 
   useEffect(() => {
-    document.title = 'ANOVA TECHNOLOGIES';
-  }, []);
-
-  useEffect(() => {
     trackPageView(location.pathname, location.search);
   }, [location.pathname, location.search]);
 
