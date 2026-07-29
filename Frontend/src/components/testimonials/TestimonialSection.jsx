@@ -5,21 +5,19 @@ import { fallbackTestimonials } from '../../utils/siteData';
 import TestimonialCard from './TestimonialCard';
 
 const sectionReveal = {
-  hidden: { opacity: 0, y: 34, filter: 'blur(10px)' },
+  hidden: { opacity: 0, y: 34 },
   show: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
     transition: { duration: 0.62, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 const headingReveal = {
-  hidden: { opacity: 0, y: 24, filter: 'blur(10px)' },
+  hidden: { opacity: 0, y: 24 },
   show: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
     transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   },
 };

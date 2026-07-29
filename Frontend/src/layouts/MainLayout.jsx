@@ -10,6 +10,16 @@ export default function MainLayout({ children }) {
   const location = useLocation();
 
   useEffect(() => {
+    const ua = navigator.userAgent || '';
+    const isTouchMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+    if (!isTouchMobile) return undefined;
+    document.body.classList.add('mobile-render-safe');
+    return () => {
+      document.body.classList.remove('mobile-render-safe');
+    };
+  }, []);
+
+  useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 

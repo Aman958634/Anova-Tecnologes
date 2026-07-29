@@ -6,12 +6,11 @@ import Spotlight from './Spotlight';
 import StarRating from './StarRating';
 
 const cardMotion = {
-  hidden: { opacity: 0, y: 28, scale: 0.985, filter: 'blur(8px)' },
+  hidden: { opacity: 0, y: 28, scale: 0.985 },
   show: {
     opacity: 1,
     y: 0,
     scale: 1,
-    filter: 'blur(0px)',
     transition: { duration: 0.58, ease: [0.22, 1, 0.36, 1] },
   },
 };
@@ -50,7 +49,7 @@ export default function TestimonialCard({ item, mobileReduced, inView }) {
           // Premium hover elevation and shadow with GPU-friendly transforms.
           whileHover={{ y: -8, scale: mobileReduced ? 1.01 : 1.03 }}
           transition={{ duration: 0.32, ease: 'easeOut' }}
-          className="group relative h-full overflow-hidden rounded-[22px] border border-white/40 bg-white/58 p-[1px] shadow-[0_12px_34px_rgba(15,23,42,0.10)] backdrop-blur-xl"
+          className="group relative h-full overflow-hidden rounded-[22px] border border-white/40 bg-white/92 p-[1px] shadow-[0_12px_34px_rgba(15,23,42,0.10)]"
           style={{
             '--spotlight-x': '50%',
             '--spotlight-y': '50%',
@@ -76,7 +75,7 @@ export default function TestimonialCard({ item, mobileReduced, inView }) {
             {/* Glass blur overlay intensifies on hover for premium depth. */}
             <motion.span
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 rounded-[21px] bg-white/10 backdrop-blur-[1.5px]"
+              className="pointer-events-none absolute inset-0 rounded-[21px] bg-white/8"
               animate={{ opacity: hovered ? 0.8 : 0.35 }}
               transition={{ duration: 0.3, ease: 'easeOut' }}
             />

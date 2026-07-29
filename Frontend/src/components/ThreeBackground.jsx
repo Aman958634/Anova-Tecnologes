@@ -5,6 +5,12 @@ export default function ThreeBackground() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
+    const isTouchMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isTouchMobile || prefersReducedMotion) {
+      return undefined;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
 
@@ -112,7 +118,7 @@ export default function ThreeBackground() {
   }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+    <div className="pointer-events-none absolute inset-0 -z-10 hidden overflow-hidden md:block">
       <canvas ref={canvasRef} className="h-full w-full" />
     </div>
   );

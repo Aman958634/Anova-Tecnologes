@@ -185,7 +185,7 @@ function ServiceIconVisual({ service }) {
           rotateY: tiltY,
           transformStyle: 'preserve-3d',
         }}
-        className="relative grid h-[78px] w-[78px] place-items-center rounded-[22px] border border-white/45 bg-white/16 backdrop-blur-xl shadow-[0_18px_40px_rgba(16,56,140,0.28),inset_0_1px_0_rgba(255,255,255,0.65)]"
+        className="relative grid h-[78px] w-[78px] place-items-center rounded-[22px] border border-white/45 bg-white/28 shadow-[0_18px_40px_rgba(16,56,140,0.28),inset_0_1px_0_rgba(255,255,255,0.65)]"
       >
         <motion.span
           aria-hidden="true"
@@ -193,11 +193,6 @@ function ServiceIconVisual({ service }) {
           style={{ backgroundSize: '240% 240%' }}
           animate={{
             backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-            filter: [
-              'saturate(1.05) brightness(1.02)',
-              'saturate(1.25) brightness(1.12)',
-              'saturate(1.05) brightness(1.02)'
-            ]
           }}
           transition={{ duration: 6.4, repeat: Infinity, ease: 'easeInOut' }}
         />
@@ -253,11 +248,6 @@ function ServiceIconVisual({ service }) {
           className="relative z-10"
           animate={{
             scale: [1, 1.08, 1],
-            filter: [
-              'drop-shadow(0 0 0px rgba(255,255,255,0.1))',
-              'drop-shadow(0 0 14px rgba(255,255,255,0.65))',
-              'drop-shadow(0 0 0px rgba(255,255,255,0.1))'
-            ],
           }}
           transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
         >
@@ -492,7 +482,7 @@ export function HomeServicesSection() {
               className="group relative"
             >
               <motion.div
-                className="relative h-full overflow-hidden rounded-3xl border border-white/45 bg-white/55 p-[1px] shadow-[0_14px_38px_rgba(14,30,84,0.14)] backdrop-blur-xl transition-all duration-500 ease-out"
+                className="relative h-full overflow-hidden rounded-3xl border border-white/45 bg-white/82 p-[1px] shadow-[0_14px_38px_rgba(14,30,84,0.14)] transition-all duration-500 ease-out"
                 transition={{ duration: 0.5, ease: 'easeOut' }}
                 variants={{
                   rest: {

@@ -1244,3 +1244,21 @@ section[id] {
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee { animation: none !important; }
 }
+
+/* Mobile render hardening: prevent sticky blur/compositing artifacts in Android/iOS browsers. */
+body.mobile-render-safe main {
+  filter: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
+body.mobile-render-safe main [style*='filter'] {
+  filter: none !important;
+}
+
+body.mobile-render-safe main .glass,
+body.mobile-render-safe main [class*='backdrop-blur'] {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}

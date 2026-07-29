@@ -2,11 +2,10 @@ import { Monitor, UtensilsCrossed, GraduationCap, Code2, ShoppingCart, HeartHand
 
 // Section-level reveal for the full Projects block.
 export const sectionEnter = {
-  hidden: { opacity: 0, y: 32, filter: 'blur(10px)' },
+  hidden: { opacity: 0, y: 32 },
   show: {
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
     transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
   },
 };
@@ -25,12 +24,11 @@ export const gridStagger = {
 
 // Card entrance animation: fade + move up 80px + scale + blur to clear.
 export const cardEntrance = {
-  hidden: { opacity: 0, y: 80, scale: 0.95, filter: 'blur(10px)' },
+  hidden: { opacity: 0, y: 80, scale: 0.95 },
   show: {
     opacity: 1,
     y: 0,
     scale: 1,
-    filter: 'blur(0px)',
     transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
   },
 };
