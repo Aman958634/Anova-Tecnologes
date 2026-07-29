@@ -8,6 +8,9 @@ import ThreeBackground from '../components/ThreeBackground';
 
 export default function MainLayout({ children }) {
   const location = useLocation();
+  const isMobileViewport = typeof window !== 'undefined'
+    ? window.matchMedia('(max-width: 768px), (hover: none) and (pointer: coarse)').matches
+    : false;
 
   useEffect(() => {
     const ua = navigator.userAgent || '';
@@ -73,18 +76,24 @@ export default function MainLayout({ children }) {
     <div className="relative min-h-screen bg-[#071c46] text-slate-100">
       <ThreeBackground />
       <Navbar />
-      <AnimatePresence mode="wait">
-        <motion.main
-          key={location.pathname}
-          initial={false}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="relative z-[1] pt-[80px]"
-        >
+      {isMobileViewport ? (
+        <main className="relative z-[1] pt-[80px] mobile-static-render">
           {children}
-        </motion.main>
-      </AnimatePresence>
+        </main>
+      ) : (
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={location.pathname}
+            initial={false}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="relative z-[1] pt-[80px]"
+          >
+            {children}
+          </motion.main>
+        </AnimatePresence>
+      )}
       <Footer />
       <ChatbotWidget />
     </div>
