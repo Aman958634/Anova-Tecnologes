@@ -126,7 +126,7 @@ function ChatbotWidget() {
   }, [messages, isOpen]);
 
   return (
-    <div className="fixed bottom-4 right-4 z-[60]">
+    <div className="fixed bottom-4 right-4 z-[70] sm:bottom-4 sm:right-4">
       {!isOpen ? (
         <button
           onClick={() => setIsOpen(true)}
@@ -136,7 +136,7 @@ function ChatbotWidget() {
           <span>Talk to ANOVA</span>
         </button>
       ) : (
-        <div className={`${isExpanded ? 'w-[min(96vw,760px)] h-[90vh]' : 'w-[min(92vw,380px)]'} overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.18)]`}>
+        <div className={`${isExpanded ? 'h-[88vh] w-[min(96vw,760px)]' : 'w-[min(92vw,380px)]'} max-h-[calc(100dvh-120px)] overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-[0_24px_60px_rgba(15,23,42,0.18)]`}>
           <div className="flex items-center justify-between bg-[#102c66] px-4 py-3 text-white">
             <div className="flex items-center gap-2">
               <div className="grid h-9 w-9 place-items-center rounded-full bg-white/15">
@@ -157,7 +157,7 @@ function ChatbotWidget() {
             </div>
           </div>
 
-          <div className={`flex flex-col gap-3 overflow-y-auto bg-[#f7f9fc] p-4 ${isExpanded ? 'max-h-[70vh]' : 'max-h-[420px]'}`}>
+          <div className={`flex flex-col gap-3 overflow-y-auto bg-[#f7f9fc] p-4 ${isExpanded ? 'max-h-[62vh] sm:max-h-[70vh]' : 'max-h-[54vh] sm:max-h-[420px]'}`}>
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-6 ${message.role === 'user' ? 'bg-[#163c88] text-white' : 'bg-white text-slate-700 shadow-sm'}`}>

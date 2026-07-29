@@ -11,7 +11,7 @@
   position: fixed;
   right: var(--wa-right-offset);
   bottom: var(--wa-bottom-offset);
-  z-index: 9999;
+  z-index: 65;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -134,7 +134,7 @@
   :root {
     --wa-size: 56px;
     --wa-right-offset: 14px;
-    --wa-bottom-offset: max(96px, calc(env(safe-area-inset-bottom, 0px) + 72px));
+    --wa-bottom-offset: max(148px, calc(env(safe-area-inset-bottom, 0px) + 124px));
   }
 
   .wa-tooltip {

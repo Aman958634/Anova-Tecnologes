@@ -346,8 +346,8 @@ export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-[#0b2659] text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(96,140,255,0.16),_rgba(11,38,89,0.70)_45%)]" />
-      <div className="section-shell relative py-20 lg:py-24">
-        <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      <div className="section-shell relative py-14 sm:py-16 lg:py-24">
+        <div className="mx-auto grid max-w-7xl gap-10 sm:gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <motion.div
             initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
@@ -358,7 +358,7 @@ export function HeroSection() {
               <span className="h-2.5 w-2.5 rounded-full bg-[#5ab4ff]" /> Premium IT Solutions Agency
             </span>
 
-            <h1 className="mt-8 text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 text-[2rem] font-semibold leading-tight tracking-tight text-white sm:mt-8 sm:text-5xl lg:text-6xl">
               Transforming Ideas into Powerful Digital Solutions
             </h1>
 
@@ -366,7 +366,7 @@ export function HeroSection() {
               We build modern websites, mobile apps, and digital marketing strategies that help businesses grow faster.
             </p>
 
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center">
               <a href="#contact" className="inline-flex items-center justify-center rounded-full bg-[#2471ff] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#1f5fe6]">
                 Get Free Website Audit
               </a>
@@ -383,7 +383,7 @@ export function HeroSection() {
             transition={{ duration: 0.55, ease: 'easeOut' }}
             className="relative"
           >
-            <div className="overflow-hidden rounded-[32px] border border-white/10 bg-[#122d62] shadow-[0_45px_80px_rgba(7,25,74,0.35)] relative">
+            <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#122d62] shadow-[0_45px_80px_rgba(7,25,74,0.35)] sm:rounded-[32px]">
               <video
                 poster="/laptop-hero.svg"
                 preload="metadata"
@@ -391,7 +391,7 @@ export function HeroSection() {
                 autoPlay
                 loop
                 playsInline
-                className="h-[520px] w-full object-cover sm:h-[560px]"
+                className="h-[260px] w-full object-cover object-center sm:h-[400px] lg:h-[560px]"
               >
                 <source src={heroVideo} type="video/mp4" />
                 Your browser does not support the video tag.

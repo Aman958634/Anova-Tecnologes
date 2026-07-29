@@ -344,7 +344,7 @@
 
 @media (max-width: 1360px) {
   .ent-nav__container {
-    width: min(1400px, calc(100vw - 56px));
+    width: 100%;
   }
 
   .ent-nav__mega-slot {
@@ -374,7 +374,9 @@
 
 @media (max-width: 767px) {
   .ent-nav__container {
-    width: calc(100vw - 24px);
+    width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .ent-nav__cta {
@@ -389,5 +391,6 @@
 
   .ent-dropdown {
     width: min(260px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
   }
 }

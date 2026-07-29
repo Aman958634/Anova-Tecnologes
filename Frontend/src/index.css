@@ -20,6 +20,34 @@
   --project-neon-cyan: rgba(41, 214, 255, 0.86);
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  image-rendering: auto;
+}
+
 @keyframes project-ripple {
   0% {
     opacity: 0.75;
@@ -1145,6 +1173,15 @@ section[id] {
 @media (max-width: 768px) {
   body {
     font-size: 15px;
+  }
+
+  .glass,
+  .card-animate,
+  .ent-nav,
+  .ent-dropdown,
+  .wa-tooltip {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
   }
 
   .mega-menu-panel,

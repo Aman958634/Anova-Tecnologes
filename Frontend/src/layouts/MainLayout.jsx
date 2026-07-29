@@ -66,10 +66,10 @@ export default function MainLayout({ children }) {
       <AnimatePresence mode="wait">
         <motion.main
           key={location.pathname}
-          initial={{ opacity: 0, y: 10 }}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.32, ease: 'easeOut' }}
+          exit={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
           className="relative z-[1] pt-[80px]"
         >
           {children}
