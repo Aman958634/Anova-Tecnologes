@@ -17,6 +17,7 @@ export default function MainLayout({ children }) {
     ? window.matchMedia('(max-width: 768px), (hover: none) and (pointer: coarse)').matches
     : false;
   const shouldRenderThreeBackground = !isMobile && !isTablet && !isMobileViewport && !prefersReducedMotion;
+  const contentOffsetStyle = { paddingTop: 'calc(80px + env(safe-area-inset-top))' };
 
   useEffect(() => {
     const ua = navigator.userAgent || '';
@@ -87,7 +88,7 @@ export default function MainLayout({ children }) {
       ) : null}
       <Navbar />
       {isMobileViewport ? (
-        <main className="relative z-[1] pt-[80px] mobile-static-render">
+        <main className="relative z-[1] mobile-static-render" style={contentOffsetStyle}>
           {children}
         </main>
       ) : (
@@ -98,7 +99,8 @@ export default function MainLayout({ children }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 1, y: 0 }}
             transition={{ duration: isMobile ? 0.15 : isTablet ? 0.18 : 0.2, ease: 'easeOut' }}
-            className="relative z-[1] pt-[80px]"
+            className="relative z-[1]"
+            style={contentOffsetStyle}
           >
             {children}
           </motion.main>
