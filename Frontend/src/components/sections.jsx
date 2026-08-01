@@ -397,6 +397,8 @@ export function HeroSection() {
 
 export function HomeServicesSection() {
   const [services, setServices] = useState(fallbackServices);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const cardVariants = {
     hidden: { opacity: 0, y: 22, scale: 0.985 },
@@ -431,12 +433,17 @@ export function HomeServicesSection() {
   };
 
   const fetchServices = useCallback(async () => {
+    setLoading(true);
+    setError('');
     try {
       const response = await api.get('/services', { params: { page: 1, limit: 100 } });
       const items = response.data.data || [];
       setServices(items.length > 0 ? items : fallbackServices);
     } catch {
+      setError('Unable to load live services right now. Showing fallback services.');
       setServices(fallbackServices);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -467,11 +474,32 @@ export function HomeServicesSection() {
       className="bg-[#f3f5f8] py-12 text-slate-900 sm:py-14"
     >
       <div className="section-shell">
+        {error ? (
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <span>{error}</span>
+            <button
+              type="button"
+              onClick={fetchServices}
+              className="rounded-md bg-amber-100 px-3 py-1.5 font-semibold text-amber-900 transition hover:bg-amber-200"
+            >
+              Retry
+            </button>
+          </div>
+        ) : null}
+
+        {loading ? (
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={`home-services-skeleton-${index}`} className="h-[360px] animate-pulse rounded-3xl border border-slate-200 bg-slate-100" />
+            ))}
+          </div>
+        ) : null}
+
         <motion.div
           initial="hidden"
           animate="show"
           variants={gridVariants}
-          className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
+          className={`${loading ? 'hidden ' : ''}grid gap-6 sm:grid-cols-2 xl:grid-cols-3`}
         >
           {services.map((service) => (
             <motion.div
@@ -608,7 +636,18 @@ export function ServicesSection() {
       </div>
 
       <div className="section-shell py-16 sm:py-20 lg:py-24">
-        <div className="mb-8 text-sm text-slate-600">{statusMessage}</div>
+        <div className="mb-8 flex flex-wrap items-center gap-3 text-sm text-slate-600">
+          <span>{statusMessage}</span>
+          {error ? (
+            <button
+              type="button"
+              onClick={fetchServices}
+              className="rounded-md bg-red-100 px-3 py-1.5 font-semibold text-red-800 transition hover:bg-red-200"
+            >
+              Retry
+            </button>
+          ) : null}
+        </div>
         <div className="space-y-8">
           {services.map((service, index) => {
             const isReversed = index % 2 === 1;
@@ -653,6 +692,9 @@ export function ServicesSection() {
                         alt={service.title}
                         loading="lazy"
                         decoding="async"
+                        width={1280}
+                        height={720}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 45vw"
                         onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
                         className="h-full w-full object-cover bg-[#f5f7fb]"
                       />
@@ -777,6 +819,11 @@ export function AboutSection() {
             <img
               src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80"
               alt="Team working together"
+              loading="lazy"
+              decoding="async"
+              width={1200}
+              height={800}
+              sizes="(max-width: 1024px) 100vw, 50vw"
               className="h-[420px] w-full object-cover"
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(10,42,102,0.25))]" />
@@ -817,13 +864,20 @@ export function AboutSection() {
 
 export function ProjectsSection() {
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const fetchProjects = useCallback(async () => {
+    setLoading(true);
+    setError('');
     try {
       const response = await api.get('/projects', { params: { page: 1, limit: 9 } });
       setProjects(response.data.data || []);
     } catch {
+      setError('Unable to load projects right now. Please retry.');
       setProjects([]);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -863,7 +917,28 @@ export function ProjectsSection() {
           </p>
         </div>
 
-        <ProjectGrid projects={projects} />
+        {!loading ? <ProjectGrid projects={projects} /> : null}
+
+        {loading ? (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={`projects-skeleton-${index}`} className="h-[350px] animate-pulse rounded-[20px] border border-slate-200 bg-white" />
+            ))}
+          </div>
+        ) : null}
+
+        {!loading && error ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <span>{error}</span>
+            <button
+              type="button"
+              onClick={fetchProjects}
+              className="rounded-md bg-red-100 px-3 py-1.5 font-semibold text-red-800 transition hover:bg-red-200"
+            >
+              Retry
+            </button>
+          </div>
+        ) : null}
 
       </div>
     </motion.section>
@@ -887,6 +962,9 @@ export function TeamSection() {
                 alt={member.name}
                 loading="lazy"
                 decoding="async"
+                width={720}
+                height={720}
+                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
                 onError={(e) => { e.currentTarget.src = imageFallbackByKey(); }}
                 className="h-72 w-full object-cover bg-[#f8fafc]"
               />

@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import Lenis from '@studio-freight/lenis';
 import { motion } from 'framer-motion';
 import ProjectCard from './ProjectCard';
 import { gridStagger } from './animationUtils';
@@ -18,19 +17,34 @@ export default function ProjectGrid({ projects }) {
   }, []);
 
   useEffect(() => {
-    // Lenis smooth scrolling for premium in-section motion continuity.
-    const lenis = new Lenis({ duration: 1.06, smoothWheel: true, smoothTouch: false, wheelMultiplier: 0.9 });
-    const raf = (time) => {
-      lenis.raf(time);
+    if (mobileReduced) {
+      return undefined;
+    }
+
+    let lenis = null;
+    let disposed = false;
+
+    const setupLenis = async () => {
+      const module = await import('@studio-freight/lenis');
+      if (disposed) return;
+      const Lenis = module.default;
+      lenis = new Lenis({ duration: 1.06, smoothWheel: true, smoothTouch: false, wheelMultiplier: 0.9 });
+      const raf = (time) => {
+        if (!lenis) return;
+        lenis.raf(time);
+        rafRef.current = requestAnimationFrame(raf);
+      };
       rafRef.current = requestAnimationFrame(raf);
     };
-    rafRef.current = requestAnimationFrame(raf);
+
+    setupLenis();
 
     return () => {
+      disposed = true;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      lenis.destroy();
+      if (lenis) lenis.destroy();
     };
-  }, []);
+  }, [mobileReduced]);
 
   const data = useMemo(() => projects || [], [projects]);
 

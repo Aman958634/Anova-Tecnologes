@@ -36,16 +36,23 @@ const gridReveal = {
 
 export default function TestimonialSection() {
   const [testimonials, setTestimonials] = useState(fallbackTestimonials);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [mobileReduced, setMobileReduced] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
 
   const fetchTestimonials = useCallback(async () => {
+    setLoading(true);
+    setError('');
     try {
       const response = await api.get('/testimonials');
       const items = response.data.data || [];
       setTestimonials(items.length > 0 ? items : fallbackTestimonials);
     } catch {
+      setError('Unable to load live testimonials right now. Showing fallback testimonials.');
       setTestimonials(fallbackTestimonials);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -100,12 +107,33 @@ export default function TestimonialSection() {
           <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-7 text-[#4d5f84]">Trusted results that speak for themselves.</p>
         </motion.div>
 
+        {error ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <span>{error}</span>
+            <button
+              type="button"
+              onClick={fetchTestimonials}
+              className="rounded-md bg-amber-100 px-3 py-1.5 font-semibold text-amber-900 transition hover:bg-amber-200"
+            >
+              Retry
+            </button>
+          </div>
+        ) : null}
+
+        {loading ? (
+          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={`testimonial-skeleton-${index}`} className="h-[280px] animate-pulse rounded-[22px] border border-slate-200 bg-white" />
+            ))}
+          </div>
+        ) : null}
+
         <motion.div
           variants={gridReveal}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.15 }}
-          className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3"
+          className={`${loading ? 'hidden ' : ''}grid gap-6 sm:grid-cols-2 xl:grid-cols-3`}
         >
           {list.map((item) => (
             <TestimonialCard

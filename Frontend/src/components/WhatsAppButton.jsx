@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { FaWhatsapp } from 'react-icons/fa';
+import { MessageCircle } from 'lucide-react';
 import './WhatsAppButton.css';
 
 const WHATSAPP_URL =
@@ -39,7 +39,7 @@ function WhatsAppButton({
         rel="noopener noreferrer"
         aria-label={ariaLabel}
       >
-        <FaWhatsapp className="wa-icon" aria-hidden="true" focusable="false" />
+        <MessageCircle className="wa-icon" aria-hidden="true" focusable="false" />
         <span className="wa-status-dot" aria-hidden="true" />
       </a>
     </div>

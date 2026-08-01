@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Suspense, lazy, useEffect } from 'react';
@@ -11,6 +11,7 @@ const Services = lazy(() => import('./pages/Services'));
 const Projects = lazy(() => import('./pages/Projects'));
 const Contact = lazy(() => import('./pages/Contact'));
 const Login = lazy(() => import('./pages/Login'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminServices = lazy(() => import('./pages/AdminServices'));
 const AdminProjects = lazy(() => import('./pages/AdminProjects'));
@@ -52,7 +53,7 @@ export default function App() {
           <Route path="/admin/testimonials" element={<ProtectedRoute><AdminTestimonials /></ProtectedRoute>} />
           <Route path="/admin/contacts" element={<ProtectedRoute><AdminContacts /></ProtectedRoute>} />
           <Route path="/admin/chatbot-leads" element={<ProtectedRoute><AdminChatbotLeads /></ProtectedRoute>} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<PublicRoute element={<NotFound />} />} />
         </Routes>
 
         {/* Global floating CTA: appears on all routes with safe mobile offset. */}

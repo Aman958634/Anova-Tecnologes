@@ -34,15 +34,18 @@ export default function ProjectImage({ project, mobileReduced }) {
             alt={project.title}
             loading="lazy"
             decoding="async"
+            width={1280}
+            height={720}
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             onError={(event) => {
               event.currentTarget.src = buildImageUrl(null);
             }}
             className="h-full w-full object-cover"
             // Continuous floating motion for luxurious movement.
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+            animate={mobileReduced ? { y: 0 } : { y: [0, -8, 0] }}
+            transition={mobileReduced ? { duration: 0.01 } : { duration: 5, repeat: Infinity, ease: 'easeInOut' }}
             // Hover zoom and image tone enhancement.
-            whileHover={{ scale: 1.08, filter: 'brightness(1.05) contrast(1.05)' }}
+            whileHover={mobileReduced ? undefined : { scale: 1.08, filter: 'brightness(1.05) contrast(1.05)' }}
             style={{ willChange: 'transform, filter' }}
           />
         </motion.div>

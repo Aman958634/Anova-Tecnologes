@@ -483,7 +483,9 @@ export default function AdminResourceManager({ resource, title, description }) {
           <a href={buildImageUrl(imageValue)} target="_blank" rel="noreferrer">
             <img
               src={buildImageUrl(imageValue)}
-              alt={row.title || 'image'}
+              alt={row.title ? `${row.title} thumbnail` : 'Resource thumbnail'}
+              loading="lazy"
+              decoding="async"
               onError={(e) => { e.currentTarget.src = buildImageUrl(null); }}
               width={70}
               height={70}
@@ -611,6 +613,10 @@ export default function AdminResourceManager({ resource, title, description }) {
                     <img
                       src={serviceUrlPreviewSrc}
                       alt={form.title || 'Service preview'}
+                      loading="lazy"
+                      decoding="async"
+                      width={640}
+                      height={360}
                       onLoad={() => setServiceUrlPreviewError(false)}
                       onError={() => {
                         setServiceUrlPreviewError(true);
@@ -652,7 +658,7 @@ export default function AdminResourceManager({ resource, title, description }) {
               {previewUrl && (!shouldShowLiveServiceUrlPreview || form.image) ? (
                 <div className="md:col-span-2 mt-2 relative">
                   <button type="button" onClick={handleRemoveImage} className="absolute right-2 top-2 z-10 inline-flex items-center gap-2 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100">Delete image</button>
-                  <img src={previewUrl} alt="preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-40 sm:h-32 w-full rounded-md object-cover bg-white" />
+                  <img src={previewUrl} alt="Service image preview" loading="lazy" decoding="async" width={640} height={360} onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-40 sm:h-32 w-full rounded-md object-cover bg-white" />
                 </div>
               ) : null}
               <label className="admin-services-checkbox md:col-span-2">
@@ -692,7 +698,7 @@ export default function AdminResourceManager({ resource, title, description }) {
               {previewUrl ? (
                 <div className="md:col-span-2 mt-2 relative">
                   <button type="button" onClick={handleRemoveImage} className="absolute right-2 top-2 z-10 inline-flex items-center gap-2 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100">Delete image</button>
-                  <img src={previewUrl} alt="preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-32 w-full rounded-md object-cover bg-white" />
+                  <img src={previewUrl} alt="Project image preview" loading="lazy" decoding="async" width={640} height={360} onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-32 w-full rounded-md object-cover bg-white" />
                 </div>
               ) : null}
               <label className="flex items-center gap-2 text-sm text-[#163c88]"><input type="checkbox" checked={Boolean(form.featured)} onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))} /> Featured</label>
@@ -727,7 +733,7 @@ export default function AdminResourceManager({ resource, title, description }) {
                 <div className="md:col-span-2 mt-2 relative">
                   <button type="button" onClick={handleRemoveImage} className="absolute right-2 top-2 z-10 inline-flex items-center gap-2 rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100">Delete image</button>
                   <p className="text-xs text-slate-500">Current / selected image preview</p>
-                  <img src={previewUrl} alt="team preview" onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-32 w-full rounded-md object-cover bg-white" />
+                  <img src={previewUrl} alt="Team member image preview" loading="lazy" decoding="async" width={640} height={640} onError={(e) => { e.currentTarget.src = buildImageUrl(null); }} className="h-32 w-full rounded-md object-cover bg-white" />
                 </div>
               ) : null}
               <label className="flex items-center gap-2 text-sm text-[#163c88]"><input type="checkbox" checked={Boolean(form.featured)} onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))} /> Featured</label>

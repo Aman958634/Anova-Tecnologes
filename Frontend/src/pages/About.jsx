@@ -1,13 +1,19 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lightbulb, Target, Users } from 'lucide-react';
-import api from '../services/api';
-import { buildImageUrl, imageFallbackByKey } from '../utils/helpers';
+import { getTeam } from '../services/api';
+import { buildImageUrl, imageFallbackByKey, useMediaQuery } from '../utils/helpers';
 import { fallbackTeam } from '../utils/siteData';
 import SEO from '../components/SEO';
+import { useResource } from '../hooks/useResource';
 
 export default function About() {
-  const [teamMembers, setTeamMembers] = useState(fallbackTeam);
+  const isMobile = useMediaQuery('(max-width: 640px)');
+  const isTablet = useMediaQuery('(min-width: 641px) and (max-width: 1024px)');
+  const { data: teamMembers = fallbackTeam, loading, error, retry } = useResource(
+    () => getTeam(1, 12),
+    [getTeam]
+  );
   const coreValues = [
     {
       icon: Target,
@@ -27,38 +33,19 @@ export default function About() {
   ];
 
   useEffect(() => {
-    let active = true;
-
-    const fetchTeam = async () => {
-      try {
-        const response = await api.get('/team', { params: { page: 1, limit: 12 } });
-        if (!active) return;
-        const items = response.data.data || [];
-        setTeamMembers(items.length > 0 ? items : fallbackTeam);
-      } catch {
-        if (!active) return;
-        setTeamMembers(fallbackTeam);
-      }
-    };
-
-    fetchTeam();
-
-    const onDataUpdated = () => {
-      fetchTeam();
-    };
+    const onDataUpdated = () => retry();
     const onStorage = (event) => {
-      if (event.key === 'anova:data-updated') fetchTeam();
+      if (event.key === 'anova:data-updated') retry();
     };
 
     window.addEventListener('anova:data-updated', onDataUpdated);
     window.addEventListener('storage', onStorage);
 
     return () => {
-      active = false;
       window.removeEventListener('anova:data-updated', onDataUpdated);
       window.removeEventListener('storage', onStorage);
     };
-  }, []);
+  }, [retry]);
 
   // Use the site team-working hero image for the About right-side illustration
   const heroImage = 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80';
@@ -98,6 +85,11 @@ export default function About() {
           <img
             src={src}
             alt={member.name}
+            loading="lazy"
+            decoding="async"
+            width={720}
+            height={900}
+            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
             onError={(e) => { e.currentTarget.src = imageFallbackByKey(); }}
             className="h-[250px] w-full object-cover bg-[#eaf1ff]"
           />
@@ -169,8 +161,12 @@ export default function About() {
               <img
                 src={buildImageUrl(heroImage, heroImageFallback)}
                 alt="Team collaboration"
-                loading="lazy"
+                loading="eager"
+                fetchPriority="high"
                 decoding="async"
+                width={1200}
+                height={800}
+                sizes="(max-width: 1024px) 100vw, 420px"
                 onError={(e) => { e.currentTarget.src = heroImageFallback; }}
                 className="w-full h-auto sm:h-[420px] object-cover rounded-[18px]"
               />
@@ -235,9 +231,28 @@ export default function About() {
           </motion.div>
 
           <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {teamMembers.map((member) => (
-              <TeamMemberCard key={member.id} member={member} />
-            ))}
+            {error ? (
+              <div className="sm:col-span-2 xl:col-span-4 flex flex-col items-center justify-center gap-3 py-12 text-center">
+                <p className="text-sm text-red-600">Unable to load team members right now.</p>
+                <button onClick={retry} className="rounded-lg bg-[#2f6df7] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2458d0]">
+                  Retry
+                </button>
+              </div>
+            ) : loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="animate-pulse rounded-[14px] border border-slate-200 bg-slate-100">
+                  <div className="h-[250px] w-full bg-slate-200/60" />
+                  <div className="space-y-2 p-4 text-center">
+                    <div className="mx-auto h-5 w-3/4 rounded bg-slate-200/80" />
+                    <div className="mx-auto h-4 w-1/2 rounded bg-slate-200/60" />
+                  </div>
+                </div>
+              ))
+            ) : (
+              teamMembers.map((member) => (
+                <TeamMemberCard key={member.id} member={member} />
+              ))
+            )}
           </div>
         </div>
       </section>

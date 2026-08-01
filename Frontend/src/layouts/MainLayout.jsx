@@ -1,16 +1,22 @@
-import { useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import ChatbotWidget from '../components/ChatbotWidget';
-import ThreeBackground from '../components/ThreeBackground';
+import { useMediaQuery } from '../utils/helpers';
+
+const ChatbotWidget = lazy(() => import('../components/ChatbotWidget'));
+const ThreeBackground = lazy(() => import('../components/ThreeBackground'));
 
 export default function MainLayout({ children }) {
   const location = useLocation();
+  const isMobile = useMediaQuery('(max-width: 640px)');
+  const isTablet = useMediaQuery('(min-width: 641px) and (max-width: 1024px)');
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const isMobileViewport = typeof window !== 'undefined'
     ? window.matchMedia('(max-width: 768px), (hover: none) and (pointer: coarse)').matches
     : false;
+  const shouldRenderThreeBackground = !isMobile && !isTablet && !isMobileViewport && !prefersReducedMotion;
 
   useEffect(() => {
     const ua = navigator.userAgent || '';
@@ -74,7 +80,11 @@ export default function MainLayout({ children }) {
 
   return (
     <div className="relative min-h-screen bg-[#071c46] text-slate-100">
-      <ThreeBackground />
+      {shouldRenderThreeBackground ? (
+        <Suspense fallback={null}>
+          <ThreeBackground />
+        </Suspense>
+      ) : null}
       <Navbar />
       {isMobileViewport ? (
         <main className="relative z-[1] pt-[80px] mobile-static-render">
@@ -87,7 +97,7 @@ export default function MainLayout({ children }) {
             initial={false}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={{ duration: isMobile ? 0.15 : isTablet ? 0.18 : 0.2, ease: 'easeOut' }}
             className="relative z-[1] pt-[80px]"
           >
             {children}
@@ -95,7 +105,9 @@ export default function MainLayout({ children }) {
         </AnimatePresence>
       )}
       <Footer />
-      <ChatbotWidget />
+      <Suspense fallback={null}>
+        <ChatbotWidget />
+      </Suspense>
     </div>
   );
 }

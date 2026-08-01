@@ -10,7 +10,9 @@ export default function Footer() {
         <motion.div initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.35 }} className="space-y-4">
           <img
             src="/logoanova-white.png"
-            alt="Anova Technologies"
+            alt="Anova Technologies logo"
+            width={166}
+            height={66}
             className="h-auto w-[112px] max-w-none object-contain drop-shadow-[0_4px_12px_rgba(255,255,255,0.14)] sm:w-[166px]"
             loading="lazy"
             decoding="async"

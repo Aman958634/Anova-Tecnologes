@@ -9,7 +9,6 @@ const normalizeConfiguredApiUrl = (value) => {
 
   const cleaned = raw.replace(/\/+$/, '');
 
-  // Guard against stale deployment env values pointing to the retired backend host.
   if (/^https?:\/\/anova-tecnologes-backend\.onrender\.com\/api$/i.test(cleaned)) {
     return ACTIVE_BACKEND_API_URL;
   }
@@ -22,7 +21,6 @@ export const API_BASE_URL = (() => {
   const host = isBrowser ? window.location.hostname : '';
   const isVercelHost = /(^|\.)vercel\.app$/i.test(host);
 
-  // On Vercel frontend, enforce same-origin /api and rely on vercel.json rewrite.
   if (isVercelHost) {
     return DEFAULT_API_BASE_URL;
   }
@@ -33,7 +31,7 @@ export const API_BASE_URL = (() => {
 
 export const API_ORIGIN = API_BASE_URL.replace(/\/api$/i, '');
 
-export function createApiClient({ timeout = 30000 } = {}) {
+function createApiClient({ timeout = 30000, retries = 2, retryDelay = 800 } = {}) {
   const client = axios.create({
     baseURL: API_BASE_URL,
     timeout,
@@ -41,8 +39,6 @@ export function createApiClient({ timeout = 30000 } = {}) {
       Accept: 'application/json'
     }
   });
-
-  console.log('Base URL:', API_BASE_URL);
 
   client.interceptors.request.use((config) => {
     const token = localStorage.getItem('anova-token');
@@ -53,7 +49,6 @@ export function createApiClient({ timeout = 30000 } = {}) {
     const isFormDataPayload = typeof FormData !== 'undefined' && config.data instanceof FormData;
 
     if (isFormDataPayload) {
-      // Keep Content-Type unset for FormData so the browser can send multipart boundary.
       if (typeof config.headers?.setContentType === 'function') {
         config.headers.setContentType(false);
       }
@@ -63,48 +58,43 @@ export function createApiClient({ timeout = 30000 } = {}) {
       }
     }
 
-    const resolvedContentType =
-      typeof config.headers?.getContentType === 'function'
-        ? config.headers.getContentType()
-        : config.headers?.['Content-Type'] || config.headers?.['content-type'];
-
-    console.log('API request debug:', {
-      method: config.method,
-      url: config.url,
-      isFormDataPayload,
-      contentType: resolvedContentType || null,
-    });
-
     return config;
   });
 
   client.interceptors.response.use(
-    (response) => {
-      const method = String(response?.config?.method || '').toLowerCase();
-      if (method === 'post' || method === 'put' || method === 'patch' || method === 'delete') {
-        const stamp = String(Date.now());
-        try {
-          localStorage.setItem('anova:data-updated', stamp);
-        } catch {
-          // Ignore localStorage failures in restricted contexts.
-        }
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new CustomEvent('anova:data-updated', {
-            detail: {
-              stamp,
-              method,
-              url: response?.config?.url || null,
-            },
-          }));
-        }
+    (response) => response,
+    async (error) => {
+      const { config, response } = error;
+      if (!config) {
+        return Promise.reject(error);
       }
-      return response;
-    },
-    (error) => {
-      console.log('API error response:', error.response);
-      console.log('API error message:', error.message);
-      console.log('API error config:', error.config);
-      return Promise.reject(error);
+
+      const method = String(config.method || 'get').toLowerCase();
+      const canRetry = method === 'get' || method === 'head' || method === 'options';
+      if (!canRetry) {
+        return Promise.reject(error);
+      }
+
+      const retryCount = config.__retryCount || 0;
+      if (retryCount >= retries) {
+        return Promise.reject(error);
+      }
+
+      const shouldRetry =
+        !response ||
+        response.status >= 500 ||
+        error.code === 'ECONNABORTED' ||
+        error.code === 'ENOTFOUND' ||
+        error.code === 'ECONNREFUSED';
+
+      if (!shouldRetry) {
+        return Promise.reject(error);
+      }
+
+      config.__retryCount = retryCount + 1;
+      await new Promise((resolve) => setTimeout(resolve, retryDelay * config.__retryCount));
+
+      return client(config);
     }
   );
 
@@ -112,5 +102,11 @@ export function createApiClient({ timeout = 30000 } = {}) {
 }
 
 export const api = createApiClient();
+
+export function createRetryApi() {
+  return createApiClient({ retries: 2 });
+}
+
+export const retryApi = createRetryApi();
 
 export default api;

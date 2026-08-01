@@ -182,7 +182,16 @@ export default function Navbar() {
     <header className={`ent-nav ${isScrolled ? 'is-scrolled' : ''}`}>
       <div className="ent-nav__container navbar-container">
         <Link to="/" className="ent-nav__logo-link" aria-label="Anova Technologies home">
-          <img src={isScrolled ? '/logoanova.png' : '/logoanova-white.png'} alt="Anova Technologies" className="ent-nav__logo" />
+          <img
+            src={isScrolled ? '/logoanova.png' : '/logoanova-white.png'}
+            alt="Anova Technologies logo"
+            width={140}
+            height={56}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            className="ent-nav__logo"
+          />
         </Link>
 
         {isDesktopOrLaptop ? (

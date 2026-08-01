@@ -38,7 +38,16 @@ export default function Login() {
         className="w-full max-w-md rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(11,37,91,0.96),rgba(14,44,104,0.96))] p-8 shadow-[0_28px_80px_rgba(5,20,50,0.35)]"
       >
         <div className="mb-6 flex items-center gap-3">
-          <img src="/logoanova-white.png" alt="Anova Technologies" className="h-12 w-auto object-contain" />
+          <img
+            src="/logoanova-white.png"
+            alt="Anova Technologies logo"
+            width={160}
+            height={64}
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            className="h-12 w-auto object-contain"
+          />
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-cyan-300">Admin Access</p>
             <p className="text-xl font-semibold text-white">Anova Technologies</p>

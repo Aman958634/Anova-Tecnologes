@@ -1,3 +1,5 @@
+import React, { useState, useEffect } from 'react';
+
 export function formatDate(dateValue) {
   if (!dateValue) return 'Fresh update';
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(dateValue));
@@ -9,7 +11,6 @@ export function buildImageUrl(url, fallback = null) {
 
   const trimmed = String(url).trim();
 
-  // Absolute URLs are used as-is. For ImageKit, apply dynamic optimization params.
   if (/^https?:\/\//i.test(trimmed)) {
     try {
       const parsed = new URL(trimmed);
@@ -22,7 +23,6 @@ export function buildImageUrl(url, fallback = null) {
     }
   }
 
-  // Legacy relative paths are still supported for old records.
   let path = trimmed.replace(/\\+/g, '/');
   if (!path.startsWith('/')) path = `/${path}`;
 
@@ -33,8 +33,24 @@ export function imageFallbackByKey() {
   return '/placeholder-image.svg';
 }
 
-// persistent image override helpers removed — previews will not persist after refresh
-
 export function starsFromRating(rating = 5) {
   return Array.from({ length: 5 }, (_, index) => index < rating);
+}
+
+export function useMediaQuery(query) {
+  const [matches, setMatches] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia(query).matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const handler = (event) => setMatches(event.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, [query]);
+
+  return matches;
 }

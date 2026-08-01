@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { LayoutDashboard, LogOut, Mail, Newspaper, Shapes, Star, FolderKanban, Users, BarChart3, Bot } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useMediaQuery } from '../utils/helpers';
 
 const adminLinks = [
   { label: 'Dashboard', path: '/admin', icon: LayoutDashboard },
@@ -19,24 +20,26 @@ const adminLinks = [
 export default function AdminLayout({ children }) {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const isMobile = useMediaQuery('(max-width: 640px)');
+  const isTablet = useMediaQuery('(min-width: 641px) and (max-width: 1024px)');
 
   const sidebarVariants = {
-    hidden: { opacity: 0, x: -16 },
+    hidden: { opacity: 0, x: isMobile ? 0 : -16 },
     show: {
       opacity: 1,
       x: 0,
       transition: {
-        duration: 0.32,
+        duration: isMobile ? 0.2 : 0.32,
         ease: 'easeOut',
-        staggerChildren: 0.05,
-        delayChildren: 0.06
+        staggerChildren: isMobile ? 0.03 : 0.05,
+        delayChildren: isMobile ? 0.03 : 0.06
       }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, x: -10 },
-    show: { opacity: 1, x: 0 }
+    hidden: { opacity: 0, x: isMobile ? 0 : -10 },
+    show: { opacity: 1, x: 0, transition: { duration: isMobile ? 0.2 : 0.3 } }
   };
 
   return (
@@ -92,9 +95,9 @@ export default function AdminLayout({ children }) {
       </motion.aside>
       <motion.section
         key={location.pathname}
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: isMobile ? 6 : isTablet ? 10 : 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: 'easeOut' }}
+        transition={{ duration: isMobile ? 0.2 : isTablet ? 0.25 : 0.3, ease: 'easeOut' }}
         className="p-4 sm:p-6 lg:p-8"
       >
         {children}

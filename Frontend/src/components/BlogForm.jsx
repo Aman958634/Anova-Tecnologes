@@ -120,7 +120,15 @@ const BlogForm = ({ currentBlog, onSubmit, onClose }) => {
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
         {blogData.imageUrl && !imageFile && (
-          <img src={blogData.imageUrl} alt="Current Blog" className="mt-2 h-20 w-20 object-cover" />
+          <img
+            src={blogData.imageUrl}
+            alt="Current blog preview"
+            loading="lazy"
+            decoding="async"
+            width={80}
+            height={80}
+            className="mt-2 h-20 w-20 object-cover"
+          />
         )}
       </div>
       <div className="mb-4">

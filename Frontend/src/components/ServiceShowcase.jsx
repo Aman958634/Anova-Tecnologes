@@ -3,23 +3,34 @@ import { RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { fallbackServices } from '../utils/siteData';
+import { useMediaQuery } from '../utils/helpers';
 
 const SLIDE_INTERVAL = 3500;
 
 export default function ServiceShowcase() {
   const [services, setServices] = useState(fallbackServices.slice(0, 6));
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const [autoRestart, setAutoRestart] = useState(true);
+  const isMobile = useMediaQuery('(max-width: 640px)');
+  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const intervalRef = useRef(null);
 
   const fetchServices = useCallback(async () => {
+    setLoading(true);
+    setError('');
     try {
       const response = await api.get('/services', { params: { page: 1, limit: 8 } });
       const items = response.data.data || [];
       if (items.length > 0) setServices(items);
+      else setServices(fallbackServices.slice(0, 6));
     } catch {
-      // use fallback
+      setServices(fallbackServices.slice(0, 6));
+      setError('Unable to load live services right now. Showing fallback content.');
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -35,10 +46,10 @@ export default function ServiceShowcase() {
   }, [services.length]);
 
   useEffect(() => {
-    if (!autoRestart || paused) return;
+    if (!autoRestart || paused || prefersReducedMotion) return;
     intervalRef.current = window.setInterval(next, SLIDE_INTERVAL);
     return () => window.clearInterval(intervalRef.current);
-  }, [next, paused, autoRestart, services.length]);
+  }, [next, paused, autoRestart, services.length, prefersReducedMotion]);
 
   const handleRestart = () => {
     setCurrent(0);
@@ -72,9 +83,30 @@ export default function ServiceShowcase() {
           </p>
         </div>
 
+        {loading ? (
+          <div className="grid gap-3 rounded-[24px] border border-slate-200 bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
+            <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
+            <div className="h-10 w-3/4 animate-pulse rounded bg-slate-200" />
+            <div className="h-4 w-full animate-pulse rounded bg-slate-200" />
+          </div>
+        ) : null}
+
+        {error ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <span>{error}</span>
+            <button
+              type="button"
+              onClick={fetchServices}
+              className="rounded-md bg-amber-100 px-3 py-1.5 font-semibold text-amber-900 transition hover:bg-amber-200"
+            >
+              Retry
+            </button>
+          </div>
+        ) : null}
+
         {/* Showcase Card */}
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, y: isMobile ? 10 : 18 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 0.45, ease: 'easeOut' }}
@@ -107,9 +139,9 @@ export default function ServiceShowcase() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={current}
-                initial={{ opacity: 0, y: 22 }}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: isMobile ? 8 : 22 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -14 }}
+                exit={prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: isMobile ? -8 : -14 }}
                 transition={{ duration: 0.42, ease: 'easeOut' }}
                 className="space-y-5"
               >
