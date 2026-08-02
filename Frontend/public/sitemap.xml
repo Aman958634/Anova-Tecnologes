@@ -2,37 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://anova-tecnologes.vercel.app/</loc>
+    <loc>https://anova-tecnologes-app.vercel.app/</loc>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://anova-tecnologes.vercel.app/services</loc>
+    <loc>https://anova-tecnologes-app.vercel.app/services</loc>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://anova-tecnologes.vercel.app/projects</loc>
+    <loc>https://anova-tecnologes-app.vercel.app/projects</loc>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://anova-tecnologes.vercel.app/blogs</loc>
+    <loc>https://anova-tecnologes-app.vercel.app/blogs</loc>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://anova-tecnologes.vercel.app/about</loc>
+    <loc>https://anova-tecnologes-app.vercel.app/about</loc>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://anova-tecnologes.vercel.app/contact</loc>
+    <loc>https://anova-tecnologes-app.vercel.app/contact</loc>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://anova-tecnologes.vercel.app/testimonials</loc>
+    <loc>https://anova-tecnologes-app.vercel.app/testimonials</loc>
     <priority>0.7</priority>
   </url>
 
