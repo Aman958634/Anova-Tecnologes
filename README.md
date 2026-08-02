@@ -32,13 +32,12 @@ npm install
 npm run dev
 ```
 
-The backend bootstraps the schema automatically and can seed a default admin user only when secure credentials are configured in `Backend/.env`.
+The backend bootstraps the schema automatically and seeds a default admin user when credentials are available.
 
-Default admin setup requirements:
+Default admin login from `Backend/.env`:
 
-- `DEFAULT_ADMIN_EMAIL` must be set.
-- `DEFAULT_ADMIN_PASSWORD` must be set and at least 12 characters.
-- `SEED_SECRET` must be set and at least 32 characters.
+- Email: `admin@anova.com`
+- Password: `Admin@12345`
 
 ### 2. Frontend
 
