@@ -14,6 +14,7 @@ const { notFound, errorHandler } = require('./middleware/errorHandler');
 const { ensureChatbotTables } = require('./controllers/chatbotController');
 const { ensureCloudinaryConfigured, validateCloudinaryConnection } = require('./config/cloudinary');
 const { apiRateLimit } = require('./middleware/rateLimiter');
+const logger = require('./utils/logger');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -21,8 +22,13 @@ app.disable('etag');
 app.disable('x-powered-by');
 const PORT = process.env.PORT || 8080;
 
-if (!process.env.JWT_SECRET) {
-  console.error('JWT_SECRET is required and is not set. Refusing to start.');
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.trim().length < 32) {
+  logger.error('JWT_SECRET must be set and at least 32 characters. Refusing to start.');
+  process.exit(1);
+}
+
+if (!process.env.SEED_SECRET || process.env.SEED_SECRET.trim().length < 32) {
+  logger.error('SEED_SECRET must be set and at least 32 characters. Refusing to start.');
   process.exit(1);
 }
 
@@ -34,6 +40,8 @@ const allowedOrigins = [
   'https://anova-tecnologes-app.vercel.app',
   'http://localhost:5173',
   'http://localhost:5175',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5175',
   ...(process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : [])
 ].map(o => o.trim());
 
@@ -46,11 +54,7 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    if (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1')) {
-      return callback(null, true);
-    }
-
-    if (origin.endsWith('.vercel.app') || origin.endsWith('.railway.app') || origin.endsWith('.onrender.com')) {
+    if (process.env.NODE_ENV !== 'production' && (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1'))) {
       return callback(null, true);
     }
 
@@ -96,13 +100,18 @@ app.use(helmet({
 app.use(compression());
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'tiny' : 'dev'));
 app.use('/api', apiRateLimit);
 app.use('/api', (req, res, next) => {
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  res.setHeader('Surrogate-Control', 'no-store');
+  const isPublicGet = req.method === 'GET' && !req.path.startsWith('/auth') && !req.path.startsWith('/admin');
+  if (isPublicGet) {
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=120');
+  } else {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+  }
   next();
 });
 
@@ -153,8 +162,13 @@ app.use(errorHandler);
 // =========================
 async function ensureDefaultAdmin() {
   const email = (process.env.DEFAULT_ADMIN_EMAIL || 'admin@anova.com').toLowerCase();
-  const password = process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@12345';
+  const password = process.env.DEFAULT_ADMIN_PASSWORD;
   const name = process.env.DEFAULT_ADMIN_NAME || 'Admin';
+
+  if (!password || password.trim().length < 12) {
+    logger.warn('Skipping default admin setup due to missing/weak DEFAULT_ADMIN_PASSWORD');
+    return;
+  }
 
   const [rows] = await pool.query(
     'SELECT id, password, role FROM users WHERE email = ? LIMIT 1',
@@ -169,7 +183,7 @@ async function ensureDefaultAdmin() {
       [name, email, hashedPassword, 'admin']
     );
 
-    console.log(`✅ Admin created: ${email}`);
+    logger.info('Default admin created', { email });
     return;
   }
 
@@ -186,9 +200,9 @@ async function ensureDefaultAdmin() {
       'UPDATE users SET password=? WHERE id=?',
       [hashedPassword, user.id]
     );
-    console.log(`🔁 Admin password updated: ${email}`);
+    logger.info('Default admin password updated', { email });
   } else {
-    console.log(`✅ Admin verified: ${email}`);
+    logger.info('Default admin verified', { email });
   }
 }
 
@@ -285,7 +299,7 @@ async function seedDefaultServices() {
     [values]
   );
 
-  console.log('✅ Default services seeded into services table');
+  logger.info('Default services seeded');
 }
 
 async function seedDefaultProjects() {
@@ -313,7 +327,7 @@ async function seedDefaultProjects() {
 
   const values = projects.map((p) => [p.title, p.description, p.image_url, p.live_demo_url, p.tags, p.featured]);
   await pool.query('INSERT INTO projects (title, description, image_url, live_demo_url, tags, featured) VALUES ?;', [values]);
-  console.log('✅ Default projects seeded into projects table');
+  logger.info('Default projects seeded');
 }
 
 async function seedDefaultTeam() {
@@ -328,7 +342,7 @@ async function seedDefaultTeam() {
 
   const values = members.map((m) => [m.name, m.designation, m.image_url, m.featured]);
   await pool.query('INSERT INTO team_members (name, designation, image_url, featured) VALUES ?;', [values]);
-  console.log('✅ Default team members seeded into team_members table');
+  logger.info('Default team members seeded');
 }
 
 async function seedDefaultTestimonials() {
@@ -343,7 +357,7 @@ async function seedDefaultTestimonials() {
 
   const values = testimonials.map((t) => [t.name, t.designation, t.review, t.photo_url, t.rating]);
   await pool.query('INSERT INTO testimonials (name, designation, review, photo_url, rating) VALUES ?;', [values]);
-  console.log('✅ Default testimonials seeded into testimonials table');
+  logger.info('Default testimonials seeded');
 }
 
 async function seedDefaultBlogs() {
@@ -357,7 +371,7 @@ async function seedDefaultBlogs() {
 
   const values = blogs.map((b) => [b.title, b.excerpt, b.content, b.category, b.image_url, b.published_at]);
   await pool.query('INSERT INTO blogs (title, excerpt, content, category, image_url, published_at) VALUES ?;', [values]);
-  console.log('✅ Default blogs seeded into blogs table');
+  logger.info('Default blogs seeded');
 }
 
 async function ensureProjectImageStorageColumns() {
@@ -383,7 +397,7 @@ async function ensureProjectImageStorageColumns() {
 
     if (rows.length === 0) {
       await pool.query(`ALTER TABLE projects ADD COLUMN ${column.name} ${column.definition}`);
-      console.log(`✅ Added projects.${column.name}`);
+      logger.info('Added projects column', { column: column.name });
     }
   }
 
@@ -407,7 +421,7 @@ async function ensureProjectImageStorageColumns() {
 
     if (rows.length === 0) {
       await pool.query(`CREATE INDEX ${index.name} ON projects (${index.column})`);
-      console.log(`✅ Added index ${index.name}`);
+      logger.info('Added projects index', { index: index.name });
     }
   }
 }
@@ -432,7 +446,7 @@ async function ensureBaseSchema() {
   const schemaPath = path.join(__dirname, 'config', 'schema.sql');
   const schemaSql = await fs.readFile(schemaPath, 'utf8');
   await executeSqlBatch(schemaSql, { source: 'config/schema.sql' });
-  console.log('✅ Base schema ensured from config/schema.sql');
+  logger.info('Base schema ensured from config/schema.sql');
 }
 
 async function runMigrationsIfPresent() {
@@ -455,7 +469,7 @@ async function runMigrationsIfPresent() {
         const fullPath = path.join(dir, fileName);
         const sql = await fs.readFile(fullPath, 'utf8');
         await executeSqlBatch(sql, { source: fullPath });
-        console.log(`✅ Migration executed: ${fileName}`);
+        logger.info('Migration executed', { fileName });
         ranAnyMigration = true;
       }
     } catch (error) {
@@ -467,7 +481,7 @@ async function runMigrationsIfPresent() {
   }
 
   if (!ranAnyMigration) {
-    console.log('ℹ️  No migration files found, skipping migration step');
+    logger.info('No migration files found, skipping migration step');
   }
 }
 
@@ -478,7 +492,7 @@ async function runMigrationsIfPresent() {
 async function bootstrap() {
   try {
     await testConnection();
-    console.log('✅ Database connected');
+    logger.info('Database connected');
 
     // Ensure all core tables exist before any seed/auth query executes.
     await ensureBaseSchema();
@@ -486,41 +500,41 @@ async function bootstrap() {
 
     // Chatbot tables are created in controller helper and must exist before runtime usage.
     await ensureChatbotTables();
-    console.log('✅ Chatbot tables ready');
+    logger.info('Chatbot tables ready');
 
     ensureCloudinaryConfigured();
-    console.log('✅ Cloudinary configuration ready');
+    logger.info('Cloudinary configuration ready');
 
     await validateCloudinaryConnection();
-    console.log('✅ Cloudinary connectivity verified');
+    logger.info('Cloudinary connectivity verified');
 
     await ensureDefaultAdmin();
-    console.log('✅ Default admin ready');
+    logger.info('Default admin ready');
 
     await ensureProjectImageStorageColumns();
-    console.log('✅ Project image storage schema ready');
+    logger.info('Project image storage schema ready');
 
     await seedDefaultServices();
-    console.log('✅ Default services ready');
+    logger.info('Default services ready');
 
     await seedDefaultProjects();
-    console.log('✅ Default projects ready');
+    logger.info('Default projects ready');
 
     await seedDefaultTeam();
-    console.log('✅ Default team ready');
+    logger.info('Default team ready');
 
     await seedDefaultTestimonials();
-    console.log('✅ Default testimonials ready');
+    logger.info('Default testimonials ready');
 
     await seedDefaultBlogs();
-    console.log('✅ Default blogs ready');
+    logger.info('Default blogs ready');
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      logger.info('Server started', { port: PORT });
     });
 
   } catch (err) {
-    console.error('❌ Server startup failed:', err.message);
+    logger.error('Server startup failed', { message: err.message });
 
     // DO NOT silently continue in production
     process.exit(1);

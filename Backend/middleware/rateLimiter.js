@@ -2,10 +2,13 @@ const WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 15 * 60 * 1000);
 const MAX_REQUESTS = Number(process.env.RATE_LIMIT_MAX || 300);
 const LOGIN_WINDOW_MS = Number(process.env.LOGIN_RATE_LIMIT_WINDOW_MS || 10 * 60 * 1000);
 const LOGIN_MAX_REQUESTS = Number(process.env.LOGIN_RATE_LIMIT_MAX || 12);
+const CONTACT_WINDOW_MS = Number(process.env.CONTACT_RATE_LIMIT_WINDOW_MS || 10 * 60 * 1000);
+const CONTACT_MAX_REQUESTS = Number(process.env.CONTACT_RATE_LIMIT_MAX || 6);
 
 const stores = {
   api: new Map(),
   auth: new Map(),
+  contact: new Map(),
 };
 
 function getClientIp(req) {
@@ -73,7 +76,25 @@ function authRateLimit(req, res, next) {
   next();
 }
 
+function contactRateLimit(req, res, next) {
+  const key = getClientIp(req);
+  const { limited, remaining, resetAt } = hitStore(stores.contact, key, CONTACT_WINDOW_MS, CONTACT_MAX_REQUESTS);
+  setRateLimitHeaders(res, CONTACT_MAX_REQUESTS, remaining, resetAt);
+
+  if (limited) {
+    const retryAfter = Math.max(Math.ceil((resetAt - Date.now()) / 1000), 1);
+    res.setHeader('Retry-After', String(retryAfter));
+    return res.status(429).json({
+      success: false,
+      message: 'Too many contact submissions. Please try again later.'
+    });
+  }
+
+  next();
+}
+
 module.exports = {
   apiRateLimit,
   authRateLimit,
+  contactRateLimit,
 };

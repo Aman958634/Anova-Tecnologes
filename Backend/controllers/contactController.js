@@ -2,14 +2,34 @@ const asyncHandler = require('../utils/asyncHandler');
 const { pool } = require('../config/db');
 const { deleteById, countRows } = require('../models/baseModel');
 const { sendEmail, contactEmail } = require('../config/smtp');
+const logger = require('../utils/logger');
 
 const createContact = asyncHandler(async (req, res) => {
-  const { name, email, phone, subject, message } = req.body;
+  const name = String(req.body?.name || '').trim();
+  const email = String(req.body?.email || '').trim();
+  const phone = String(req.body?.phone || '').trim();
+  const subject = String(req.body?.subject || '').trim();
+  const message = String(req.body?.message || '').trim();
 
   if (!name || !email || !subject || !message) {
     return res.status(400).json({
       success: false,
       message: 'Name, email, subject, and message are required.',
+    });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Please provide a valid email address.',
+    });
+  }
+
+  if (name.length > 120 || email.length > 190 || subject.length > 180 || message.length > 4000 || phone.length > 40) {
+    return res.status(400).json({
+      success: false,
+      message: 'One or more fields exceed allowed length.',
     });
   }
 
@@ -20,9 +40,6 @@ const createContact = asyncHandler(async (req, res) => {
       [name, email, phone || null, subject, message]
     );
 
-    console.log('🔥 CONTACT API HIT');
-    console.log(req.body);
-
     const contact = {
       id: result.insertId,
       name,
@@ -31,9 +48,6 @@ const createContact = asyncHandler(async (req, res) => {
       subject,
       message,
     };
-
-    console.log('✅ Contact saved to DB');
-    console.log(contact);
 
     // Email template
     const html = `
@@ -59,33 +73,29 @@ const createContact = asyncHandler(async (req, res) => {
     };
 
     res.status(201).json(responsePayload);
-    console.log('✅ Response sent to client');
 
     setImmediate(() => {
-      console.log('📧 Starting Brevo API email send...');
-      console.log('Admin email:', contactEmail);
-
       sendEmail(
         contactEmail,
         `New contact received: ${subject}`,
         html,
         email
       )
-        .then((response) => {
-          console.log('✅ Email sent successfully:');
-          console.log(JSON.stringify(response, null, 2));
+        .then(() => {
+          logger.info('contact_notification_email_sent', { contactId: contact.id });
         })
         .catch((emailError) => {
-          console.error('❌ Email send error:');
-          console.error(emailError);
-          console.error(emailError?.body || emailError?.response || emailError);
+          logger.error('contact_notification_email_failed', {
+            contactId: contact.id,
+            message: emailError?.message || 'Email provider error',
+          });
         });
     });
 
     return;
 
   } catch (err) {
-    console.error('❌ Failed to save contact:', err);
+    logger.error('contact_create_failed', { message: err.message });
 
     return res.status(500).json({
       success: false,
