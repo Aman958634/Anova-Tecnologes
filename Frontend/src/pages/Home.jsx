@@ -27,7 +27,12 @@ export default function Home() {
       window.addEventListener(eventName, onFirstInteraction, { once: true, passive: true });
     });
 
+    // Keep perf-friendly interaction-first behavior, but guarantee sections appear
+    // even when no interaction event fires (common in synthetic/mobile captures).
+    const guaranteedLoad = window.setTimeout(loadDeferredSections, 1200);
+
     return () => {
+      window.clearTimeout(guaranteedLoad);
       interactionEvents.forEach((eventName) => {
         window.removeEventListener(eventName, onFirstInteraction);
       });

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ChevronDown, Menu, X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import MegaMenu from './MegaMenu';
 import Dropdown from './Dropdown';
 import { NAV_ITEMS } from './NavigationData';
