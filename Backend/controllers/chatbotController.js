@@ -3,7 +3,7 @@ const { pool } = require('../config/db');
 
 const COMPANY_CONTEXT = `
 ANOVA Technology is a software development company that builds custom websites, web applications, CRM/ERP systems, and e-commerce solutions.
-Website: https://anova-tecnologes.vercel.app/
+Website: https://anova-tecnologes-app.vercel.app/
 Services: website development, web application development, CRM/ERP, e-commerce, digital strategy, and business software solutions.
 Contact: hello@anova-tech.com or through the website contact form.
 `;

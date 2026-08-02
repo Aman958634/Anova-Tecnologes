@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 
-const BASE_URL = 'https://anova-tecnologes.vercel.app';
+const BASE_URL = 'https://anova-tecnologes-app.vercel.app';
 
 function esc(str) {
   if (!str) return '';
@@ -26,7 +26,7 @@ export const schemas = {
     description:
       'ANOVA Technologies is a full-service digital solutions company building modern websites, web applications, mobile apps, and digital products that help businesses grow.',
     sameAs: [
-      'https://anova-tecnologes.vercel.app',
+      'https://anova-tecnologes-app.vercel.app',
     ],
     contactPoint: {
       '@type': 'ContactPoint',

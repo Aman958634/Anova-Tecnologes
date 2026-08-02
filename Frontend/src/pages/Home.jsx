@@ -7,11 +7,11 @@ export default function Home() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'ANOVA Technologies',
-    url: 'https://anova-tecnologes.vercel.app',
-    logo: 'https://anova-tecnologes.vercel.app/logoanova-white.png',
+    url: 'https://anova-tecnologes-app.vercel.app',
+    logo: 'https://anova-tecnologes-app.vercel.app/logoanova-white.png',
     description: 'Full-service digital solutions company building modern websites, web applications, mobile apps, and digital products that help businesses grow.',
     sameAs: [
-      'https://anova-tecnologes.vercel.app',
+      'https://anova-tecnologes-app.vercel.app',
     ],
     contactPoint: {
       '@type': 'ContactPoint',
@@ -26,8 +26,8 @@ export default function Home() {
     '@type': 'ProfessionalService',
     name: 'ANOVA Technologies',
     description: 'Full-service digital solutions company specializing in web development, mobile app development, UI/UX design, cloud solutions, and AI-powered features.',
-    url: 'https://anova-tecnologes.vercel.app',
-    image: 'https://anova-tecnologes.vercel.app/logoanova.png',
+    url: 'https://anova-tecnologes-app.vercel.app',
+    image: 'https://anova-tecnologes-app.vercel.app/logoanova.png',
     areaServed: { '@type': 'Country', name: 'India' },
     serviceType: [
       'Web Development',
