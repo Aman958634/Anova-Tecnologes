@@ -1,5 +1,4 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -35,20 +34,24 @@ export default function MainLayout({ children }) {
   }, []);
 
   useEffect(() => {
-    let fallbackTimer;
-
     const enableDeferredFeatures = () => {
       setShouldLoadThreeBackground(true);
       setShouldLoadChatbot(true);
+      interactionEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, enableDeferredFeatures);
+      });
     };
 
-    if (typeof window.requestIdleCallback === 'function') {
-      const idleId = window.requestIdleCallback(enableDeferredFeatures, { timeout: 7000 });
-      return () => window.cancelIdleCallback(idleId);
-    }
+    const interactionEvents = ['scroll', 'pointerdown', 'touchstart', 'keydown'];
+    interactionEvents.forEach((eventName) => {
+      window.addEventListener(eventName, enableDeferredFeatures, { once: true, passive: true });
+    });
 
-    fallbackTimer = window.setTimeout(enableDeferredFeatures, 7000);
-    return () => window.clearTimeout(fallbackTimer);
+    return () => {
+      interactionEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, enableDeferredFeatures);
+      });
+    };
   }, []);
 
   useEffect(() => {
@@ -115,20 +118,9 @@ export default function MainLayout({ children }) {
           {children}
         </main>
       ) : (
-        <AnimatePresence mode="wait">
-          <motion.main
-            id="main-content"
-            key={location.pathname}
-            initial={false}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 1, y: 0 }}
-            transition={{ duration: isMobile ? 0.15 : isTablet ? 0.18 : 0.2, ease: 'easeOut' }}
-            className="relative z-[1]"
-            style={contentOffsetStyle}
-          >
-            {children}
-          </motion.main>
-        </AnimatePresence>
+        <main id="main-content" key={location.pathname} className="relative z-[1]" style={contentOffsetStyle}>
+          {children}
+        </main>
       )}
       <Footer />
       {ENABLE_CHATBOT_WIDGET && shouldLoadChatbot ? (

@@ -27,19 +27,7 @@ export default function Home() {
       window.addEventListener(eventName, onFirstInteraction, { once: true, passive: true });
     });
 
-    if (typeof window.requestIdleCallback === 'function') {
-      const idleId = window.requestIdleCallback(loadDeferredSections, { timeout: 10000 });
-      return () => {
-        window.cancelIdleCallback(idleId);
-        interactionEvents.forEach((eventName) => {
-          window.removeEventListener(eventName, onFirstInteraction);
-        });
-      };
-    }
-
-    const timeoutId = window.setTimeout(loadDeferredSections, 9000);
     return () => {
-      window.clearTimeout(timeoutId);
       interactionEvents.forEach((eventName) => {
         window.removeEventListener(eventName, onFirstInteraction);
       });

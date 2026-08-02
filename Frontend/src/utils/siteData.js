@@ -46,7 +46,7 @@ export const fallbackTestimonials = [
     designation: 'Product Director, NovaOps',
     review: 'The team delivered a launch-ready platform with speed, polish, and a clear technical vision.',
     rating: 5,
-    photo_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80'
+    photo_url: '/placeholder-image.svg'
   },
   {
     id: 2,
@@ -54,7 +54,7 @@ export const fallbackTestimonials = [
     designation: 'Founder, GridFlow',
     review: 'The UI, motion, and responsiveness all feel deeply considered. It elevated our brand immediately.',
     rating: 5,
-    photo_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80'
+    photo_url: '/placeholder-image.svg'
   },
   {
     id: 3,
@@ -62,7 +62,7 @@ export const fallbackTestimonials = [
     designation: 'Marketing Lead, BluePeak',
     review: 'A clean process, strong communication, and a product that looks premium on every screen size.',
     rating: 5,
-    photo_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=600&q=80'
+    photo_url: '/placeholder-image.svg'
   }
 ];
 
@@ -71,25 +71,25 @@ export const fallbackTeam = [
     id: 1,
     name: 'Aarav Shah',
     designation: 'Founder & CTO',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80'
+    image: '/placeholder-image.svg'
   },
   {
     id: 2,
     name: 'Maya Patel',
     designation: 'Lead UI Designer',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=800&q=80'
+    image: '/placeholder-image.svg'
   },
   {
     id: 3,
     name: 'Noah Bennett',
     designation: 'Full Stack Engineer',
-    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80'
+    image: '/placeholder-image.svg'
   },
   {
     id: 4,
     name: 'Emma Lewis',
     designation: 'Growth Strategist',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=800&q=80'
+    image: '/placeholder-image.svg'
   }
 ];
 

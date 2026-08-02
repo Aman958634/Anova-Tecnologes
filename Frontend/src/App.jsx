@@ -38,24 +38,6 @@ export default function App() {
     trackPageView(location.pathname, location.search);
   }, [location.pathname, location.search]);
 
-  useEffect(() => {
-    const preload = () => {
-      import('./pages/About');
-      import('./pages/Services');
-      import('./pages/Projects');
-      import('./pages/Contact');
-      import('./pages/Blogs');
-    };
-
-    if (typeof window.requestIdleCallback === 'function') {
-      const handle = window.requestIdleCallback(preload, { timeout: 1200 });
-      return () => window.cancelIdleCallback(handle);
-    }
-
-    const timeout = window.setTimeout(preload, 600);
-    return () => window.clearTimeout(timeout);
-  }, []);
-
   return (
     <Suspense fallback={<div className="min-h-screen grid place-items-center bg-[#071c46] text-white" role="status" aria-live="polite">Loading page...</div>}>
       <>

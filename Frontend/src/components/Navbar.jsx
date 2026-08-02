@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ChevronDown, Menu, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
 import MegaMenu from './MegaMenu';
 import Dropdown from './Dropdown';
 import { NAV_ITEMS } from './NavigationData';
@@ -247,21 +246,19 @@ export default function Navbar() {
                     <ChevronDown className={`ent-nav__chevron ${isOpen ? 'is-open' : ''}`} />
                   </button>
 
-                  <AnimatePresence>
-                    {isOpen && !shouldUseMega ? (
-                      <Dropdown
-                        title={item.label}
-                        items={item.menu.items}
-                        onClose={closeMenu}
-                        onEnter={() => {
-                          clearOpenTimer();
-                          clearCloseTimer();
-                        }}
-                        onLeave={startDropdownCloseTimer}
-                        menuId={`menu-${item.key}`}
-                      />
-                    ) : null}
-                  </AnimatePresence>
+                  {isOpen && !shouldUseMega ? (
+                    <Dropdown
+                      title={item.label}
+                      items={item.menu.items}
+                      onClose={closeMenu}
+                      onEnter={() => {
+                        clearOpenTimer();
+                        clearCloseTimer();
+                      }}
+                      onLeave={startDropdownCloseTimer}
+                      menuId={`menu-${item.key}`}
+                    />
+                  ) : null}
                 </div>
               );
             })}
@@ -305,15 +302,8 @@ export default function Navbar() {
         ) : null}
       </div>
 
-      <AnimatePresence>
-        {!isDesktopOrLaptop && isMobileOpen ? (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.22, ease: 'easeOut' }}
-            className="ent-nav__mobile"
-          >
+      {!isDesktopOrLaptop && isMobileOpen ? (
+        <div className="ent-nav__mobile">
             <nav id="mobile-navigation" className="ent-nav__mobile-list" aria-label="Mobile Navigation">
               {visibleNavItems.map((item) => {
                 const hasMenu = Boolean(item.menu);
@@ -378,9 +368,8 @@ export default function Navbar() {
                 Get In Touch
               </Link>
             </nav>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+        </div>
+      ) : null}
     </header>
   );
 }

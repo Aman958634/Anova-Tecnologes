@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { compression } from 'vite-plugin-compression2';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 function getPackageName(id) {
   const normalized = id.replace(/\\/g, '/');
@@ -21,6 +22,14 @@ export default defineConfig(({ mode }) => ({
     compression({
       algorithms: ['gzip', 'brotliCompress'],
     }),
+    process.env.ANALYZE === 'true'
+      ? visualizer({
+          filename: 'dist/bundle-stats.html',
+          gzipSize: true,
+          brotliSize: true,
+          open: false,
+        })
+      : null,
   ],
   build: {
     target: 'es2020',

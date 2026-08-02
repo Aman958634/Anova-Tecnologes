@@ -29,6 +29,7 @@ export function initAnalytics() {
   window.gtag = window.gtag || function gtag() { window.dataLayer.push(arguments); };
 
   const load = () => {
+    if (document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}"]`)) return;
     const script = document.createElement('script');
     script.async = true;
     script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
@@ -40,12 +41,22 @@ export function initAnalytics() {
     document.head.appendChild(script);
   };
 
-  if (typeof window.requestIdleCallback === 'function') {
-    window.requestIdleCallback(load, { timeout: 2000 });
-    return;
-  }
+  const onFirstInteraction = () => {
+    load();
+    interactionEvents.forEach((eventName) => {
+      window.removeEventListener(eventName, onFirstInteraction);
+    });
+    if (fallbackTimer) {
+      window.clearTimeout(fallbackTimer);
+    }
+  };
 
-  window.setTimeout(load, 1200);
+  const interactionEvents = ['pointerdown', 'keydown', 'scroll', 'touchstart'];
+  interactionEvents.forEach((eventName) => {
+    window.addEventListener(eventName, onFirstInteraction, { once: true, passive: true });
+  });
+
+  const fallbackTimer = window.setTimeout(onFirstInteraction, 15000);
 }
 
 /**

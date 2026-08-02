@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import ProjectCard from './ProjectCard';
 import { gridStagger } from './animationUtils';
@@ -6,7 +6,6 @@ import { gridStagger } from './animationUtils';
 export default function ProjectGrid({ projects }) {
   const [liked, setLiked] = useState({});
   const [mobileReduced, setMobileReduced] = useState(false);
-  const rafRef = useRef(0);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 1024px), (prefers-reduced-motion: reduce)');
@@ -15,36 +14,6 @@ export default function ProjectGrid({ projects }) {
     mediaQuery.addEventListener('change', update);
     return () => mediaQuery.removeEventListener('change', update);
   }, []);
-
-  useEffect(() => {
-    if (mobileReduced) {
-      return undefined;
-    }
-
-    let lenis = null;
-    let disposed = false;
-
-    const setupLenis = async () => {
-      const module = await import('@studio-freight/lenis');
-      if (disposed) return;
-      const Lenis = module.default;
-      lenis = new Lenis({ duration: 1.06, smoothWheel: true, smoothTouch: false, wheelMultiplier: 0.9 });
-      const raf = (time) => {
-        if (!lenis) return;
-        lenis.raf(time);
-        rafRef.current = requestAnimationFrame(raf);
-      };
-      rafRef.current = requestAnimationFrame(raf);
-    };
-
-    setupLenis();
-
-    return () => {
-      disposed = true;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (lenis) lenis.destroy();
-    };
-  }, [mobileReduced]);
 
   const data = useMemo(() => projects || [], [projects]);
 
