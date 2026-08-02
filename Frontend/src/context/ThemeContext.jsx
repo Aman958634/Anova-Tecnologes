@@ -1,9 +1,10 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => localStorage.getItem('anova-theme') || 'dark');
+  const toggleTheme = useCallback(() => setTheme((current) => (current === 'dark' ? 'light' : 'dark')), []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -15,7 +16,7 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('anova-theme', theme);
   }, [theme]);
 
-  const value = useMemo(() => ({ theme, setTheme, toggleTheme: () => setTheme((current) => (current === 'dark' ? 'light' : 'dark')) }), [theme]);
+  const value = useMemo(() => ({ theme, setTheme, toggleTheme }), [theme, toggleTheme]);
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }

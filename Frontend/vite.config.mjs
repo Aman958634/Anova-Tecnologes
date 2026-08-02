@@ -59,7 +59,7 @@ export default defineConfig(({ mode }) => ({
             return 'motion';
           }
 
-          if (pkg === 'three' || pkg === '@studio-freight/lenis') {
+          if (pkg === 'three') {
             return 'graphics';
           }
 

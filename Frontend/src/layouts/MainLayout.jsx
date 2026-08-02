@@ -100,7 +100,7 @@ export default function MainLayout({ children }) {
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'auto' });
     return undefined;
   }, [location.pathname]);
 

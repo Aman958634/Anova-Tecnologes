@@ -50,7 +50,6 @@ export default function AdminResourceManager({ resource, title, description }) {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const tableRef = useRef(null);
   const [highlightedId, setHighlightedId] = useState(null);
-  const isDev = import.meta.env.DEV;
 
   const endpoint = endpoints[resource];
   const supportsForm = resource !== 'contacts';
@@ -111,16 +110,6 @@ export default function AdminResourceManager({ resource, title, description }) {
           image_url: normalizeImageUrl(item) || null,
         }))
         : data;
-      if (isDev && resource === 'services') {
-        console.log('[Admin Services] fetched rows', normalizedData.map((item) => ({
-          id: item.id,
-          title: item.title,
-          image_url: item.image_url,
-          imageUrl: item.imageUrl,
-          image: item.image,
-          thumbnail: item.thumbnail,
-        })));
-      }
       setRows(normalizedData);
       if (supportsPagination) {
         setMeta((current) => ({
@@ -254,25 +243,6 @@ export default function AdminResourceManager({ resource, title, description }) {
     return payload;
   };
 
-  const logServicePayloadDebug = (payload, method, url) => {
-    if (!(isDev && resource === 'services')) return;
-    const entries = {};
-    payload.forEach((value, key) => {
-      if (value instanceof File) {
-        entries[key] = `[File:${value.name}]`;
-      } else {
-        entries[key] = value;
-      }
-    });
-    console.log('[Admin Services] submit payload', {
-      method,
-      url,
-      serviceId: form.id || null,
-      entries,
-      previewUrl,
-    });
-  };
-
   const buildFormDataFrom = (obj) => {
     const payload = new FormData();
     Object.entries(obj).forEach(([key, value]) => {
@@ -315,17 +285,8 @@ export default function AdminResourceManager({ resource, title, description }) {
       const method = form.id ? 'put' : 'post';
       const url = `${endpoint}${form.id ? `/${form.id}` : ''}`;
       const payload = buildPayload();
-      logServicePayloadDebug(payload, method, url);
       // Let the browser set `Content-Type` with proper boundary for FormData.
       const response = await api[method](url, payload);
-      if (isDev && resource === 'services') {
-        const responseData = response?.data;
-        console.log('[Admin Services] submit response', {
-          id: responseData?.id || responseData?.data?.id,
-          image_url: responseData?.image_url || responseData?.data?.image_url,
-          imageUrl: responseData?.imageUrl || responseData?.data?.imageUrl,
-        });
-      }
       toast.success(`${title} saved successfully`);
       const createdOrUpdated = response?.data?.data || response?.data?.project || null;
       const createdId = createdOrUpdated?.id || response?.data?.id || null;
@@ -454,11 +415,6 @@ export default function AdminResourceManager({ resource, title, description }) {
   };
 
   const columns = tableColumns[resource] || [];
-
-  const logServiceRowRender = (row) => {
-    if (!(isDev && resource === 'services')) return;
-    console.log('[Admin Services] render service row', row);
-  };
 
   const renderCellValue = (column, row) => {
     const value = row[column.key];
@@ -807,7 +763,6 @@ export default function AdminResourceManager({ resource, title, description }) {
                 <TableHeader columns={[...columns.map((column) => column.label), 'Actions']} />
                 <tbody>
                   {rows.map((row) => {
-                    logServiceRowRender(row);
                     return (
                       <tr key={row.id} className={`border-t border-[#e6efff] hover:bg-[#f8fbff] ${highlightedId === row.id ? 'ring-4 ring-[#2f80ff]/30' : ''}`}>
                         {columns.map((column) => (

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { ChevronDown, Menu, X } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
 import MegaMenu from './MegaMenu';
 import Dropdown from './Dropdown';
 import { NAV_ITEMS } from './NavigationData';
@@ -183,7 +182,9 @@ export default function Navbar() {
       <div className="ent-nav__container navbar-container">
         <Link to="/" className="ent-nav__logo-link" aria-label="Anova Technologies home">
           <img
-            src={isScrolled ? '/logoanova.webp' : '/logoanova-white.webp'}
+            src={isScrolled ? '/logoanova-166.webp' : '/logoanova-white-166.webp'}
+            srcSet={isScrolled ? '/logoanova-112.webp 112w, /logoanova-166.webp 166w' : '/logoanova-white-112.webp 112w, /logoanova-white-166.webp 166w'}
+            sizes="140px"
             alt="Anova Technologies logo"
             width={140}
             height={56}
@@ -335,28 +336,20 @@ export default function Navbar() {
                       <ChevronDown className={`ent-nav__mobile-chevron ${mobileOpen ? 'is-open' : ''}`} />
                     </button>
 
-                    <AnimatePresence>
-                      {mobileOpen ? (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.22, ease: 'easeOut' }}
-                          className="ent-nav__mobile-submenu"
-                        >
-                          {item.menu.items.map((entry) => (
-                            <Link
-                              key={`${item.key}-${entry.label}`}
-                              to={entry.path}
-                              className="ent-nav__mobile-sublink"
-                              onClick={() => setIsMobileOpen(false)}
-                            >
-                              {entry.label}
-                            </Link>
-                          ))}
-                        </motion.div>
-                      ) : null}
-                    </AnimatePresence>
+                    {mobileOpen ? (
+                      <div className="ent-nav__mobile-submenu is-open">
+                        {item.menu.items.map((entry) => (
+                          <Link
+                            key={`${item.key}-${entry.label}`}
+                            to={entry.path}
+                            className="ent-nav__mobile-sublink"
+                            onClick={() => setIsMobileOpen(false)}
+                          >
+                            {entry.label}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                 );
               })}

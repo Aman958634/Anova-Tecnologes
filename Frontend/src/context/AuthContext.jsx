@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext(null);
@@ -26,21 +26,21 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, [token]);
 
-  const login = async (credentials) => {
+  const login = useCallback(async (credentials) => {
     const response = await api.post('/auth/login', credentials);
     setToken(response.data.token);
     setUser(response.data.user);
     localStorage.setItem('anova-token', response.data.token);
     return response.data.user;
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('anova-token');
     setToken(null);
     setUser(null);
-  };
+  }, []);
 
-  const value = useMemo(() => ({ user, token, loading, login, logout, isAuthenticated: Boolean(token && user) }), [user, token, loading]);
+  const value = useMemo(() => ({ user, token, loading, login, logout, isAuthenticated: Boolean(token && user) }), [user, token, loading, login, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

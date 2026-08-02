@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import ProjectCard from './ProjectCard';
 import { gridStagger } from './animationUtils';
@@ -16,6 +16,9 @@ export default function ProjectGrid({ projects }) {
   }, []);
 
   const data = useMemo(() => projects || [], [projects]);
+  const handleToggleLike = useCallback((id) => {
+    setLiked((prev) => ({ ...prev, [id]: !prev[id] }));
+  }, []);
 
   return (
     <motion.div
@@ -31,7 +34,7 @@ export default function ProjectGrid({ projects }) {
           project={project}
           index={index}
           liked={Boolean(liked[project.id])}
-          onToggleLike={(id) => setLiked((prev) => ({ ...prev, [id]: !prev[id] }))}
+          onToggleLike={handleToggleLike}
           mobileReduced={mobileReduced}
         />
       ))}

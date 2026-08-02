@@ -15,7 +15,9 @@ export default function Footer() {
       <div className="section-shell grid gap-10 py-16 sm:gap-8 md:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-4">
           <img
-            src="/logoanova-white.webp"
+            src="/logoanova-white-166.webp"
+            srcSet="/logoanova-white-112.webp 112w, /logoanova-white-166.webp 166w"
+            sizes="(max-width: 640px) 112px, 166px"
             alt="Anova Technologies logo"
             width={166}
             height={66}

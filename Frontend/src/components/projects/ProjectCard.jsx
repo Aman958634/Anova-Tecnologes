@@ -1,11 +1,11 @@
-import { useMemo, useRef } from 'react';
+import { memo, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Heart } from 'lucide-react';
 import ProjectButton from './ProjectButton';
 import ProjectImage from './ProjectImage';
 import { cardEntrance, cardIconBg, chipColor, getCardIcon, getProjectTags } from './animationUtils';
 
-export default function ProjectCard({ project, index, liked, onToggleLike, mobileReduced }) {
+function ProjectCard({ project, index, liked, onToggleLike, mobileReduced }) {
   const cardRef = useRef(null);
   const tags = useMemo(() => getProjectTags(project), [project]);
   const CardIcon = getCardIcon(index);
@@ -101,3 +101,12 @@ export default function ProjectCard({ project, index, liked, onToggleLike, mobil
     </motion.div>
   );
 }
+
+export default memo(ProjectCard, (prev, next) => {
+  return (
+    prev.project === next.project &&
+    prev.index === next.index &&
+    prev.liked === next.liked &&
+    prev.mobileReduced === next.mobileReduced
+  );
+});

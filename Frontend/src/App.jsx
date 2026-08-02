@@ -1,8 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
-import { Suspense, lazy, useEffect } from 'react';
-import WhatsAppButton from './components/WhatsAppButton';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { initAnalytics, trackPageView } from './utils/analytics';
 
 const Home = lazy(() => import('./pages/Home'));
@@ -22,6 +21,7 @@ const AdminBlogs = lazy(() => import('./pages/AdminBlogs'));
 const AdminTestimonials = lazy(() => import('./pages/AdminTestimonials'));
 const AdminContacts = lazy(() => import('./pages/AdminContacts'));
 const AdminChatbotLeads = lazy(() => import('./pages/AdminChatbotLeads'));
+const WhatsAppButton = lazy(() => import('./components/WhatsAppButton'));
 
 function PublicRoute({ element }) {
   return <MainLayout>{element}</MainLayout>;
@@ -29,6 +29,7 @@ function PublicRoute({ element }) {
 
 export default function App() {
   const location = useLocation();
+  const [shouldLoadFloatingCta, setShouldLoadFloatingCta] = useState(false);
 
   useEffect(() => {
     initAnalytics();
@@ -37,6 +38,34 @@ export default function App() {
   useEffect(() => {
     trackPageView(location.pathname, location.search);
   }, [location.pathname, location.search]);
+
+  useEffect(() => {
+    const enableFloatingCta = () => {
+      setShouldLoadFloatingCta(true);
+      interactionEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, enableFloatingCta);
+      });
+      if (fallbackTimer) {
+        window.clearTimeout(fallbackTimer);
+      }
+    };
+
+    const interactionEvents = ['pointerdown', 'touchstart', 'scroll', 'keydown'];
+    interactionEvents.forEach((eventName) => {
+      window.addEventListener(eventName, enableFloatingCta, { once: true, passive: true });
+    });
+
+    const fallbackTimer = window.setTimeout(enableFloatingCta, 15000);
+
+    return () => {
+      if (fallbackTimer) {
+        window.clearTimeout(fallbackTimer);
+      }
+      interactionEvents.forEach((eventName) => {
+        window.removeEventListener(eventName, enableFloatingCta);
+      });
+    };
+  }, []);
 
   return (
     <Suspense fallback={<div className="min-h-screen grid place-items-center bg-[#071c46] text-white" role="status" aria-live="polite">Loading page...</div>}>
@@ -62,8 +91,12 @@ export default function App() {
           <Route path="*" element={<PublicRoute element={<NotFound />} />} />
         </Routes>
 
-        {/* Global floating CTA: appears on all routes with safe mobile offset. */}
-        <WhatsAppButton />
+        {/* Defer global floating CTA until interaction to keep initial render lean. */}
+        {shouldLoadFloatingCta ? (
+          <Suspense fallback={null}>
+            <WhatsAppButton />
+          </Suspense>
+        ) : null}
       </>
     </Suspense>
   );

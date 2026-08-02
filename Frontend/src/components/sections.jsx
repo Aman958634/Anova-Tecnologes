@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, BarChart3, CheckCircle2, Clock3, Code2, Cloud, Cpu, Database, Globe, LayoutPanelTop, Link2, Mail, MapPin, Megaphone, Palette, Phone, PlayCircle, Smartphone, ShieldCheck } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Clock3, Code2, Cloud, Cpu, Globe, Mail, MapPin, Megaphone, Palette, Phone, PlayCircle, Smartphone, ShieldCheck } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { buildImageUrl, imageFallbackByKey } from '../utils/helpers';
 import { fallbackServices, fallbackTeam } from '../utils/siteData';

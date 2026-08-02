@@ -340,6 +340,21 @@
   gap: 4px;
 }
 
+.ent-nav__mobile-submenu.is-open {
+  animation: mobileSubmenuReveal 0.22s ease-out;
+}
+
+@keyframes mobileSubmenuReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .ent-nav__mobile-sublink {
   font-size: 14px;
   font-weight: 500;

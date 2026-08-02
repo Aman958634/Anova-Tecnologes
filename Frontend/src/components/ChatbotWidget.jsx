@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MessageCircle, Send, X, Sparkles, Bot, User, Maximize, Minimize } from 'lucide-react';
+import { MessageCircle, Send, X, Sparkles, Bot, Maximize, Minimize } from 'lucide-react';
 import api from '../services/api';
 
 const QUICK_ACTIONS = [
@@ -51,27 +51,20 @@ function ChatbotWidget() {
   };
 
   const handleQuickAction = async (action) => {
-    console.log('[Chatbot] Quick action clicked:', action);
     setInput(action);
     await sendMessage(action);
   };
 
   const sendMessage = async (messageText = input) => {
     const text = (messageText || '').trim();
-    console.log('[Chatbot] sendMessage called', { messageText, input, text, sessionId });
-    if (!text) {
-      console.warn('[Chatbot] sendMessage aborted because text is empty');
-      return;
-    }
+    if (!text) return;
 
     appendMessage(text, 'user');
     setInput('');
     setIsLoading(true);
 
     try {
-      console.log('[Chatbot] Sending request to /chatbot/reply');
       const response = await api.post('/chatbot/reply', { message: text, session_id: sessionId });
-      console.log('[Chatbot] Received response', response?.data);
       const reply = response?.data?.reply || response?.data?.data?.reply || response?.data?.message;
       if (!reply) {
         throw new Error('Invalid chatbot response payload');
@@ -83,11 +76,6 @@ function ChatbotWidget() {
         appendMessage('We can collect your project details now. Please share a few details so we can follow up.', 'assistant');
       }
     } catch (error) {
-      console.error('Chatbot request failed:', {
-        message: error.message,
-        response: error?.response?.data || error?.response,
-        request: error?.request
-      });
       const backendMessage = error?.response?.data?.message || error?.response?.data?.error;
       appendMessage(
         backendMessage || 'Sorry, I could not respond right now. Please try again or contact us directly.',
@@ -187,7 +175,7 @@ function ChatbotWidget() {
             <div id="chatbot-end" />
           </div>
 
-          <form onSubmit={(event) => { event.preventDefault(); console.log('[Chatbot] form submit'); leadMode ? submitLead(event) : sendMessage(); }} className="border-t border-slate-200 bg-white p-3">
+          <form onSubmit={(event) => { event.preventDefault(); leadMode ? submitLead(event) : sendMessage(); }} className="border-t border-slate-200 bg-white p-3">
             {leadMode ? (
               <div className="mb-3 space-y-2 text-sm text-slate-600">
                 <input value={leadForm.name} onChange={(event) => setLeadForm((current) => ({ ...current, name: event.target.value }))} placeholder="Your name" className="w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-[#163c88]" />
