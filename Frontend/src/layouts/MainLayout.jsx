@@ -17,6 +17,7 @@ export default function MainLayout({ children }) {
     ? window.matchMedia('(max-width: 768px), (hover: none) and (pointer: coarse)').matches
     : false;
   const shouldRenderThreeBackground = !isMobile && !isTablet && !isMobileViewport && !prefersReducedMotion;
+  // Offset page content by the fixed navbar height plus the iOS safe area inset.
   const contentOffsetStyle = { paddingTop: 'calc(80px + env(safe-area-inset-top))' };
 
   useEffect(() => {
