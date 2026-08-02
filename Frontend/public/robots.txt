@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://anova-tecnologes.vercel.app/sitemap.xml
+Sitemap: https://anova-tecnologes-app.vercel.app/sitemap.xml
