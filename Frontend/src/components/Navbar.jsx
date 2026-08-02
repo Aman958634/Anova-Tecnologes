@@ -275,6 +275,7 @@ export default function Navbar() {
           </Link>
 
           {!isDesktopOrLaptop ? (
+            /* The hamburger icon uses currentColor, so the navbar CSS can switch it from white to dark when the header becomes scrolled. */
             <button
               type="button"
               className="ent-nav__hamburger"

@@ -211,6 +211,22 @@
   place-items: center;
   position: relative;
   z-index: 3;
+  color: #ffffff;
+  transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.ent-nav__hamburger:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.ent-nav.is-scrolled .ent-nav__hamburger {
+  color: #111827;
+  background: rgba(17, 24, 39, 0.04);
+  border-color: rgba(17, 24, 39, 0.12);
+}
+
+.ent-nav.is-scrolled .ent-nav__hamburger:hover {
+  background: rgba(17, 24, 39, 0.08);
 }
 
 .ent-dropdown {
