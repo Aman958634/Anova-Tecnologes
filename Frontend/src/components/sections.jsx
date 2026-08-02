@@ -813,13 +813,16 @@ export function AboutSection() {
         <div className="relative justify-self-center">
           <div className="relative overflow-hidden rounded-[18px] shadow-[0_20px_55px_rgba(15,23,42,0.18)]">
             <img
-              src="/placeholder-image.svg"
+              src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80"
               alt="Team working together"
               loading="lazy"
               decoding="async"
               width={1200}
               height={800}
               sizes="(max-width: 1024px) 100vw, 50vw"
+              onError={(e) => {
+                e.currentTarget.src = '/placeholder-image.svg';
+              }}
               className="h-[420px] w-full object-cover"
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(10,42,102,0.25))]" />
