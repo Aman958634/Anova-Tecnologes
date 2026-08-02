@@ -7,7 +7,7 @@ import { useMediaQuery } from '../utils/helpers';
 const ChatbotWidget = lazy(() => import('../components/ChatbotWidget'));
 const ThreeBackground = lazy(() => import('../components/ThreeBackground'));
 const ENABLE_THREE_BACKGROUND = import.meta.env.VITE_ENABLE_THREE_BACKGROUND === 'true';
-const ENABLE_CHATBOT_WIDGET = import.meta.env.VITE_ENABLE_CHATBOT_WIDGET === 'true';
+const ENABLE_CHATBOT_WIDGET = import.meta.env.VITE_ENABLE_CHATBOT_WIDGET !== 'false';
 
 export default function MainLayout({ children }) {
   const location = useLocation();
