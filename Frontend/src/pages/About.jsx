@@ -77,7 +77,7 @@ export default function About() {
         key={member.id}
         initial={{ opacity: 0, y: 18 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.35 }}
+        viewport={{ once: false, amount: 0.35 }}
         transition={{ duration: 0.45 }}
         className="overflow-hidden rounded-[14px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.05)]"
       >
@@ -180,7 +180,7 @@ export default function About() {
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.35 }}
+            viewport={{ once: false, amount: 0.35 }}
             transition={{ duration: 0.45 }}
             className="mx-auto max-w-3xl text-center"
           >
@@ -199,7 +199,7 @@ export default function About() {
                   key={item.title}
                   initial={{ opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.35 }}
+                  viewport={{ once: false, amount: 0.35 }}
                   transition={{ duration: 0.45 }}
                   className="rounded-[16px] border border-slate-200 bg-white px-6 py-8 text-center shadow-[0_8px_24px_rgba(15,23,42,0.05)]"
                 >
@@ -220,7 +220,7 @@ export default function About() {
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.35 }}
+            viewport={{ once: false, amount: 0.35 }}
             transition={{ duration: 0.45 }}
             className="mx-auto max-w-3xl text-center"
           >

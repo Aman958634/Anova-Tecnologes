@@ -22,14 +22,14 @@ export const gridStagger = {
   },
 };
 
-// Card entrance animation: fade + move up 80px + scale + blur to clear.
+// Card entrance animation: fade + move up gently + scale into place.
 export const cardEntrance = {
-  hidden: { opacity: 0, y: 80, scale: 0.95 },
+  hidden: { opacity: 0, y: 48, scale: 0.98 },
   show: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.52, ease: [0.22, 1, 0.36, 1] },
   },
 };
 

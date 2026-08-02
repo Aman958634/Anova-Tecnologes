@@ -25,7 +25,7 @@ export default function ProjectGrid({ projects }) {
       variants={gridStagger}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.12 }}
+      viewport={{ once: false, amount: 0.16 }}
       className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
     >
       {data.map((project, index) => (

@@ -88,7 +88,7 @@ export default function TestimonialSection() {
       variants={sectionReveal}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.16 }}
+      viewport={{ once: false, amount: 0.16 }}
       className="bg-[#f6f8fc] py-16 text-slate-900 sm:py-20 lg:py-24"
       onViewportEnter={() => setHasEntered(true)}
     >
@@ -97,7 +97,7 @@ export default function TestimonialSection() {
           variants={headingReveal}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.55 }}
+          viewport={{ once: false, amount: 0.55 }}
           className="mx-auto max-w-3xl text-center"
         >
           <span className="inline-flex items-center gap-2 rounded-full border border-[#c6d4ff] bg-white px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#2f6df7]">
@@ -132,7 +132,7 @@ export default function TestimonialSection() {
           variants={gridReveal}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.15 }}
+          viewport={{ once: false, amount: 0.15 }}
           className={`${loading ? 'hidden ' : ''}grid gap-6 sm:grid-cols-2 xl:grid-cols-3`}
         >
           {list.map((item) => (

@@ -11,7 +11,13 @@ function ProjectCard({ project, index, liked, onToggleLike, mobileReduced }) {
   const CardIcon = getCardIcon(index);
 
   return (
-    <motion.div variants={cardEntrance} className="card-animate">
+    <motion.div
+      variants={cardEntrance}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: false, amount: 0.2 }}
+      className="card-animate h-full"
+    >
       <motion.article
         ref={cardRef}
         whileHover={{ y: mobileReduced ? -4 : -10 }}

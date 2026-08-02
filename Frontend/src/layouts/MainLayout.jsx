@@ -114,7 +114,7 @@ export default function MainLayout({ children }) {
       ) : null}
       <Navbar />
       {isMobileViewport ? (
-        <main id="main-content" className="relative z-[1] mobile-static-render" style={contentOffsetStyle}>
+        <main id="main-content" className="relative z-[1]" style={contentOffsetStyle}>
           {children}
         </main>
       ) : (

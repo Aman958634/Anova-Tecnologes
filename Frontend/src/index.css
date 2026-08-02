@@ -1225,12 +1225,6 @@ section[id] {
     transform: none;
   }
 
-  .fx-reveal {
-    opacity: 1 !important;
-    transform: none !important;
-    transition-duration: 0.45s;
-  }
-
   .section-shell > * {
     animation-duration: 0.48s;
   }
@@ -1290,24 +1284,9 @@ body.mobile-render-safe main [class*='backdrop-blur'] {
   backdrop-filter: none !important;
 }
 
-/* Prevent Framer/observer hidden states from sticking on mobile browsers. */
-body.mobile-render-safe main.mobile-static-render section,
-body.mobile-render-safe main.mobile-static-render .card-animate,
-body.mobile-render-safe main.mobile-static-render [class*='section-shell'] > * {
-  opacity: 1 !important;
+/* Keep mobile browser rendering stable without freezing Framer Motion reveal states. */
+body.mobile-render-safe main section,
+body.mobile-render-safe main .card-animate,
+body.mobile-render-safe main [class*='section-shell'] > * {
   visibility: visible !important;
-}
-
-body.mobile-render-safe main.mobile-static-render section[style*='opacity: 0'],
-body.mobile-render-safe main.mobile-static-render section [style*='opacity: 0'],
-body.mobile-render-safe main.mobile-static-render .card-animate[style*='opacity: 0'],
-body.mobile-render-safe main.mobile-static-render .card-animate [style*='opacity: 0'] {
-  opacity: 1 !important;
-}
-
-body.mobile-render-safe main.mobile-static-render section[style*='transform'],
-body.mobile-render-safe main.mobile-static-render section [style*='transform'],
-body.mobile-render-safe main.mobile-static-render .card-animate[style*='transform'],
-body.mobile-render-safe main.mobile-static-render .card-animate [style*='transform'] {
-  transform: none !important;
 }

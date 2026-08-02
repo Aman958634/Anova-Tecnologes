@@ -27,6 +27,11 @@ const sectionReveal = {
   show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }
 };
 
+const serviceCardReveal = {
+  hidden: { opacity: 0, y: 26, scale: 0.985 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }
+};
+
 function AnimatedCounter({ value, duration = 1200, delay = 80, className = '' }) {
   const [count, setCount] = useState(0);
   const [suffix, setSuffix] = useState('');
@@ -396,10 +401,7 @@ export function HomeServicesSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 22, scale: 0.985 },
-    show: { opacity: 1, y: 0, scale: 1 }
-  };
+  const cardVariants = serviceCardReveal;
 
   const gridVariants = {
     hidden: { opacity: 0 },
@@ -466,7 +468,7 @@ export function HomeServicesSection() {
       variants={sectionReveal}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.18 }}
+      viewport={{ once: false, amount: 0.18 }}
       className="bg-[#f3f5f8] py-12 text-slate-900 sm:py-14"
     >
       <div className="section-shell">
@@ -493,7 +495,8 @@ export function HomeServicesSection() {
 
         <motion.div
           initial="hidden"
-          animate="show"
+          whileInView="show"
+          viewport={{ once: false, amount: 0.16 }}
           variants={gridVariants}
           className={`${loading ? 'hidden ' : ''}grid gap-6 sm:grid-cols-2 xl:grid-cols-3`}
         >
@@ -501,6 +504,9 @@ export function HomeServicesSection() {
             <motion.div
               key={service.id || service.title}
               variants={cardVariants}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: false, amount: 0.2 }}
               transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -12, scale: 1.03 }}
               className="group relative"
@@ -621,7 +627,14 @@ export function ServicesSection() {
     : `${services.length} services available`;
 
   return (
-    <section id="services" className="bg-white text-slate-900">
+    <motion.section
+      id="services"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: false, amount: 0.2 }}
+      className="bg-white text-slate-900"
+    >
       <div className="bg-[#102c66] px-4 py-16 text-center text-white sm:py-20">
         <div className="mx-auto max-w-3xl">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">Our Services</h1>
@@ -650,8 +663,12 @@ export function ServicesSection() {
             const bullets = resolveFeatures(service);
 
             return (
-              <div
+              <motion.div
                 key={service.id || service.title}
+                initial={{ opacity: 0, y: 28, scale: 0.985 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.55, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
                 className={`card-animate overflow-hidden rounded-[26px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)] transition hover:shadow-[0_24px_55px_rgba(15,23,42,0.12)] lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-10 ${isReversed ? 'lg:grid-flow-col-dense lg:grid-cols-[0.95fr_1.05fr]' : ''}`}
               >
                 <div className="space-y-6">
@@ -703,7 +720,7 @@ export function ServicesSection() {
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
@@ -726,7 +743,7 @@ export function ServicesSection() {
           </div>
         </div>
       )}
-    </section>
+    </motion.section>
   );
 }
 
@@ -780,7 +797,7 @@ export function AboutSection() {
       variants={sectionReveal}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.18 }}
+      viewport={{ once: false, amount: 0.18 }}
       className="bg-[#eef4ff] py-24 text-slate-900"
     >
       <div className="section-shell grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
@@ -846,7 +863,7 @@ export function AboutSection() {
             key={label}
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: false, amount: 0.3 }}
             transition={{ duration: 0.4, delay: index * 0.08 }}
             className="card-animate rounded-xl px-2 py-3 text-center"
           >
@@ -898,7 +915,7 @@ export function ProjectsSection() {
       variants={sectionEnter}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: false, amount: 0.2 }}
       className="bg-[#f0f3fa] py-16 text-slate-900 sm:py-20"
     >
       <div className="section-shell space-y-10">
@@ -997,7 +1014,7 @@ export function BlogSection() {
       variants={sectionReveal}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: false, amount: 0.2 }}
       className="bg-white py-20 sm:py-24"
     >
       <div className="section-shell space-y-10">
@@ -1030,7 +1047,7 @@ export function ContactSection() {
       variants={sectionReveal}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.18 }}
+      viewport={{ once: false, amount: 0.18 }}
       className="relative overflow-hidden bg-[#102c66] py-20 text-white sm:py-24"
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,156,255,0.18),_transparent_45%)]" />

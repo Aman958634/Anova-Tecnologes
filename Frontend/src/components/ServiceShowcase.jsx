@@ -108,7 +108,7 @@ export default function ServiceShowcase() {
         <motion.div
           initial={prefersReducedMotion ? false : { opacity: 0, y: isMobile ? 10 : 18 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
+          viewport={{ once: false, amount: 0.25 }}
           transition={{ duration: 0.45, ease: 'easeOut' }}
           className="card-animate relative overflow-hidden rounded-[24px] shadow-[0_24px_60px_rgba(10,30,90,0.28)]"
           style={{ background: 'linear-gradient(135deg,#081f55 0%,#0a2a66 45%,#0b2f74 100%)' }}

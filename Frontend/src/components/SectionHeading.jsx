@@ -9,7 +9,7 @@ export default function SectionHeading({ eyebrow, title, description, center = f
     <motion.div
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.35 }}
+      viewport={{ once: false, amount: 0.35 }}
       transition={{ duration: 0.5 }}
       className={center ? 'mx-auto max-w-3xl text-center' : 'max-w-3xl'}
     >
