@@ -10,6 +10,7 @@ const About = lazy(() => import('./pages/About'));
 const Services = lazy(() => import('./pages/Services'));
 const Projects = lazy(() => import('./pages/Projects'));
 const Contact = lazy(() => import('./pages/Contact'));
+const Blogs = lazy(() => import('./pages/Blogs'));
 const Login = lazy(() => import('./pages/Login'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
@@ -33,14 +34,33 @@ export default function App() {
     trackPageView(location.pathname, location.search);
   }, [location.pathname, location.search]);
 
+  useEffect(() => {
+    const preload = () => {
+      import('./pages/About');
+      import('./pages/Services');
+      import('./pages/Projects');
+      import('./pages/Contact');
+      import('./pages/Blogs');
+    };
+
+    if (typeof window.requestIdleCallback === 'function') {
+      const handle = window.requestIdleCallback(preload, { timeout: 1200 });
+      return () => window.cancelIdleCallback(handle);
+    }
+
+    const timeout = window.setTimeout(preload, 600);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
   return (
-    <Suspense fallback={<div className="min-h-screen grid place-items-center bg-[#071c46] text-white">Loading page…</div>}>
+    <Suspense fallback={<div className="min-h-screen grid place-items-center bg-[#071c46] text-white" role="status" aria-live="polite">Loading page...</div>}>
       <>
         <Routes>
           <Route path="/" element={<PublicRoute element={<Home />} />} />
           <Route path="/about" element={<PublicRoute element={<About />} />} />
           <Route path="/services" element={<PublicRoute element={<Services />} />} />
           <Route path="/projects" element={<PublicRoute element={<Projects />} />} />
+          <Route path="/blogs" element={<PublicRoute element={<Blogs />} />} />
           <Route path="/contact" element={<PublicRoute element={<Contact />} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin/login" element={<Login />} />

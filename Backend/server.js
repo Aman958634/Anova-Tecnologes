@@ -13,11 +13,18 @@ const routes = require('./routes');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 const { ensureChatbotTables } = require('./controllers/chatbotController');
 const { ensureCloudinaryConfigured, validateCloudinaryConnection } = require('./config/cloudinary');
+const { apiRateLimit } = require('./middleware/rateLimiter');
 
 const app = express();
 app.set('trust proxy', 1);
 app.disable('etag');
+app.disable('x-powered-by');
 const PORT = process.env.PORT || 8080;
+
+if (!process.env.JWT_SECRET) {
+  console.error('JWT_SECRET is required and is not set. Refusing to start.');
+  process.exit(1);
+}
 
 
 // =========================
@@ -68,11 +75,29 @@ app.use((req, res, next) => {
   }
   next();
 });
-app.use(helmet({ crossOriginResourcePolicy: false }));
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+      baseUri: ["'none'"],
+      formAction: ["'self'"],
+      connectSrc: ["'self'"],
+      imgSrc: ["'self'", 'data:'],
+      objectSrc: ["'none'"],
+      scriptSrc: ["'none'"],
+      styleSrc: ["'none'"],
+      upgradeInsecureRequests: []
+    }
+  },
+  referrerPolicy: { policy: 'no-referrer' },
+}));
 app.use(compression());
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use('/api', apiRateLimit);
 app.use('/api', (req, res, next) => {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
   res.setHeader('Pragma', 'no-cache');
@@ -109,6 +134,10 @@ app.get('/api/health', (req, res) => {
     time: new Date().toISOString(),
     service: 'backend'
   });
+});
+
+app.get('/.well-known/security.txt', (req, res) => {
+  res.type('text/plain').send('Contact: mailto:anovatechnologies5@gmail.com\nPreferred-Languages: en\n');
 });
 
 

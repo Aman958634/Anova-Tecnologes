@@ -281,6 +281,8 @@ export default function Navbar() {
               className="ent-nav__hamburger"
               onClick={() => setIsMobileOpen((value) => !value)}
               aria-label="Toggle menu"
+              aria-expanded={isMobileOpen}
+              aria-controls="mobile-navigation"
             >
               {isMobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -312,7 +314,7 @@ export default function Navbar() {
             transition={{ duration: 0.22, ease: 'easeOut' }}
             className="ent-nav__mobile"
           >
-            <nav className="ent-nav__mobile-list" aria-label="Mobile Navigation">
+            <nav id="mobile-navigation" className="ent-nav__mobile-list" aria-label="Mobile Navigation">
               {visibleNavItems.map((item) => {
                 const hasMenu = Boolean(item.menu);
 

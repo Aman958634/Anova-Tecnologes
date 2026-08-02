@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowRight, BarChart3, CheckCircle2, Clock3, Code2, Cloud, Cpu, Database, Globe, LayoutPanelTop, Link2, Mail, MapPin, Megaphone, Palette, Phone, PlayCircle, Smartphone, ShieldCheck } from 'lucide-react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { buildImageUrl, imageFallbackByKey } from '../utils/helpers';
@@ -679,9 +680,9 @@ export function ServicesSection() {
                     </div>
                   </div>
 
-                  <a href="/contact" className="inline-flex items-center rounded-md bg-[#2f6df7] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#245fe0]">
+                  <Link to="/contact" className="inline-flex items-center rounded-md bg-[#2f6df7] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#245fe0]">
                     Request Service
-                  </a>
+                  </Link>
                 </div>
 
                 <div className="mt-6 lg:mt-0">
@@ -724,9 +725,9 @@ export function ServicesSection() {
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
               Our experts can help analyze your business requirements and suggest the most effective digital solutions for your specific goals.
             </p>
-            <a href="/contact" className="mt-8 inline-flex items-center justify-center rounded-md bg-[#2f6df7] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#245fe0]">
+            <Link to="/contact" className="mt-8 inline-flex items-center justify-center rounded-md bg-[#2f6df7] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#245fe0]">
               Talk to an Expert
-            </a>
+            </Link>
           </div>
         </div>
       )}
@@ -1014,7 +1015,7 @@ export function BlogSection() {
                 </div>
                 <h3 className="text-xl font-semibold text-[#163c88]">{post.title}</h3>
                 <p className="text-sm leading-7 text-slate-600">{post.excerpt}</p>
-                <a href="/contact" className="btn-secondary w-fit px-4 py-2 text-sm">Read More</a>
+                <Link to="/contact" className="btn-secondary w-fit px-4 py-2 text-sm">Read More</Link>
               </div>
             </SectionCard>
           ))}
@@ -1040,9 +1041,9 @@ export function ContactSection() {
         <p className="mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
           Let&apos;s discuss how our technology solutions can help you achieve your business goals.
         </p>
-        <a href="/contact" className="mt-8 inline-flex items-center justify-center rounded-md bg-[#2f6df7] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#245fe0]">
+        <Link to="/contact" className="mt-8 inline-flex items-center justify-center rounded-md bg-[#2f6df7] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#245fe0]">
           Contact Us Today
-        </a>
+        </Link>
       </div>
     </motion.section>
   );

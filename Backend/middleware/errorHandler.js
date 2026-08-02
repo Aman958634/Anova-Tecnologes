@@ -21,7 +21,7 @@ function errorHandler(err, req, res, next) {
       message: err.message,
       code: err.code,
       name: err.name,
-      stack: err.stack,
+      ...(process.env.NODE_ENV !== 'production' ? { stack: err.stack } : {}),
     });
   }
 
@@ -32,7 +32,7 @@ function errorHandler(err, req, res, next) {
   res.status(statusCode).json({
     success: false,
     message: (err && err.message) || 'Server error',
-    stack: err && err.stack,
+    ...(process.env.NODE_ENV !== 'production' ? { stack: err && err.stack } : {}),
   });
 }
 

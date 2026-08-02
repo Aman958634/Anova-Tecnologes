@@ -56,6 +56,10 @@ const login = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: 'Email and password are required.' });
   }
 
+  if (typeof email !== 'string' || typeof password !== 'string' || email.length > 160 || password.length > 256) {
+    return res.status(400).json({ message: 'Invalid email or password format.' });
+  }
+
   const normalizedEmail = email.toLowerCase().trim();
   const user = await findUserByEmail(normalizedEmail);
   const usingDefaultPassword = password === defaultAdminPassword || password === fallbackAdminPassword;
@@ -85,7 +89,7 @@ const login = asyncHandler(async (req, res) => {
   const token = jwt.sign(
     { id: authenticatedUser.id, email: authenticatedUser.email, role: authenticatedUser.role, name: authenticatedUser.name },
     process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: process.env.JWT_EXPIRES_IN || '7d', algorithm: 'HS256' }
   );
 
   res.json({

@@ -82,6 +82,7 @@ export default function MainLayout({ children }) {
 
   return (
     <div className="relative min-h-screen bg-[#071c46] text-slate-100">
+      <a href="#main-content" className="skip-link">Skip to main content</a>
       {shouldRenderThreeBackground ? (
         <Suspense fallback={null}>
           <ThreeBackground />
@@ -89,12 +90,13 @@ export default function MainLayout({ children }) {
       ) : null}
       <Navbar />
       {isMobileViewport ? (
-        <main className="relative z-[1] mobile-static-render" style={contentOffsetStyle}>
+        <main id="main-content" className="relative z-[1] mobile-static-render" style={contentOffsetStyle}>
           {children}
         </main>
       ) : (
         <AnimatePresence mode="wait">
           <motion.main
+            id="main-content"
             key={location.pathname}
             initial={false}
             animate={{ opacity: 1, y: 0 }}

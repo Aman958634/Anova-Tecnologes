@@ -13,6 +13,7 @@ import {
 import { motion } from 'framer-motion';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import SEO from '../components/SEO';
 
 const initialForm = {
   name: '',
@@ -119,7 +120,13 @@ export default function Contact() {
   }, []);
 
   return (
-    <div className="bg-white text-slate-900">
+    <>
+      <SEO
+        title="Contact"
+        description="Contact ANOVA Technologies for web development, app development, UI/UX, cloud, and digital growth consulting."
+        url="/contact"
+      />
+      <div className="bg-white text-slate-900">
       <section className="bg-white">
         <div className="bg-[#102c66] px-4 py-16 text-center text-white sm:py-20">
           <motion.div
@@ -209,14 +216,15 @@ export default function Contact() {
                   <Send className="h-4 w-4" />
                 </button>
 
-                {status === 'success' ? <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">Your message has been sent successfully. We will contact you shortly.</p> : null}
-                {status === 'error' ? <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{errorMessage}</p> : null}
+                {status === 'success' ? <p role="status" aria-live="polite" className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">Your message has been sent successfully. We will contact you shortly.</p> : null}
+                {status === 'error' ? <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{errorMessage}</p> : null}
               </form>
             </div>
           </motion.div>
         </div>
       </section>
-    </div>
+      </div>
+    </>
   );
 }
 
