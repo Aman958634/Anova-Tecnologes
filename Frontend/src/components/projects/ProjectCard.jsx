@@ -47,6 +47,7 @@ export default function ProjectCard({ project, index, liked, onToggleLike, mobil
           <motion.button
             type="button"
             onClick={() => onToggleLike(project.id)}
+            aria-label={liked ? `Remove ${project.title} from favorites` : `Add ${project.title} to favorites`}
             whileHover={{ scale: 1.12, rotate: 10 }}
             whileTap={{ scale: 0.9 }}
             className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full border border-white/60 bg-white/75 shadow-[0_10px_20px_rgba(22,49,98,0.16)] backdrop-blur"
@@ -85,6 +86,7 @@ export default function ProjectCard({ project, index, liked, onToggleLike, mobil
             <ProjectButton href={project.live_demo_url} label="View Case Study" />
             <motion.a
               href={project.live_demo_url || '#contact'}
+              aria-label={`Open ${project.title} case study`}
               target={project.live_demo_url ? '_blank' : undefined}
               rel="noreferrer"
               whileHover={{ scale: 1.08, x: 2 }}

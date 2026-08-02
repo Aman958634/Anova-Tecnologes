@@ -3,7 +3,7 @@ import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Suspense, lazy, useEffect } from 'react';
 import WhatsAppButton from './components/WhatsAppButton';
-import { trackPageView } from './utils/analytics';
+import { initAnalytics, trackPageView } from './utils/analytics';
 
 const Home = lazy(() => import('./pages/Home'));
 const About = lazy(() => import('./pages/About'));
@@ -29,6 +29,10 @@ function PublicRoute({ element }) {
 
 export default function App() {
   const location = useLocation();
+
+  useEffect(() => {
+    initAnalytics();
+  }, []);
 
   useEffect(() => {
     trackPageView(location.pathname, location.search);

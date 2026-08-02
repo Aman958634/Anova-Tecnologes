@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 
 export default function SectionHeading({ eyebrow, title, description, center = false, tone = 'dark' }) {
-  const eyebrowClass = tone === 'light' ? 'text-cyan-300' : 'text-[#2f6df7]';
+  const eyebrowClass = tone === 'light' ? 'text-cyan-300' : 'text-[#1e4eb5]';
   const titleClass = tone === 'light' ? 'text-white' : 'text-[#163c88]';
   const copyClass = tone === 'light' ? 'text-slate-300' : 'text-slate-600';
 

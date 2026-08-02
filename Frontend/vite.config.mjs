@@ -2,6 +2,18 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { compression } from 'vite-plugin-compression2';
 
+function getPackageName(id) {
+  const normalized = id.replace(/\\/g, '/');
+  const match = normalized.match(/node_modules\/(.*?)(\/|$)/);
+  if (!match) return null;
+  const pkg = match[1];
+  if (pkg.startsWith('@')) {
+    const scoped = normalized.match(/node_modules\/(@[^\/]+\/[^\/]+)(\/|$)/);
+    return scoped ? scoped[1] : pkg;
+  }
+  return pkg;
+}
+
 export default defineConfig(({ mode }) => ({
   publicDir: 'public',
   plugins: [
@@ -20,18 +32,41 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-router-dom')) {
-              return 'vendor-react';
-            }
-            if (id.includes('lucide-react') || id.includes('framer-motion') || id.includes('axios')) {
-              return 'vendor-ui';
-            }
-            if (id.includes('three')) {
-              return 'vendor-three';
-            }
-            return 'vendor';
+          if (!id.includes('node_modules')) return;
+
+          const pkg = getPackageName(id);
+
+          if (!pkg) return 'vendor';
+
+          if (pkg === 'react' || pkg === 'react-dom' || pkg === 'scheduler') {
+            return 'framework';
           }
+
+          if (pkg === 'react-router-dom' || pkg === 'react-router' || pkg === 'history') {
+            return 'router';
+          }
+
+          if (pkg === 'framer-motion') {
+            return 'motion';
+          }
+
+          if (pkg === 'three' || pkg === '@studio-freight/lenis') {
+            return 'graphics';
+          }
+
+          if (pkg === 'lucide-react') {
+            return 'icons';
+          }
+
+          if (pkg === 'axios') {
+            return 'network';
+          }
+
+          if (pkg === 'react-helmet-async' || pkg === 'react-hot-toast') {
+            return 'ui-runtime';
+          }
+
+          return 'vendor';
         },
         assetFileNames: (assetInfo) => {
           const ext = assetInfo.name.split('.').at(-1) || '';

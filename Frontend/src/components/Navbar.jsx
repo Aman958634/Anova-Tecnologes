@@ -183,7 +183,7 @@ export default function Navbar() {
       <div className="ent-nav__container navbar-container">
         <Link to="/" className="ent-nav__logo-link" aria-label="Anova Technologies home">
           <img
-            src={isScrolled ? '/logoanova.png' : '/logoanova-white.png'}
+            src={isScrolled ? '/logoanova.webp' : '/logoanova-white.webp'}
             alt="Anova Technologies logo"
             width={140}
             height={56}

@@ -22,7 +22,7 @@ export const schemas = {
     '@type': 'Organization',
     name: 'ANOVA Technologies',
     url: BASE_URL,
-    logo: `${BASE_URL}/logoanova-white.png`,
+    logo: `${BASE_URL}/logoanova-white.webp`,
     description:
       'ANOVA Technologies is a full-service digital solutions company building modern websites, web applications, mobile apps, and digital products that help businesses grow.',
     sameAs: [
@@ -44,7 +44,7 @@ export const schemas = {
     description:
       'Full-service digital solutions company specializing in web development, mobile app development, UI/UX design, cloud solutions, and AI-powered features.',
     url: BASE_URL,
-    image: `${BASE_URL}/logoanova.png`,
+    image: `${BASE_URL}/logoanova.webp`,
     areaServed: {
       '@type': 'Country',
       name: 'India',
@@ -87,7 +87,7 @@ export const schemas = {
       name: 'ANOVA Technologies',
       logo: {
         '@type': 'ImageObject',
-        url: `${BASE_URL}/logoanova-white.png`,
+        url: `${BASE_URL}/logoanova-white.webp`,
       },
     },
     datePublished: post.published_at || undefined,
@@ -128,7 +128,7 @@ export default function SEO({
   const pageTitle = title ? `${title} | ANOVA Technologies` : 'ANOVA Technologies';
   const metaDescription = description || 'Full-service digital solutions company building modern websites, web applications, mobile apps, and digital products that help businesses grow.';
   const metaKeywords = keywords || 'Web Development, Mobile App Development, UI/UX Design, Cloud Solutions, AI Solutions, Digital Marketing, React.js, Node.js';
-  const metaImage = image || '/anova-social-preview-1200x630.png';
+  const metaImage = image || '/anova-social-preview-1200x630.webp';
   const metaImageUrl = metaImage.startsWith('http') ? metaImage : `${BASE_URL}${metaImage}`;
 
   return (

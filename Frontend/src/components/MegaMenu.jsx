@@ -1,12 +1,6 @@
-import { memo, Suspense, lazy } from 'react';
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
-const ChevronRight = lazy(() => import('lucide-react').then((mod) => ({ default: mod.ChevronRight })));
-const Code2 = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Code2 })));
-const Smartphone = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Smartphone })));
-const Palette = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Palette })));
-const Bot = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Bot })));
-const Cloud = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Cloud })));
-const Megaphone = lazy(() => import('lucide-react').then((mod) => ({ default: mod.Megaphone })));
+import { ChevronRight, Code2, Smartphone, Palette, Bot, Cloud, Megaphone } from 'lucide-react';
 
 const ICON_MAP = {
   Code2,
@@ -50,9 +44,7 @@ function MegaMenu({ item, isVisible, onClose, menuId }) {
                     onClick={onClose}
                   >
                     <span>{entry.label}</span>
-                    <Suspense fallback={null}>
-                      <ChevronRight className="ent-mega__arrow" size={14} />
-                    </Suspense>
+                    <ChevronRight className="ent-mega__arrow" size={14} />
                   </Link>
                 ))}
               </div>

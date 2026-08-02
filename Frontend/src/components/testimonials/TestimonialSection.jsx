@@ -104,7 +104,7 @@ export default function TestimonialSection() {
             Testimonials
           </span>
           <h2 className="mt-4 text-3xl font-bold tracking-tight text-[#0f1b3f] sm:text-4xl lg:text-5xl">Client Success Stories</h2>
-          <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-7 text-[#4d5f84]">Trusted results that speak for themselves.</p>
+          <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-7 text-[#334155]">Trusted results that speak for themselves.</p>
         </motion.div>
 
         {error ? (

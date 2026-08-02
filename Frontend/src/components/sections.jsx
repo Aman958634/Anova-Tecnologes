@@ -333,6 +333,30 @@ function ServiceIconVisual({ service }) {
 
 export function HeroSection() {
   const heroVideo = '/hero-video.mp4';
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+
+  useEffect(() => {
+    let timeoutId;
+
+    const scheduleVideoLoad = () => {
+      timeoutId = window.setTimeout(() => {
+        setShouldLoadVideo(true);
+      }, 5000);
+    };
+
+    if (typeof window.requestIdleCallback === 'function') {
+      const idleId = window.requestIdleCallback(scheduleVideoLoad, { timeout: 4500 });
+      return () => {
+        window.cancelIdleCallback(idleId);
+        if (timeoutId) window.clearTimeout(timeoutId);
+      };
+    }
+
+    scheduleVideoLoad();
+    return () => {
+      if (timeoutId) window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   return (
     <section className="relative overflow-hidden bg-[#0b2659] text-white">
@@ -375,18 +399,30 @@ export function HeroSection() {
             className="relative"
           >
             <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#122d62] shadow-[0_45px_80px_rgba(7,25,74,0.35)] sm:rounded-[32px]">
-              <video
-                poster="/laptop-hero.svg"
-                preload="metadata"
-                muted
-                autoPlay
-                loop
-                playsInline
-                className="h-[260px] w-full object-cover object-center sm:h-[400px] lg:h-[560px]"
-              >
-                <source src={heroVideo} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+              {shouldLoadVideo ? (
+                <video
+                  poster="/laptop-hero.svg"
+                  preload="none"
+                  muted
+                  autoPlay
+                  loop
+                  playsInline
+                  className="h-[260px] w-full object-cover object-center sm:h-[400px] lg:h-[560px]"
+                >
+                  <source src={heroVideo} type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <img
+                  src="/laptop-hero.svg"
+                  alt="Hero visual showing ANOVA digital product showcase"
+                  width={1200}
+                  height={675}
+                  fetchPriority="high"
+                  decoding="async"
+                  className="h-[260px] w-full object-cover object-center sm:h-[400px] lg:h-[560px]"
+                />
+              )}
 
             </div>
           </motion.div>
@@ -829,7 +865,7 @@ export function AboutSection() {
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(10,42,102,0.25))]" />
             <div className="absolute inset-0 grid place-items-center">
-              <button className="grid h-20 w-20 place-items-center rounded-full bg-[#2f6df7] text-white shadow-lg">
+              <button type="button" aria-label="Play company introduction video" className="grid h-20 w-20 place-items-center rounded-full bg-[#2f6df7] text-white shadow-lg">
                 <PlayCircle className="h-10 w-10" />
               </button>
             </div>

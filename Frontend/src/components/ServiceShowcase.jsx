@@ -163,9 +163,11 @@ export default function ServiceShowcase() {
           {/* Bottom controls */}
           <div className="relative flex items-center gap-4 border-t border-white/10 px-6 py-4">
             <button
+              type="button"
               onClick={handleRestart}
-              className="text-white/60 transition hover:text-white"
+              className="grid h-10 w-10 place-items-center rounded-full text-white/60 transition hover:bg-white/10 hover:text-white"
               title="Restart slideshow"
+              aria-label="Restart service slideshow"
             >
               <RefreshCw className="h-4 w-4" />
             </button>
@@ -173,14 +175,21 @@ export default function ServiceShowcase() {
             <div className="flex flex-1 items-center gap-1.5">
               {services.map((_, index) => (
                 <button
+                  type="button"
                   key={index}
                   onClick={() => goTo(index)}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    index === current
-                      ? 'w-8 bg-white'
-                      : 'w-4 bg-white/30 hover:bg-white/50'
-                  }`}
-                />
+                  className="grid h-8 w-8 place-items-center rounded-full transition hover:bg-white/10"
+                  aria-label={`Go to service slide ${index + 1}`}
+                  aria-current={index === current ? 'true' : undefined}
+                >
+                  <span
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      index === current
+                        ? 'w-7 bg-white'
+                        : 'w-4 bg-white/35 hover:bg-white/55'
+                    }`}
+                  />
+                </button>
               ))}
             </div>
 

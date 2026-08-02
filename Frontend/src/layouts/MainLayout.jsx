@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -7,16 +7,20 @@ import { useMediaQuery } from '../utils/helpers';
 
 const ChatbotWidget = lazy(() => import('../components/ChatbotWidget'));
 const ThreeBackground = lazy(() => import('../components/ThreeBackground'));
+const ENABLE_THREE_BACKGROUND = import.meta.env.VITE_ENABLE_THREE_BACKGROUND === 'true';
+const ENABLE_CHATBOT_WIDGET = import.meta.env.VITE_ENABLE_CHATBOT_WIDGET === 'true';
 
 export default function MainLayout({ children }) {
   const location = useLocation();
+  const [shouldLoadThreeBackground, setShouldLoadThreeBackground] = useState(false);
+  const [shouldLoadChatbot, setShouldLoadChatbot] = useState(false);
   const isMobile = useMediaQuery('(max-width: 640px)');
   const isTablet = useMediaQuery('(min-width: 641px) and (max-width: 1024px)');
   const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const isMobileViewport = typeof window !== 'undefined'
     ? window.matchMedia('(max-width: 768px), (hover: none) and (pointer: coarse)').matches
     : false;
-  const shouldRenderThreeBackground = !isMobile && !isTablet && !isMobileViewport && !prefersReducedMotion;
+  const shouldRenderThreeBackground = ENABLE_THREE_BACKGROUND && shouldLoadThreeBackground && !isMobile && !isTablet && !isMobileViewport && !prefersReducedMotion;
   // Offset page content by the fixed navbar height plus the iOS safe area inset.
   const contentOffsetStyle = { paddingTop: 'calc(80px + env(safe-area-inset-top))' };
 
@@ -28,6 +32,23 @@ export default function MainLayout({ children }) {
     return () => {
       document.body.classList.remove('mobile-render-safe');
     };
+  }, []);
+
+  useEffect(() => {
+    let fallbackTimer;
+
+    const enableDeferredFeatures = () => {
+      setShouldLoadThreeBackground(true);
+      setShouldLoadChatbot(true);
+    };
+
+    if (typeof window.requestIdleCallback === 'function') {
+      const idleId = window.requestIdleCallback(enableDeferredFeatures, { timeout: 7000 });
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    fallbackTimer = window.setTimeout(enableDeferredFeatures, 7000);
+    return () => window.clearTimeout(fallbackTimer);
   }, []);
 
   useEffect(() => {
@@ -110,9 +131,11 @@ export default function MainLayout({ children }) {
         </AnimatePresence>
       )}
       <Footer />
-      <Suspense fallback={null}>
-        <ChatbotWidget />
-      </Suspense>
+      {ENABLE_CHATBOT_WIDGET && shouldLoadChatbot ? (
+        <Suspense fallback={null}>
+          <ChatbotWidget />
+        </Suspense>
+      ) : null}
     </div>
   );
 }

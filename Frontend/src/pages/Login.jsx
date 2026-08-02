@@ -39,7 +39,7 @@ export default function Login() {
       >
         <div className="mb-6 flex items-center gap-3">
           <img
-            src="/logoanova-white.png"
+            src="/logoanova-white.webp"
             alt="Anova Technologies logo"
             width={160}
             height={64}

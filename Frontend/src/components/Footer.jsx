@@ -16,7 +16,7 @@ export default function Footer() {
       <div className="section-shell grid gap-10 py-16 sm:gap-8 md:grid-cols-2 lg:grid-cols-4">
         <motion.div initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.35 }} className="space-y-4">
           <img
-            src="/logoanova-white.png"
+            src="/logoanova-white.webp"
             alt="Anova Technologies logo"
             width={166}
             height={66}

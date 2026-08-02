@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { HelmetProvider } from 'react-helmet-async';
+import { MotionConfig } from 'framer-motion';
 import App from './App';
 import './index.css';
 import { ThemeProvider } from './context/ThemeContext';
@@ -15,10 +16,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ThemeProvider>
         <AuthProvider>
           <ErrorBoundary>
-            <BrowserRouter>
-              <App />
-              <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
-            </BrowserRouter>
+            <MotionConfig reducedMotion="user">
+              <BrowserRouter>
+                <App />
+                <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
+              </BrowserRouter>
+            </MotionConfig>
           </ErrorBoundary>
         </AuthProvider>
       </ThemeProvider>
