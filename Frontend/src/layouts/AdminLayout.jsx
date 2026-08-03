@@ -1,5 +1,4 @@
 import { Link, NavLink } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { LayoutDashboard, LogOut, Mail, Newspaper, Shapes, Star, FolderKanban, Users, BarChart3, Bot } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -23,33 +22,11 @@ export default function AdminLayout({ children }) {
   const isMobile = useMediaQuery('(max-width: 640px)');
   const isTablet = useMediaQuery('(min-width: 641px) and (max-width: 1024px)');
 
-  const sidebarVariants = {
-    hidden: { opacity: 0, x: isMobile ? 0 : -16 },
-    show: {
-      opacity: 1,
-      x: 0,
-      transition: {
-        duration: isMobile ? 0.2 : 0.32,
-        ease: 'easeOut',
-        staggerChildren: isMobile ? 0.03 : 0.05,
-        delayChildren: isMobile ? 0.03 : 0.06
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: isMobile ? 0 : -10 },
-    show: { opacity: 1, x: 0, transition: { duration: isMobile ? 0.2 : 0.3 } }
-  };
+  // Animations removed for static admin layout.
 
   return (
     <div className="admin-light min-h-screen bg-brand-50 lg:grid lg:grid-cols-[280px_1fr]">
-      <motion.aside
-        variants={sidebarVariants}
-        initial="hidden"
-        animate="show"
-        className="border-b border-brand-200 bg-[#EFF6FF] p-5 sm:p-6 lg:border-b-0 lg:border-r lg:p-6"
-      >
+      <aside className="border-b border-brand-200 bg-[#EFF6FF] p-5 sm:p-6 lg:border-b-0 lg:border-r lg:p-6">
         <div className="mb-8 rounded-[28px] border border-white/10 bg-white/5 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.14)] backdrop-blur-xl sm:flex sm:items-center sm:justify-between sm:gap-4">
           <Link to="/" className="flex items-center gap-3 text-slate-900">
             <div className="grid h-12 w-12 place-items-center rounded-3xl bg-gradient-to-br from-cyan-500 via-sky-500 to-indigo-500 text-lg font-bold shadow-lg shadow-cyan-500/20">A</div>
@@ -65,7 +42,7 @@ export default function AdminLayout({ children }) {
         </div>
         <nav className="space-y-2">
           {adminLinks.map((link) => (
-            <motion.div key={link.path} variants={itemVariants}>
+            <div key={link.path}>
               <NavLink
                 to={link.path}
                 end={link.path === '/admin'}
@@ -77,31 +54,24 @@ export default function AdminLayout({ children }) {
                   }`
                 }
               >
-                <span className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-slate-900 transition group-hover:bg-[#e6f0ff] group-hover:text-slate-900">
+                <span className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-slate-900 transition group-hover:bg-[#e6f0eff] group-hover:text-slate-900">
                   <link.icon className="h-4 w-4" />
                 </span>
                 <span>{link.label}</span>
               </NavLink>
-            </motion.div>
+            </div>
           ))}
         </nav>
-        <motion.button
-          variants={itemVariants}
+        <button
           onClick={logout}
           className="mt-10 inline-flex w-full items-center justify-center gap-2 rounded-[18px] bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_48px_rgba(15,23,42,0.18)] transition hover:from-slate-800 hover:to-slate-700"
         >
           <LogOut className="h-4 w-4" /> Logout
-        </motion.button>
-      </motion.aside>
-      <motion.section
-        key={location.pathname}
-        initial={{ opacity: 0, y: isMobile ? 6 : isTablet ? 10 : 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: isMobile ? 0.2 : isTablet ? 0.25 : 0.3, ease: 'easeOut' }}
-        className="p-4 sm:p-6 lg:p-8"
-      >
+        </button>
+      </aside>
+      <section className="p-4 sm:p-6 lg:p-8">
         {children}
-      </motion.section>
+      </section>
     </div>
   );
 }

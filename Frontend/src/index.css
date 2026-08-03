@@ -1290,3 +1290,19 @@ body.mobile-render-safe main .card-animate,
 body.mobile-render-safe main [class*='section-shell'] > * {
   visibility: visible !important;
 }
+
+/* Global override: disable transitions and animations site-wide (except when user prefers motion). */
+@media (prefers-reduced-motion: no-preference) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+  .card-animate:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  .btn-primary::after,
+  .btn-secondary::after {
+    transition: none !important;
+  }
+}

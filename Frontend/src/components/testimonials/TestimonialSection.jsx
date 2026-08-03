@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
 import api from '../../services/api';
 import { fallbackTestimonials } from '../../utils/siteData';
 import TestimonialCard from './TestimonialCard';
@@ -83,29 +82,18 @@ export default function TestimonialSection() {
 
   const list = useMemo(() => testimonials || [], [testimonials]);
 
+  useEffect(() => setHasEntered(true), []);
+
   return (
-    <motion.section
-      variants={sectionReveal}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: false, amount: 0.16 }}
-      className="bg-[#f6f8fc] py-16 text-slate-900 sm:py-20 lg:py-24"
-      onViewportEnter={() => setHasEntered(true)}
-    >
+    <section className="bg-[#f6f8fc] py-16 text-slate-900 sm:py-20 lg:py-24">
       <div className="section-shell space-y-10">
-        <motion.div
-          variants={headingReveal}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.55 }}
-          className="mx-auto max-w-3xl text-center"
-        >
+        <div className="mx-auto max-w-3xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-[#c6d4ff] bg-white px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#2f6df7]">
             Testimonials
           </span>
           <h2 className="mt-4 text-3xl font-bold tracking-tight text-[#0f1b3f] sm:text-4xl lg:text-5xl">Client Success Stories</h2>
           <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-7 text-[#334155]">Trusted results that speak for themselves.</p>
-        </motion.div>
+        </div>
 
         {error ? (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -128,13 +116,7 @@ export default function TestimonialSection() {
           </div>
         ) : null}
 
-        <motion.div
-          variants={gridReveal}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.15 }}
-          className={`${loading ? 'hidden ' : ''}grid gap-6 sm:grid-cols-2 xl:grid-cols-3`}
-        >
+        <div className={`${loading ? 'hidden ' : ''}grid gap-6 sm:grid-cols-2 xl:grid-cols-3`}>
           {list.map((item) => (
             <TestimonialCard
               key={item.id || item.name}
@@ -143,8 +125,8 @@ export default function TestimonialSection() {
               inView={hasEntered}
             />
           ))}
-        </motion.div>
+        </div>
       </div>
-    </motion.section>
+    </section>
   );
 }

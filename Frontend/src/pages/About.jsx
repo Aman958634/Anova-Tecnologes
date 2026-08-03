@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { Lightbulb, Target, Users } from 'lucide-react';
 import { getTeam } from '../services/api';
 import { buildImageUrl, imageFallbackByKey, useMediaQuery } from '../utils/helpers';
@@ -73,14 +72,7 @@ export default function About() {
       .toUpperCase();
 
     return (
-      <motion.div
-        key={member.id}
-        initial={{ opacity: 0, y: 18 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.35 }}
-        transition={{ duration: 0.45 }}
-        className="overflow-hidden rounded-[14px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.05)]"
-      >
+      <div key={member.id} className="overflow-hidden rounded-[14px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
         {src ? (
           <img
             src={src}
@@ -116,26 +108,16 @@ export default function About() {
       />
       <div className="bg-white text-slate-900">
       <section className="bg-[#102c66] px-4 py-16 text-center text-white sm:py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-          className="mx-auto max-w-3xl"
-        >
+        <div className="mx-auto max-w-3xl">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">About Anova Technologies</h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
             We are a full-service digital solutions company passionate about helping businesses establish a powerful digital identity and achieve online success.
           </p>
-        </motion.div>
+        </div>
       </section>
 
       <section className="section-shell py-16 sm:py-20 lg:py-24">
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.05 }}
-          className="grid items-center gap-12 lg:grid-cols-[0.98fr_1.02fr]"
-        >
+        <div className="grid items-center gap-12 lg:grid-cols-[0.98fr_1.02fr]">
           <div>
             <p className="text-2xl font-semibold tracking-tight text-[#163c88] sm:text-[2rem]">Our Story</p>
             <div className="mt-4 max-w-xl space-y-4 text-sm leading-7 text-slate-600 sm:text-base">
@@ -152,12 +134,7 @@ export default function About() {
           </div>
 
           <div className="justify-self-center lg:justify-self-end">
-            <motion.div
-              initial={{ opacity: 0, x: 18 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="overflow-hidden rounded-[18px] shadow-[0_20px_55px_rgba(15,23,42,0.18)] w-full max-w-[420px]"
-            >
+            <div className="overflow-hidden rounded-[18px] shadow-[0_20px_55px_rgba(15,23,42,0.18)] w-full max-w-[420px]">
               <img
                 src={buildImageUrl(heroImage, heroImageFallback)}
                 alt="Team collaboration"
@@ -170,45 +147,32 @@ export default function About() {
                 onError={(e) => { e.currentTarget.src = heroImageFallback; }}
                 className="w-full h-auto sm:h-[420px] object-cover rounded-[18px]"
               />
-            </motion.div>
+            </div>
           </div>
         </motion.div>
       </section>
 
       <section className="border-t border-slate-200 bg-white py-16 sm:py-20">
         <div className="section-shell">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.35 }}
-            transition={{ duration: 0.45 }}
-            className="mx-auto max-w-3xl text-center"
-          >
+          <div className="mx-auto max-w-3xl text-center">
             <p className="text-2xl font-semibold tracking-tight text-[#163c88] sm:text-[2rem]">Our Core Values</p>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
               These principles guide every project we undertake and every line of code we write.
             </p>
-          </motion.div>
+          </div>
 
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
             {coreValues.map((item) => {
               const Icon = item.icon;
 
               return (
-                <motion.div
-                  key={item.title}
-                  initial={{ opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, amount: 0.35 }}
-                  transition={{ duration: 0.45 }}
-                  className="rounded-[16px] border border-slate-200 bg-white px-6 py-8 text-center shadow-[0_8px_24px_rgba(15,23,42,0.05)]"
-                >
+                <div key={item.title} className="rounded-[16px] border border-slate-200 bg-white px-6 py-8 text-center shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
                   <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[#2f6df7] text-white shadow-[0_10px_24px_rgba(47,109,247,0.18)]">
                     <Icon className="h-5 w-5" />
                   </div>
                   <h3 className="mt-5 text-[1.02rem] font-semibold text-[#163c88]">{item.title}</h3>
                   <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-slate-600">{item.text}</p>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -217,18 +181,12 @@ export default function About() {
 
       <section className="border-t border-slate-200 bg-[#f8fbff] py-16 sm:py-20">
         <div className="section-shell">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.35 }}
-            transition={{ duration: 0.45 }}
-            className="mx-auto max-w-3xl text-center"
-          >
+          <div className="mx-auto max-w-3xl text-center">
             <p className="text-2xl font-semibold tracking-tight text-[#163c88] sm:text-[2rem]">Meet Our Experts</p>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
               The talented individuals behind our successful projects.
             </p>
-          </motion.div>
+          </div>
 
           <div className="mt-10 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
             {error ? (

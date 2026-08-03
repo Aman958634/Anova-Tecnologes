@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+// animations removed for static showcase
 import api from '../services/api';
 import { fallbackServices } from '../utils/siteData';
 import { useMediaQuery } from '../utils/helpers';
@@ -105,11 +105,7 @@ export default function ServiceShowcase() {
         ) : null}
 
         {/* Showcase Card */}
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: isMobile ? 10 : 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.25 }}
-          transition={{ duration: 0.45, ease: 'easeOut' }}
+        <div
           className="card-animate relative overflow-hidden rounded-[24px] shadow-[0_24px_60px_rgba(10,30,90,0.28)]"
           style={{ background: 'linear-gradient(135deg,#081f55 0%,#0a2a66 45%,#0b2f74 100%)' }}
           onMouseEnter={() => setPaused(true)}
@@ -136,15 +132,7 @@ export default function ServiceShowcase() {
 
           {/* Service content */}
           <div className="relative flex min-h-[340px] flex-col items-center justify-center px-6 py-20 text-center sm:min-h-[400px]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={current}
-                initial={prefersReducedMotion ? false : { opacity: 0, y: isMobile ? 8 : 22 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: isMobile ? -8 : -14 }}
-                transition={{ duration: 0.42, ease: 'easeOut' }}
-                className="space-y-5"
-              >
+              <div key={current} className="space-y-5">
                 <p className="font-mono text-xs font-semibold uppercase tracking-[0.36em] text-[#7aaeff]">
                   // Service {padded}
                 </p>
@@ -156,8 +144,7 @@ export default function ServiceShowcase() {
                     {service.description}
                   </p>
                 ) : null}
-              </motion.div>
-            </AnimatePresence>
+              </div>
           </div>
 
           {/* Bottom controls */}

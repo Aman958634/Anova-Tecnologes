@@ -1,71 +1,28 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, Clock3, Code2, Cloud, Cpu, Globe, Mail, MapPin, Megaphone, Palette, Phone, PlayCircle, Smartphone, ShieldCheck } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { buildImageUrl, imageFallbackByKey } from '../utils/helpers';
 import { fallbackServices, fallbackTeam } from '../utils/siteData';
 import SectionHeading from './SectionHeading';
 import ProjectGrid from './projects/ProjectGrid';
-import { sectionEnter } from './projects/animationUtils';
 import TestimonialSection from './testimonials/TestimonialSection';
 import api from '../services/api';
 
 function SectionCard({ children, className = '' }) {
   return (
-    <motion.div
-      whileHover={{ y: -6, scale: 1.002 }}
-      whileTap={{ scale: 0.997 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-      className={`card-animate rounded-[22px] border border-slate-200 bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)] ${className}`}>
+    <div className={`card-animate rounded-[22px] border border-slate-200 bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)] ${className}`}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
-const sectionReveal = {
-  hidden: { opacity: 0, y: 26 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }
-};
+const sectionReveal = {};
 
-const serviceCardReveal = {
-  hidden: { opacity: 0, y: 26, scale: 0.985 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } }
-};
+const serviceCardReveal = {};
 
-function AnimatedCounter({ value, duration = 1200, delay = 80, className = '' }) {
-  const [count, setCount] = useState(0);
-  const [suffix, setSuffix] = useState('');
-
-  useEffect(() => {
-    const parsedValue = Number(String(value).replace(/[^0-9]/g, '')) || 0;
-    const parsedSuffix = String(value).replace(/[0-9]/g, '');
-    setSuffix(parsedSuffix);
-
-    let frame = null;
-    let start = null;
-
-    const animate = (timestamp) => {
-      if (!start) start = timestamp;
-      const elapsed = timestamp - start - delay;
-      if (elapsed < 0) {
-        frame = requestAnimationFrame(animate);
-        return;
-      }
-
-      const progress = Math.min(elapsed / duration, 1);
-      setCount(Math.round(parsedValue * progress));
-      if (progress < 1) {
-        frame = requestAnimationFrame(animate);
-      }
-    };
-
-    frame = requestAnimationFrame(animate);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-    };
-  }, [value, duration, delay]);
-
-  return <span className={className}>{count}{suffix}</span>;
+function AnimatedCounter({ value, className = '' }) {
+  // Render the final value immediately (no animation).
+  return <span className={className}>{String(value)}</span>;
 }
 
 const SERVICE_KIND_CONFIG = {
@@ -141,12 +98,7 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(96,140,255,0.16),_rgba(11,38,89,0.70)_45%)]" />
       <div className="section-shell relative py-14 sm:py-16 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 sm:gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.55, ease: 'easeOut' }}
-            className="max-w-2xl lg:max-w-none"
-          >
+          <div className="max-w-2xl lg:max-w-none">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/95 shadow-[0_8px_30px_rgba(0,0,0,0.10)]">
               <span className="h-2.5 w-2.5 rounded-full bg-[#5ab4ff]" /> Premium IT Solutions Agency
             </span>
@@ -168,14 +120,9 @@ export function HeroSection() {
               </a>
             </div>
 
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.55, ease: 'easeOut' }}
-            className="relative"
-          >
+          <div className="relative">
             <div className="relative overflow-hidden rounded-[24px] border border-white/10 bg-[#122d62] shadow-[0_45px_80px_rgba(7,25,74,0.35)] sm:rounded-[32px]">
               <img
                 src="/laptop-hero.svg"
@@ -188,7 +135,7 @@ export function HeroSection() {
               />
 
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
@@ -521,12 +468,8 @@ export function AboutSection() {
   }, [fetchStats]);
 
   return (
-    <motion.section
+    <section
       id="about"
-      variants={sectionReveal}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: false, amount: 0.18 }}
       className="bg-[#eef4ff] py-24 text-slate-900"
     >
       <div className="section-shell grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
@@ -588,22 +531,15 @@ export function AboutSection() {
 
       <div className="section-shell mt-16 grid gap-4 rounded-[22px] bg-white px-6 py-8 shadow-[0_8px_30px_rgba(15,23,42,0.05)] sm:grid-cols-4">
         {stats.map(([value, label], index) => (
-          <motion.div
-            key={label}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 0.4, delay: index * 0.08 }}
-            className="card-animate rounded-xl px-2 py-3 text-center"
-          >
+          <div key={label} className="card-animate rounded-xl px-2 py-3 text-center">
             <p className="text-[2rem] font-semibold leading-none text-[#15387c]">
               <AnimatedCounter value={value} className="inline-block" />
             </p>
             <p className="mt-2 text-[0.7rem] font-medium uppercase tracking-[0.22em] text-slate-500">{label}</p>
-          </motion.div>
+          </div>
         ))}
       </div>
-    </motion.section>
+    </section>
   );
 }
 
@@ -639,12 +575,8 @@ export function ProjectsSection() {
   }, [fetchProjects]);
 
   return (
-    <motion.section
+    <section
       id="projects"
-      variants={sectionEnter}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: false, amount: 0.2 }}
       className="bg-[#f0f3fa] py-16 text-slate-900 sm:py-20"
     >
       <div className="section-shell space-y-10">
@@ -686,7 +618,7 @@ export function ProjectsSection() {
         ) : null}
 
       </div>
-    </motion.section>
+    </section>
   );
 }
 
@@ -738,14 +670,7 @@ export function BlogSection() {
   ];
 
   return (
-    <motion.section
-      id="blog"
-      variants={sectionReveal}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: false, amount: 0.2 }}
-      className="bg-white py-20 sm:py-24"
-    >
+    <section id="blog" className="bg-white py-20 sm:py-24">
       <div className="section-shell space-y-10">
         <SectionHeading eyebrow="Blog" title="Fresh content to support credibility and SEO." description="Search-friendly article cards with dates, categories, and clear calls to action." />
         <div className="grid gap-6 lg:grid-cols-3">
@@ -765,20 +690,13 @@ export function BlogSection() {
           ))}
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
 export function ContactSection() {
   return (
-    <motion.section
-      id="contact"
-      variants={sectionReveal}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: false, amount: 0.18 }}
-      className="relative overflow-hidden bg-[#102c66] py-20 text-white sm:py-24"
-    >
+    <section id="contact" className="relative overflow-hidden bg-[#102c66] py-20 text-white sm:py-24">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,156,255,0.18),_transparent_45%)]" />
       <div className="section-shell relative flex flex-col items-center text-center">
         <h2 className="max-w-4xl text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[2.4rem]">Ready to Transform Your Digital Presence?</h2>
@@ -789,6 +707,6 @@ export function ContactSection() {
           Contact Us Today
         </Link>
       </div>
-    </motion.section>
+    </section>
   );
 }
