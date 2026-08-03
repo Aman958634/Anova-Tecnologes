@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, Clock3, Code2, Cloud, Cpu, Globe, Mail, MapPin, Megaphone, Palette, Phone, PlayCircle, Smartphone, ShieldCheck } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { buildImageUrl, imageFallbackByKey } from '../utils/helpers';
 import { fallbackServices, fallbackTeam } from '../utils/siteData';
 import SectionHeading from './SectionHeading';
@@ -343,24 +343,24 @@ export function HeroSection() {
       <div className="section-shell relative py-14 sm:py-16 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 sm:gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <motion.div
-            initial={{ opacity: 0, x: 0 }}
+            initial={{ opacity: 0, x: -24 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.55, ease: 'easeOut' }}
-            className="mx-auto flex w-full max-w-[950px] flex-col items-center justify-center gap-6 text-center lg:max-w-[1000px]"
+            className="max-w-2xl lg:max-w-none"
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/95 shadow-[0_8px_30px_rgba(0,0,0,0.10)]">
               <span className="h-2.5 w-2.5 rounded-full bg-[#5ab4ff]" /> Premium IT Solutions Agency
             </span>
 
-            <h1 className="text-[2rem] font-semibold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <h1 className="mt-6 text-[2rem] font-semibold leading-tight tracking-tight text-white sm:mt-8 sm:text-5xl lg:text-6xl">
               Transforming Ideas into Powerful Digital Solutions
             </h1>
 
-            <p className="max-w-xl text-base leading-8 text-white/80 sm:text-lg">
+            <p className="mt-6 max-w-xl text-base leading-8 text-white/80 sm:text-lg">
               We build modern websites, mobile apps, and digital marketing strategies that help businesses grow faster.
             </p>
 
-            <div className="flex flex-row flex-wrap items-center justify-center gap-5">
+            <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center">
               <a href="#contact" className="inline-flex items-center justify-center rounded-full bg-[#2471ff] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#1f5fe6]">
                 Get Free Website Audit
               </a>
@@ -463,7 +463,14 @@ export function HomeServicesSection() {
   }, [fetchServices]);
 
   return (
-    <section id="services" className="bg-[#f3f5f8] py-12 text-slate-900 sm:py-14">
+    <motion.section
+      id="services"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: false, amount: 0.18 }}
+      className="bg-[#f3f5f8] py-12 text-slate-900 sm:py-14"
+    >
       <div className="section-shell">
         {error ? (
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -471,7 +478,7 @@ export function HomeServicesSection() {
             <button
               type="button"
               onClick={fetchServices}
-              className="rounded-md bg-amber-100 px-3 py-1.5 font-semibold text-amber-900"
+              className="rounded-md bg-amber-100 px-3 py-1.5 font-semibold text-amber-900 transition hover:bg-amber-200"
             >
               Retry
             </button>
@@ -486,11 +493,52 @@ export function HomeServicesSection() {
           </div>
         ) : null}
 
-        <div className={`${loading ? 'hidden ' : ''}grid gap-6 sm:grid-cols-2 xl:grid-cols-3`}>
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: false, amount: 0.16 }}
+          variants={gridVariants}
+          className={`${loading ? 'hidden ' : ''}grid gap-6 sm:grid-cols-2 xl:grid-cols-3`}
+        >
           {services.map((service) => (
-            <div key={service.id || service.title} className="group relative">
-              <div className="relative h-full overflow-hidden rounded-3xl border border-white/45 bg-white/82 p-[1px] shadow-[0_14px_38px_rgba(14,30,84,0.14)]">
-                <div className="relative h-full rounded-[22px] border border-[#d9e7ff]/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(243,248,255,0.88)_100%)] p-8">
+            <motion.div
+              key={service.id || service.title}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+              whileHover={{ y: -12, scale: 1.03 }}
+              className="group relative"
+            >
+              <motion.div
+                className="relative h-full overflow-hidden rounded-3xl border border-white/45 bg-white/82 p-[1px] shadow-[0_14px_38px_rgba(14,30,84,0.14)] transition-all duration-500 ease-out"
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                variants={{
+                  rest: {
+                    boxShadow: '0 14px 38px rgba(14,30,84,0.14)',
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.6), rgba(248,251,255,0.52))',
+                  },
+                  hover: {
+                    boxShadow: '0 24px 55px rgba(24,67,168,0.22)',
+                    background: 'linear-gradient(135deg, rgba(109,169,255,0.35), rgba(255,255,255,0.7))',
+                  }
+                }}
+              >
+                <motion.span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-[#82b3ff]/35 blur-2xl"
+                  animate={{ scale: [1, 1.15, 1], opacity: [0.45, 0.75, 0.45] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <motion.span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -bottom-14 -left-8 h-28 w-28 rounded-full bg-[#b7d2ff]/35 blur-2xl"
+                  animate={{ scale: [1.1, 0.95, 1.1], opacity: [0.35, 0.65, 0.35] }}
+                  transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+                />
+
+                <div className="relative h-full rounded-[22px] border border-[#d9e7ff]/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(243,248,255,0.88)_100%)] p-8 transition-all duration-500 ease-out group-hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(231,242,255,0.96)_100%)]">
                   <div className="space-y-5">
                     <ServiceIconVisual service={service} />
                     <h3 className="text-[16px] font-semibold leading-[1.35] text-[#162f63]">{service.title}</h3>
@@ -505,18 +553,18 @@ export function HomeServicesSection() {
                       ))}
                     </ul>
 
-                    <a href="#projects" className="mt-5 inline-flex items-center gap-2 text-[14px] font-semibold text-[#1f67ff]">
+                    <a href="#projects" className="mt-5 inline-flex items-center gap-2 text-[14px] font-semibold text-[#1f67ff] transition-all duration-500 ease-out group-hover:text-[#0d4fcf]">
                       Learn more
-                      <ArrowRight className="h-4 w-4" />
+                      <ArrowRight className="h-4 w-4 transition-all duration-500 ease-out group-hover:translate-x-1" />
                     </a>
                   </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
@@ -579,7 +627,14 @@ export function ServicesSection() {
     : `${services.length} services available`;
 
   return (
-    <section id="services" className="bg-white text-slate-900">
+    <motion.section
+      id="services"
+      variants={sectionReveal}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: false, amount: 0.2 }}
+      className="bg-white text-slate-900"
+    >
       <div className="bg-[#102c66] px-4 py-16 text-center text-white sm:py-20">
         <div className="mx-auto max-w-3xl">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">Our Services</h1>
@@ -608,9 +663,13 @@ export function ServicesSection() {
             const bullets = resolveFeatures(service);
 
             return (
-              <div
+              <motion.div
                 key={service.id || service.title}
-                className={`overflow-hidden rounded-[26px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)] lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-10 ${isReversed ? 'lg:grid-flow-col-dense lg:grid-cols-[0.95fr_1.05fr]' : ''}`}
+                initial={{ opacity: 0, y: 28, scale: 0.985 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.55, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                className={`card-animate overflow-hidden rounded-[26px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)] transition hover:shadow-[0_24px_55px_rgba(15,23,42,0.12)] lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-10 ${isReversed ? 'lg:grid-flow-col-dense lg:grid-cols-[0.95fr_1.05fr]' : ''}`}
               >
                 <div className="space-y-6">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#eef4ff] text-[#2f6df7] ring-1 ring-[#dbe6ff]">
@@ -661,7 +720,7 @@ export function ServicesSection() {
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
@@ -684,7 +743,7 @@ export function ServicesSection() {
           </div>
         </div>
       )}
-    </section>
+    </motion.section>
   );
 }
 
