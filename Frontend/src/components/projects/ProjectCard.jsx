@@ -13,7 +13,7 @@ function ProjectCard({ project, index, liked, onToggleLike, mobileReduced }) {
     <div className="h-full">
       <article
         ref={cardRef}
-        className="group relative h-full overflow-hidden rounded-[20px] border border-[#E5E7EB] bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)]"
+        className="group relative h-full overflow-hidden rounded-[20px] border border-[#D6E2F3] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]"
       >
         <div className="relative z-10">
           <ProjectImage project={project} mobileReduced={mobileReduced} />
@@ -34,7 +34,7 @@ function ProjectCard({ project, index, liked, onToggleLike, mobileReduced }) {
           </button>
         </div>
 
-        <div className="relative z-10 p-5">
+        <div className="relative z-10 p-5 bg-[#E9EFFA]">
           <div className="-mt-9 mb-4 inline-grid h-12 w-12 place-items-center rounded-[14px] bg-gray-50 text-slate-900 shadow-sm">
             <CardIcon className="h-5 w-5" />
           </div>
