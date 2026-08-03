@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
@@ -25,18 +24,8 @@ export default function Login() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
-      className="section-shell flex min-h-[80vh] items-center justify-center py-16"
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.35, delay: 0.05, ease: 'easeOut' }}
-        className="w-full max-w-md rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(11,37,91,0.96),rgba(14,44,104,0.96))] p-8 shadow-[0_28px_80px_rgba(5,20,50,0.35)]"
-      >
+    <div className="section-shell flex min-h-[80vh] items-center justify-center py-16">
+      <div className="w-full max-w-md rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(11,37,91,0.96),rgba(14,44,104,0.96))] p-8 shadow-[0_28px_80px_rgba(5,20,50,0.35)]">
         <div className="mb-6 flex items-center gap-3">
           <img
             src="/logoanova-white.webp"
@@ -81,7 +70,7 @@ export default function Login() {
           <button className="btn-primary justify-center" disabled={loading}>{loading ? 'Signing in...' : 'Login'}</button>
         </form>
         <p className="mt-4 text-sm text-slate-300">Default admin credentials are seeded from the backend .env file.</p>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }

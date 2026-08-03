@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import { fallbackServices } from '../utils/siteData';
-import { useMediaQuery } from '../utils/helpers';
 
 const SLIDE_INTERVAL = 3500;
 
@@ -14,8 +12,6 @@ export default function ServiceShowcase() {
   const [current, setCurrent] = useState(0);
   const [paused, setPaused] = useState(false);
   const [autoRestart, setAutoRestart] = useState(true);
-  const isMobile = useMediaQuery('(max-width: 640px)');
-  const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const intervalRef = useRef(null);
 
   const fetchServices = useCallback(async () => {
@@ -46,10 +42,10 @@ export default function ServiceShowcase() {
   }, [services.length]);
 
   useEffect(() => {
-    if (!autoRestart || paused || prefersReducedMotion) return;
+    if (!autoRestart || paused) return;
     intervalRef.current = window.setInterval(next, SLIDE_INTERVAL);
     return () => window.clearInterval(intervalRef.current);
-  }, [next, paused, autoRestart, services.length, prefersReducedMotion]);
+  }, [next, paused, autoRestart, services.length]);
 
   const handleRestart = () => {
     setCurrent(0);
@@ -105,12 +101,8 @@ export default function ServiceShowcase() {
         ) : null}
 
         {/* Showcase Card */}
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: isMobile ? 10 : 18 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.25 }}
-          transition={{ duration: 0.45, ease: 'easeOut' }}
-          className="card-animate relative overflow-hidden rounded-[24px] shadow-[0_24px_60px_rgba(10,30,90,0.28)]"
+        <div
+          className="relative overflow-hidden rounded-[24px] shadow-[0_24px_60px_rgba(10,30,90,0.28)]"
           style={{ background: 'linear-gradient(135deg,#081f55 0%,#0a2a66 45%,#0b2f74 100%)' }}
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => { if (autoRestart) setPaused(false); }}
@@ -136,28 +128,19 @@ export default function ServiceShowcase() {
 
           {/* Service content */}
           <div className="relative flex min-h-[340px] flex-col items-center justify-center px-6 py-20 text-center sm:min-h-[400px]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={current}
-                initial={prefersReducedMotion ? false : { opacity: 0, y: isMobile ? 8 : 22 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: isMobile ? -8 : -14 }}
-                transition={{ duration: 0.42, ease: 'easeOut' }}
-                className="space-y-5"
-              >
-                <p className="font-mono text-xs font-semibold uppercase tracking-[0.36em] text-[#7aaeff]">
-                  // Service {padded}
+            <div className="space-y-5">
+              <p className="font-mono text-xs font-semibold uppercase tracking-[0.36em] text-[#7aaeff]">
+                // Service {padded}
+              </p>
+              <h3 className="max-w-2xl text-4xl font-bold leading-[1.06] text-white sm:text-6xl">
+                {service.title}
+              </h3>
+              {service.description ? (
+                <p className="mx-auto max-w-lg text-[15px] leading-7 text-white/60 line-clamp-2">
+                  {service.description}
                 </p>
-                <h3 className="max-w-2xl text-4xl font-bold leading-[1.06] text-white sm:text-6xl">
-                  {service.title}
-                </h3>
-                {service.description ? (
-                  <p className="mx-auto max-w-lg text-[15px] leading-7 text-white/60 line-clamp-2">
-                    {service.description}
-                  </p>
-                ) : null}
-              </motion.div>
-            </AnimatePresence>
+              ) : null}
+            </div>
           </div>
 
           {/* Bottom controls */}
@@ -197,7 +180,7 @@ export default function ServiceShowcase() {
               {padded} / {String(services.length).padStart(2, '0')}
             </span>
           </div>
-        </motion.div>
+        </div>
 
       </div>
     </section>
