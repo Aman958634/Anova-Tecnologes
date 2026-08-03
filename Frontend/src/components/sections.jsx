@@ -577,19 +577,19 @@ export function ProjectsSection() {
   return (
     <section
       id="projects"
-      className="bg-[#f0f3fa] py-16 text-slate-900 sm:py-20"
+      className="bg-white py-16 text-slate-900 sm:py-20"
     >
       <div className="section-shell space-y-10">
 
         {/* Header */}
         <div className="mx-auto max-w-2xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[#c6d4ff] bg-white px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#2f6df7]">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-700">
             Our Work
           </span>
-          <h2 className="mt-4 text-4xl font-bold tracking-tight text-[#0f1b3f] sm:text-5xl">
-            Our <span className="text-[#2f6df7]">Projects</span>
+          <h2 className="mt-4 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+            Our Projects
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-[15px] leading-7 text-[#4d5f84]">
+          <p className="mx-auto mt-3 max-w-xl text-[15px] leading-7 text-slate-600">
             We build digital solutions that drive growth and make a real impact for our clients.
           </p>
         </div>
