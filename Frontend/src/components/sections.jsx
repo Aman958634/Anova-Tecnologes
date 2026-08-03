@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, Clock3, Code2, Cloud, Cpu, Globe, Mail, MapPin, Megaphone, Palette, Phone, PlayCircle, Smartphone, ShieldCheck } from 'lucide-react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { buildImageUrl, imageFallbackByKey } from '../utils/helpers';
 import { fallbackServices, fallbackTeam } from '../utils/siteData';
 import SectionHeading from './SectionHeading';
@@ -114,225 +114,24 @@ function ServiceIconVisual({ service }) {
   const kind = getServiceKind(service);
   const config = SERVICE_KIND_CONFIG[kind] || SERVICE_KIND_CONFIG.default;
   const Icon = config.icon;
-  const magneticX = useMotionValue(0);
-  const magneticY = useMotionValue(0);
-  const smoothX = useSpring(magneticX, { stiffness: 190, damping: 16, mass: 0.3 });
-  const smoothY = useSpring(magneticY, { stiffness: 190, damping: 16, mass: 0.3 });
-  const tiltX = useTransform(smoothY, [-14, 14], [8, -8]);
-  const tiltY = useTransform(smoothX, [-14, 14], [-8, 8]);
-  const glowShiftX = useTransform(smoothX, [-14, 14], ['35%', '65%']);
-  const glowShiftY = useTransform(smoothY, [-14, 14], ['40%', '60%']);
-
-  const particlePalette =
-    kind === 'ai'
-      ? 'bg-[#b68bff]/70'
-      : kind === 'marketing'
-      ? 'bg-[#ffb37d]/70'
-      : 'bg-[#9cc8ff]/70';
-
-  const particles = [
-    { top: '10%', left: '16%', delay: 0, duration: 3.2, size: 'h-1.5 w-1.5' },
-    { top: '20%', right: '12%', delay: 0.4, duration: 3.8, size: 'h-1 w-1' },
-    { bottom: '19%', left: '14%', delay: 0.8, duration: 4.2, size: 'h-1.5 w-1.5' },
-    { bottom: '14%', right: '15%', delay: 0.2, duration: 3.5, size: 'h-1 w-1' },
-    { top: '45%', left: '7%', delay: 1.1, duration: 4.4, size: 'h-1 w-1' },
-    { top: '56%', right: '8%', delay: 0.6, duration: 3.1, size: 'h-1.5 w-1.5' },
-  ];
-
-  const onMagneticMove = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const offsetX = event.clientX - (rect.left + rect.width / 2);
-    const offsetY = event.clientY - (rect.top + rect.height / 2);
-    magneticX.set(Math.max(-14, Math.min(14, offsetX * 0.18)));
-    magneticY.set(Math.max(-14, Math.min(14, offsetY * 0.18)));
-  };
-
-  const resetMagnetic = () => {
-    magneticX.set(0);
-    magneticY.set(0);
-  };
 
   return (
-    <motion.div
-      className="relative"
-      style={{ perspective: 1000 }}
-      onMouseMove={onMagneticMove}
-      onMouseLeave={resetMagnetic}
-      whileHover={{ scale: 1.04 }}
-      transition={{ duration: 0.45, ease: 'easeOut' }}
-    >
-      <motion.span
-        aria-hidden="true"
-        className="pointer-events-none absolute -inset-8 rounded-[30px] bg-[radial-gradient(circle_at_center,rgba(76,156,255,0.34),rgba(76,156,255,0)_70%)] blur-2xl"
-        style={{
-          opacity: 0.82,
-          backgroundPositionX: glowShiftX,
-          backgroundPositionY: glowShiftY,
-        }}
-        animate={{ opacity: [0.65, 0.95, 0.65], scale: [1, 1.1, 1] }}
-        transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
-      />
-
-      <motion.div
-        animate={{
-          y: [0, -6, 0],
-          rotate: kind === 'mobile' ? [0, 5, -3, 0] : kind === 'web' ? [0, 360] : 0,
-          scale: kind === 'ai' ? [1, 1.06, 1] : 1,
-        }}
-        transition={{
-          duration: kind === 'web' ? 10 : 4,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
-        style={{
-          x: smoothX,
-          y: smoothY,
-          rotateX: tiltX,
-          rotateY: tiltY,
-          transformStyle: 'preserve-3d',
-        }}
-        className="relative grid h-[78px] w-[78px] place-items-center rounded-[22px] border border-white/45 bg-white/28 shadow-[0_18px_40px_rgba(16,56,140,0.28),inset_0_1px_0_rgba(255,255,255,0.65)]"
-      >
-        <motion.span
+    <div className="relative">
+      <div className="relative grid h-[78px] w-[78px] place-items-center rounded-[22px] border border-white/45 bg-white/28 shadow-[0_18px_40px_rgba(16,56,140,0.28),inset_0_1px_0_rgba(255,255,255,0.65)]">
+        <span
           aria-hidden="true"
           className={`pointer-events-none absolute inset-[2px] rounded-[20px] bg-gradient-to-br ${config.shellClass}`}
-          style={{ backgroundSize: '240% 240%' }}
-          animate={{
-            backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-          }}
-          transition={{ duration: 6.4, repeat: Infinity, ease: 'easeInOut' }}
         />
-
-        <motion.span
+        <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-[1px] rounded-[21px] border border-white/35"
-          animate={{ opacity: [0.45, 0.75, 0.45] }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        <motion.span
-          aria-hidden="true"
-          className="pointer-events-none absolute -inset-[1px] rounded-[22px]"
-          animate={{
-            boxShadow: [
-              '0 0 0 rgba(73,142,255,0.24)',
-              '0 0 26px rgba(73,142,255,0.44)',
-              '0 0 0 rgba(73,142,255,0.24)'
-            ]
-          }}
-          transition={{ duration: 3.1, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
-        {particles.map((particle, index) => (
-          <motion.span
-            key={`${kind}-particle-${index}`}
-            aria-hidden="true"
-            className={`pointer-events-none absolute ${particle.size} ${particlePalette} rounded-full blur-[1px]`}
-            style={particle}
-            animate={{
-              y: [0, -8, 0],
-              x: [0, index % 2 === 0 ? 3 : -3, 0],
-              opacity: [0.25, 0.85, 0.25],
-              scale: [0.9, 1.35, 0.9],
-            }}
-            transition={{
-              duration: particle.duration,
-              delay: particle.delay,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-          />
-        ))}
-
-        <motion.div
-          className="absolute inset-[10px] rounded-[14px] bg-white/14 blur-md"
-          animate={{ opacity: [0.22, 0.4, 0.22] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
-        <motion.div
-          className="relative z-10"
-          animate={{
-            scale: [1, 1.08, 1],
-          }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-        >
+        <div className="relative z-10">
           <Icon className="h-8 w-8" />
-        </motion.div>
-
-        {kind === 'cloud' ? (
-          <>
-            <motion.span
-              aria-hidden="true"
-              className="pointer-events-none absolute left-[8px] top-[10px] h-[5px] w-[5px] rounded-full bg-white/85"
-              animate={{ y: [0, -7, 0], x: [0, 2, 0], opacity: [0.25, 1, 0.25] }}
-              transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <motion.span
-              aria-hidden="true"
-              className="pointer-events-none absolute right-[10px] bottom-[11px] h-[4px] w-[4px] rounded-full bg-white/80"
-              animate={{ y: [0, -8, 0], x: [0, -3, 0], opacity: [0.2, 1, 0.2] }}
-              transition={{ duration: 2.3, repeat: Infinity, ease: 'easeInOut', delay: 0.45 }}
-            />
-            <motion.span
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 rounded-[20px] border border-[#72a8ff]/45"
-              animate={{ scale: [1, 1.14, 1], opacity: [0.5, 0.1, 0.5] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          </>
-        ) : null}
-
-        {kind === 'ai' ? (
-          <>
-            <motion.span
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-[5px] rounded-[16px] border border-[#8f64f0]/55"
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 7, repeat: Infinity, ease: 'linear' }}
-            />
-            <motion.span
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-[11px] rounded-[12px] border border-[#6a42d6]/55"
-              animate={{ rotate: [360, 0] }}
-              transition={{ duration: 5.5, repeat: Infinity, ease: 'linear' }}
-            />
-          </>
-        ) : null}
-
-        {kind === 'marketing' ? (
-          <>
-            <motion.span
-              aria-hidden="true"
-              className="pointer-events-none absolute right-[-9px] top-[21px] h-3 w-3 rounded-full border border-[#ffb37d]/75"
-              animate={{ scale: [1, 1.8, 2.3], opacity: [0.6, 0.35, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
-            />
-            <motion.span
-              aria-hidden="true"
-              className="pointer-events-none absolute right-[-14px] top-[17px] h-5 w-5 rounded-full border border-[#ffb37d]/55"
-              animate={{ scale: [1, 1.7, 2.15], opacity: [0.45, 0.25, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut', delay: 0.5 }}
-            />
-          </>
-        ) : null}
-
-        {kind === 'uiux' ? (
-          <motion.span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 rounded-[20px]"
-            animate={{
-              boxShadow: [
-                '0 0 0px rgba(246,86,173,0.25)',
-                '0 0 24px rgba(246,86,173,0.45)',
-                '0 0 0px rgba(86,160,246,0.25)',
-              ]
-            }}
-            transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        ) : null}
-      </motion.div>
-    </motion.div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -401,20 +200,6 @@ export function HomeServicesSection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const cardVariants = serviceCardReveal;
-
-  const gridVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.08,
-        delayChildren: 0.08
-      }
-    }
-  };
-
-
   const normalizedFeatures = (service) => {
     if (Array.isArray(service.key_features)) return service.key_features.filter(Boolean);
     if (typeof service.key_features === 'string') {
@@ -463,12 +248,8 @@ export function HomeServicesSection() {
   }, [fetchServices]);
 
   return (
-    <motion.section
+    <section
       id="services"
-      variants={sectionReveal}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: false, amount: 0.18 }}
       className="bg-[#f3f5f8] py-12 text-slate-900 sm:py-14"
     >
       <div className="section-shell">
@@ -493,52 +274,11 @@ export function HomeServicesSection() {
           </div>
         ) : null}
 
-        <motion.div
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: false, amount: 0.16 }}
-          variants={gridVariants}
-          className={`${loading ? 'hidden ' : ''}grid gap-6 sm:grid-cols-2 xl:grid-cols-3`}
-        >
+        <div className={`${loading ? 'hidden ' : ''}grid gap-6 sm:grid-cols-2 xl:grid-cols-3`}>
           {services.map((service) => (
-            <motion.div
-              key={service.id || service.title}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -12, scale: 1.03 }}
-              className="group relative"
-            >
-              <motion.div
-                className="relative h-full overflow-hidden rounded-3xl border border-white/45 bg-white/82 p-[1px] shadow-[0_14px_38px_rgba(14,30,84,0.14)] transition-all duration-500 ease-out"
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-                variants={{
-                  rest: {
-                    boxShadow: '0 14px 38px rgba(14,30,84,0.14)',
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.6), rgba(248,251,255,0.52))',
-                  },
-                  hover: {
-                    boxShadow: '0 24px 55px rgba(24,67,168,0.22)',
-                    background: 'linear-gradient(135deg, rgba(109,169,255,0.35), rgba(255,255,255,0.7))',
-                  }
-                }}
-              >
-                <motion.span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-[#82b3ff]/35 blur-2xl"
-                  animate={{ scale: [1, 1.15, 1], opacity: [0.45, 0.75, 0.45] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                />
-                <motion.span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -bottom-14 -left-8 h-28 w-28 rounded-full bg-[#b7d2ff]/35 blur-2xl"
-                  animate={{ scale: [1.1, 0.95, 1.1], opacity: [0.35, 0.65, 0.35] }}
-                  transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
-                />
-
-                <div className="relative h-full rounded-[22px] border border-[#d9e7ff]/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(243,248,255,0.88)_100%)] p-8 transition-all duration-500 ease-out group-hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(231,242,255,0.96)_100%)]">
+            <div key={service.id || service.title} className="group relative">
+              <div className="relative h-full overflow-hidden rounded-3xl border border-white/45 bg-white/82 p-[1px] shadow-[0_14px_38px_rgba(14,30,84,0.14)]">
+                <div className="relative h-full rounded-[22px] border border-[#d9e7ff]/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(243,248,255,0.88)_100%)] p-8">
                   <div className="space-y-5">
                     <ServiceIconVisual service={service} />
                     <h3 className="text-[16px] font-semibold leading-[1.35] text-[#162f63]">{service.title}</h3>
@@ -553,18 +293,18 @@ export function HomeServicesSection() {
                       ))}
                     </ul>
 
-                    <a href="#projects" className="mt-5 inline-flex items-center gap-2 text-[14px] font-semibold text-[#1f67ff] transition-all duration-500 ease-out group-hover:text-[#0d4fcf]">
+                    <a href="#projects" className="mt-5 inline-flex items-center gap-2 text-[14px] font-semibold text-[#1f67ff]">
                       Learn more
-                      <ArrowRight className="h-4 w-4 transition-all duration-500 ease-out group-hover:translate-x-1" />
+                      <ArrowRight className="h-4 w-4" />
                     </a>
                   </div>
                 </div>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
 
@@ -627,14 +367,7 @@ export function ServicesSection() {
     : `${services.length} services available`;
 
   return (
-    <motion.section
-      id="services"
-      variants={sectionReveal}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: false, amount: 0.2 }}
-      className="bg-white text-slate-900"
-    >
+    <section id="services" className="bg-white text-slate-900">
       <div className="bg-[#102c66] px-4 py-16 text-center text-white sm:py-20">
         <div className="mx-auto max-w-3xl">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">Our Services</h1>
@@ -663,13 +396,9 @@ export function ServicesSection() {
             const bullets = resolveFeatures(service);
 
             return (
-              <motion.div
+              <div
                 key={service.id || service.title}
-                initial={{ opacity: 0, y: 28, scale: 0.985 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: false, amount: 0.2 }}
-                transition={{ duration: 0.55, delay: index * 0.06, ease: [0.22, 1, 0.36, 1] }}
-                className={`card-animate overflow-hidden rounded-[26px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)] transition hover:shadow-[0_24px_55px_rgba(15,23,42,0.12)] lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-10 ${isReversed ? 'lg:grid-flow-col-dense lg:grid-cols-[0.95fr_1.05fr]' : ''}`}
+                className={`overflow-hidden rounded-[26px] border border-slate-200 bg-white p-6 shadow-[0_20px_45px_rgba(15,23,42,0.08)] lg:grid lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-10 ${isReversed ? 'lg:grid-flow-col-dense lg:grid-cols-[0.95fr_1.05fr]' : ''}`}
               >
                 <div className="space-y-6">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#eef4ff] text-[#2f6df7] ring-1 ring-[#dbe6ff]">
@@ -720,7 +449,7 @@ export function ServicesSection() {
                     )}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -743,7 +472,7 @@ export function ServicesSection() {
           </div>
         </div>
       )}
-    </motion.section>
+    </section>
   );
 }
 
