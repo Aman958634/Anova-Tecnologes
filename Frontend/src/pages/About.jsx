@@ -95,7 +95,7 @@ export default function About() {
           <h3 className="text-[0.95rem] font-bold tracking-tight text-[#163c88]">{member.name}</h3>
           <p className="mt-1 text-xs text-slate-500">{member.designation}</p>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
@@ -149,7 +149,7 @@ export default function About() {
               />
             </div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
       <section className="border-t border-slate-200 bg-white py-16 sm:py-20">

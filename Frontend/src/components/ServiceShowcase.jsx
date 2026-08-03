@@ -184,7 +184,7 @@ export default function ServiceShowcase() {
               {padded} / {String(services.length).padStart(2, '0')}
             </span>
           </div>
-        </motion.div>
+        </div>
 
       </div>
     </section>
