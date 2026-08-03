@@ -83,8 +83,8 @@ export default function Home() {
         url="/"
         schema={[orgSchema, serviceSchema]}
       />
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#071c46] via-[#0a2c72] to-[#0f3a92] min-h-[calc(100vh-5rem)] px-4 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1000px] flex-col items-center justify-center text-center">
+      <section className="relative flex min-h-[calc(100vh-80px)] items-center justify-center overflow-hidden bg-gradient-to-b from-[#071c46] via-[#0a2c72] to-[#0f3a92] px-4 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-full max-w-[1000px] flex-col items-center justify-center text-center">
           <p className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs tracking-[0.14em] text-white/85">
             Build. Grow. Transform.
           </p>
