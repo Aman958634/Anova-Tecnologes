@@ -84,17 +84,17 @@ export default function Home() {
         schema={[orgSchema, serviceSchema]}
       />
       <section className="relative overflow-hidden bg-gradient-to-b from-[#071c46] via-[#0a2c72] to-[#0f3a92] px-6 pb-16 pt-28 text-white sm:px-10">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto flex max-w-[700px] flex-col items-center justify-center text-center">
           <p className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs tracking-[0.14em] text-white/85">
             Build. Grow. Transform.
           </p>
           <h1 className="mt-5 max-w-4xl text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
             Custom Web And Software Solutions Built For Business Growth
           </h1>
-          <p className="mt-5 max-w-2xl text-base text-blue-100 sm:text-lg">
+          <p className="mt-5 max-w-[680px] text-base text-blue-100 sm:text-lg">
             ANOVA Technologies helps startups and enterprises launch fast, scalable digital products with modern engineering and measurable outcomes.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               to="/contact"
               className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[#0a2c72] transition hover:bg-blue-100"
