@@ -343,24 +343,24 @@ export function HeroSection() {
       <div className="section-shell relative py-14 sm:py-16 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-10 sm:gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <motion.div
-            initial={{ opacity: 0, x: -24 }}
+            initial={{ opacity: 0, x: 0 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.55, ease: 'easeOut' }}
-            className="max-w-2xl lg:max-w-none"
+            className="mx-auto flex w-full max-w-[950px] flex-col items-center justify-center gap-6 text-center lg:max-w-[1000px]"
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white/95 shadow-[0_8px_30px_rgba(0,0,0,0.10)]">
               <span className="h-2.5 w-2.5 rounded-full bg-[#5ab4ff]" /> Premium IT Solutions Agency
             </span>
 
-            <h1 className="mt-6 text-[2rem] font-semibold leading-tight tracking-tight text-white sm:mt-8 sm:text-5xl lg:text-6xl">
+            <h1 className="text-[2rem] font-semibold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
               Transforming Ideas into Powerful Digital Solutions
             </h1>
 
-            <p className="mt-6 max-w-xl text-base leading-8 text-white/80 sm:text-lg">
+            <p className="max-w-xl text-base leading-8 text-white/80 sm:text-lg">
               We build modern websites, mobile apps, and digital marketing strategies that help businesses grow faster.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:items-center">
+            <div className="flex flex-row flex-wrap items-center justify-center gap-5">
               <a href="#contact" className="inline-flex items-center justify-center rounded-full bg-[#2471ff] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#1f5fe6]">
                 Get Free Website Audit
               </a>
