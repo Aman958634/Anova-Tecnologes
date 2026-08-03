@@ -83,18 +83,18 @@ export default function Home() {
         url="/"
         schema={[orgSchema, serviceSchema]}
       />
-      <section className="relative overflow-hidden bg-gradient-to-b from-[#071c46] via-[#0a2c72] to-[#0f3a92] px-4 pb-16 pt-24 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-[1000px] flex-col items-center justify-center text-center">
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#071c46] via-[#0a2c72] to-[#0f3a92] min-h-[calc(100vh-5rem)] px-4 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[1000px] flex-col items-center justify-center text-center">
           <p className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs tracking-[0.14em] text-white/85">
             Build. Grow. Transform.
           </p>
-          <h1 className="mt-5 max-w-4xl text-center text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
+          <h1 className="mt-[20px] max-w-4xl text-center text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
             Custom Web And Software Solutions Built For Business Growth
           </h1>
-          <p className="mt-5 max-w-2xl text-center text-base text-blue-100 sm:text-lg">
+          <p className="mt-[24px] max-w-2xl text-center text-base text-blue-100 sm:text-lg">
             ANOVA Technologies helps startups and enterprises launch fast, scalable digital products with modern engineering and measurable outcomes.
           </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-[20px]">
+          <div className="mt-[32px] flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-[20px]">
             <Link
               to="/contact"
               className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[#0a2c72] transition hover:bg-blue-100"

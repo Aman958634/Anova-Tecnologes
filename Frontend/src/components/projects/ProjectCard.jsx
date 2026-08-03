@@ -13,12 +13,12 @@ function ProjectCard({ project, index, liked, onToggleLike, mobileReduced }) {
     <div className="h-full">
       <article
         ref={cardRef}
-        className="group relative h-full overflow-hidden rounded-[20px] border border-[#D6E2F3] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]"
+        className="group relative h-full overflow-hidden rounded-[20px] border border-[#202020] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]"
       >
         <div className="relative z-10">
           <ProjectImage project={project} mobileReduced={mobileReduced} />
 
-          <span className="absolute left-3 top-3 rounded-full border border-[#E5E7EB] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-700">
+          <span className="absolute left-3 top-3 rounded-full border border-[#202020] bg-white px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-700">
             {tags[0]}
           </span>
 
