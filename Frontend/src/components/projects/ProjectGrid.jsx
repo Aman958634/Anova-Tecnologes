@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import ProjectCard from './ProjectCard';
+import { gridStagger } from './animationUtils';
 
 export default function ProjectGrid({ projects }) {
   const [liked, setLiked] = useState({});
@@ -19,7 +21,13 @@ export default function ProjectGrid({ projects }) {
   }, []);
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <motion.div
+      variants={gridStagger}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: false, amount: 0.16 }}
+      className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+    >
       {data.map((project, index) => (
         <ProjectCard
           key={project.id || project.title}
@@ -30,6 +38,6 @@ export default function ProjectGrid({ projects }) {
           mobileReduced={mobileReduced}
         />
       ))}
-    </div>
+    </motion.div>
   );
 }

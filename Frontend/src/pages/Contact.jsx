@@ -10,6 +10,7 @@ import {
   PhoneCall,
   Send
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import SEO from '../components/SEO';
@@ -128,16 +129,26 @@ export default function Contact() {
       <div className="bg-white text-slate-900">
       <section className="bg-white">
         <div className="bg-[#102c66] px-4 py-16 text-center text-white sm:py-20">
-          <div className="mx-auto max-w-3xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45 }}
+            className="mx-auto max-w-3xl"
+          >
             <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">Get In Touch</h1>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
               Ready to transform your business? Contact us today to discuss your digital needs. Our team is ready to help you succeed online.
             </p>
-          </div>
+          </motion.div>
         </div>
 
         <div className="section-shell py-14 sm:py-16 lg:py-20">
-          <div className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.05 }}
+            className="grid gap-10 lg:grid-cols-[0.88fr_1.12fr] lg:items-start"
+          >
             <aside>
               <p className="text-3xl font-semibold tracking-tight text-[#163c88] sm:text-[2.1rem]">Contact Info</p>
               <p className="mt-4 max-w-sm text-sm leading-7 text-slate-600">
@@ -209,7 +220,7 @@ export default function Contact() {
                 {status === 'error' ? <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{errorMessage}</p> : null}
               </form>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
       </div>
