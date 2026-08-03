@@ -577,7 +577,7 @@ export function ProjectsSection() {
   return (
     <section
       id="projects"
-      className="bg-white py-16 text-slate-900 sm:py-20"
+      className="bg-[#F3F5F8] py-16 text-slate-900 sm:py-20"
     >
       <div className="section-shell space-y-10">
 
