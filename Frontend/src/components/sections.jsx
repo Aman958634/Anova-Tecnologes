@@ -315,8 +315,8 @@ export function ServicesSection() {
 
   return (
     <section id="services" className="bg-white text-slate-900">
-      <div className="section-shell space-y-10">
-        <div className="mx-auto max-w-2xl text-center">
+      <div className="section-shell py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-2xl text-center relative z-20">
           <span className="inline-flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-700">
             OUR SERVICES
           </span>
@@ -327,9 +327,6 @@ export function ServicesSection() {
             We deliver innovative digital solutions that help businesses grow, scale, and succeed.
           </p>
         </div>
-      </div>
-
-      <div className="section-shell py-16 sm:py-20 lg:py-24">
         <div className="mb-8 flex flex-wrap items-center gap-3 text-sm text-slate-600">
           <span>{statusMessage}</span>
           {error ? (
