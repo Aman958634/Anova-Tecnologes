@@ -315,11 +315,16 @@ export function ServicesSection() {
 
   return (
     <section id="services" className="bg-white text-slate-900">
-      <div className="bg-[#102c66] px-4 py-16 text-center text-white sm:py-20">
-        <div className="mx-auto max-w-3xl">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-5xl">Our Services</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
-            Comprehensive digital solutions to accelerate your business growth. We combine technical expertise with industry best practices to deliver outstanding results.
+      <div className="section-shell space-y-10">
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-700">
+            OUR SERVICES
+          </span>
+          <h2 className="mt-4 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
+            Our Services
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-[15px] leading-7 text-slate-600">
+            We deliver innovative digital solutions that help businesses grow, scale, and succeed.
           </p>
         </div>
       </div>
