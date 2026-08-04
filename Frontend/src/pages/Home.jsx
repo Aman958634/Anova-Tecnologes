@@ -89,7 +89,8 @@ export default function Home() {
             Build. Grow. Transform.
           </p>
           <h1 className="mt-[20px] max-w-4xl text-center text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
-            Custom Web And Software Solutions Built For Business Growth
+            𝗖𝘂𝘀𝘁𝗼𝗺 𝗪𝗲𝗯 & 𝗦𝗼𝗳𝘁𝘄𝗮𝗿𝗲 𝗦𝗼𝗹𝘂𝘁𝗶𝗼𝗻𝘀
+                   𝗕𝘂𝗶𝗹𝘁 𝗳𝗼𝗿 𝗕𝘂𝘀𝗶𝗻𝗲𝘀𝘀 𝗚𝗿𝗼𝘄𝘁𝗵
           </h1>
           <p className="mt-[24px] max-w-2xl text-center text-base text-blue-100 sm:text-lg">
             ANOVA Technologies helps startups and enterprises launch fast, scalable digital products with modern engineering and measurable outcomes.
